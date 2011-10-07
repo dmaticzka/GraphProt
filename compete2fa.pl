@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/local/perl/bin/perl
 use feature ':5.10';
 use strict 'vars';
 use warnings;
@@ -15,7 +15,7 @@ createFasta.pl
 
 =head1 SYNOPSIS
 
-usage: createFasta.pl [List of files]
+usage: createFasta.pl --target-dir=DIR [List of files]
 
 takes RNAcompete text files with affinity and writes accompanying fasta
 file with same basename including numbered id and affinity within second
@@ -23,6 +23,7 @@ field after id
 
 Options:
 
+	-target-dir write fasta output to this directory
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -48,7 +49,9 @@ Options:
 ###############################################################################
 my $help;
 my $man;
-my $result = GetOptions (	"help"	=> \$help,
+my $dir;
+my $result = GetOptions (	"target-dir=s"	=> \$dir,
+							"help"	=> \$help,
 							"man"	=> \$man);
 pod2usage(-exitstatus => 1, -verbose => 1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
@@ -60,11 +63,11 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 while (my $fname = shift @ARGV) {
 	my ( $prefix, $path, $suffix ) = fileparse( $fname, "\.[^.]*" );
-	my $ofname = "$path$prefix.fa";
+	my $ofname = "$prefix.fa";
 	my $i = 1;
 	
 	open IN, $fname or die "error: $!";
-	open OUT, ">", $ofname or die "error: $!";
+	open OUT, ">", "$dir/$ofname" or die "error: $!";
 	
 	while (my $line = <IN>) {
 		chomp $line;
