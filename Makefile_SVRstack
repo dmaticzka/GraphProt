@@ -4,7 +4,7 @@
 .SECONDARY:
 
 # parameters:
-EXPERIMENT_ID:=svr_shrep
+EXPERIMENT_ID:=svr_stack
 R:=3
 D:=6
 b:=11
@@ -15,6 +15,7 @@ FA_DIR:=~/projects/RBPaffinity/data/fasta/
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
+FA2SHREP:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
@@ -23,17 +24,14 @@ PERF:=~/src/stat/perf
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 #PROTEINS:=test
 #PROTEINS:=U1A
-BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
-			$(patsubst %,%_data_full_B,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) $(patsubst %,%_data_full_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
-all: results_aucpr.csv $(AUC_FILES) $(PERF_FILES)
+all: $(AUC_FILES) $(PERF_FILES)
 
 %.gspan : $(FA_DIR)/%.fa
-	/usr/local/perl/bin/perl $(ROOT)/bin/create_shrep/RNAtools/fasta2shrep_gspan.pl -fa $< \
+	/usr/local/perl/bin/perl $(FA2SHREP) -fa $< -stdout -stack \
 	-t 3 -M 5 -wins 50 -shift 10 > $@
 
 %.feature : %.gspan %.affy
@@ -47,39 +45,25 @@ all: results_aucpr.csv $(AUC_FILES) $(PERF_FILES)
 	-rm -rf $@.tmp # clean up affinityless feature file
 
 %.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$NF}' > $@
+	# extract affinities from fasta
+	cat $(FA_DIR)/$*.fa | grep '^>' | awk '{print $$2}' > $@
 
 %.model : %.feature
 	$(SVRTRAIN) $< $@
 
-%full_B.svrout : %full_B.model %full_A.feature
-	$(SVRPREDICT) $*full_A.feature $< $@
+%_B.svrout : %_B.model %_A.feature
+	$(SVRPREDICT) $*_A.feature $< $@
 
-%full_A.svrout : %full_A.model %full_B.feature
-	$(SVRPREDICT) $*full_B.feature $< $@
+%_A.svrout : %_A.model %_B.feature
+	$(SVRPREDICT) $*_B.feature $< $@
 
-%full_A.pred : %full_A.svrout %full_B.affy
+%_A.pred : %_A.svrout %_B.affy
 	# combine affinities and predictions
-	paste $*full_B.affy $< > $@
+	paste $*_B.affy $< > $@
 
-%full_B.pred : %full_B.svrout %full_A.affy
+%_B.pred : %_B.svrout %_A.affy
 	# combine affinities and predictions
-	paste $*full_A.affy $< > $@
-
-%bruijn_B.svrout : %bruijn_B.model %full_A.feature
-	$(SVRPREDICT) $*full_A.feature $< $@
-
-%bruijn_A.svrout : %bruijn_A.model %full_B.feature
-	$(SVRPREDICT) $*full_B.feature $< $@
-
-%bruijn_A.pred : %bruijn_A.svrout %full_B.affy
-	# combine affinities and predictions
-	paste $*full_B.affy $< > $@
-
-%bruijn_B.pred : %bruijn_B.svrout %full_A.affy
-	# combine affinities and predictions
-	paste $*full_A.affy $< > $@
+	paste $*_A.affy $< > $@
 
 %.perf : BASENAME=$(firstword $(subst _, ,$<))
 %.perf : $(shell echo $(BASENAME))
@@ -114,12 +98,5 @@ results_aucpr.csv : $(PERF_FILES)
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
 
-# keep predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.tmp* *.model *tmp *.feature *.affy
-
-.PHONY: debug
-debug:
-	@echo PROTEINS: $(PROTEINS)
-	@echo BASENAMES: $(BASENAMES)
-	@echo PERF_FILES: $(PERF_FILES)
+	-rm -rf $(MODELS) log *.gspan
