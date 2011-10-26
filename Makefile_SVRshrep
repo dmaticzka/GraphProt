@@ -1,0 +1,118 @@
+.DELETE_ON_ERROR:
+
+# don't delete intermediate files
+.SECONDARY:
+
+# parameters:
+R:=3
+D:=6
+b:=11
+
+# paths
+ROOT:=~/projects/RBPaffinity
+FA_DIR:=~/projects/RBPaffinity/data/fasta/
+THR_DIR:=~/projects/RBPaffinity/data/thresholds/
+
+# binaries
+SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
+SVRPREDICT:=~/src/libsvm-3.0/svm-predict
+PERF:=~/src/stat/perf
+
+# targets
+PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+#PROTEINS:=test
+#PROTEINS:=U1A
+BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
+			$(patsubst %,%_data_full_B,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
+AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
+
+all: results_aucpr.csv $(AUC_FILES) $(PERF_FILES)
+
+%.gspan : $(FA_DIR)/%.fa
+	/usr/local/perl/bin/perl $(ROOT)/bin/create_shrep/RNAtools/fasta2shrep_gspan.pl -fa $< \
+	-t 3 -M 5 -wins 50 -shift 10 > $@
+
+%.feature : %.gspan %.affy
+	# create features
+	ln -fs $< $* # remove suffix to have shorter filenames
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(R) -D $(D) -b $(b)
+	-rm -f $* $@_bin # clean up after feature creation
+	# add affinities to features
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
+
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$NF}' > $@
+
+%.model : %.feature
+	$(SVRTRAIN) $< $@
+
+%full_B.svrout : %full_B.model %full_A.feature
+	$(SVRPREDICT) $*full_A.feature $< $@
+
+%full_A.svrout : %full_A.model %full_B.feature
+	$(SVRPREDICT) $*full_B.feature $< $@
+
+%full_A.pred : %full_A.svrout %full_B.affy
+	# combine affinities and predictions
+	paste $*full_B.affy $< > $@
+
+%full_B.pred : %full_B.svrout %full_A.affy
+	# combine affinities and predictions
+	paste $*full_A.affy $< > $@
+
+%bruijn_B.svrout : %bruijn_B.model %full_A.feature
+	$(SVRPREDICT) $*full_A.feature $< $@
+
+%bruijn_A.svrout : %bruijn_A.model %full_B.feature
+	$(SVRPREDICT) $*full_B.feature $< $@
+
+%bruijn_A.pred : %bruijn_A.svrout %full_B.affy
+	# combine affinities and predictions
+	paste $*full_B.affy $< > $@
+
+%bruijn_B.pred : %bruijn_B.svrout %full_A.affy
+	# combine affinities and predictions
+	paste $*full_A.affy $< > $@
+
+%.perf : BASENAME=$(firstword $(subst _, ,$<))
+%.perf : $(shell echo $(BASENAME))
+%.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.perf : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.perf : %.pred
+	# select by threshold
+	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
+	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
+	# compute performance measures
+	$(PERF) < $@.threshold > $@
+	#rm -rf $@.thresold*
+
+%.auc : BASENAME=$(firstword $(subst _, ,$<))
+%.auc : $(shell echo $(BASENAME))
+%.auc : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.auc : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.auc : %.pred
+	# select by threshold
+	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print $$1, "\t" 1}'; \
+	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print $$1, "\t" 0}' ) > $@.threshold
+	# compute auc and auc-pr
+	java -jar ~/local/auc/auc.jar $@.threshold LIST | tail -n 2 > $@
+	#rm -rf $@.threshold.*
+
+results_aucpr.csv : $(AUC_FILES)
+	grep Precision $(AUC_FILES) | tr ':' ' ' | awk '{print $$1, "svr_shrep", $$NF}' | sort > $@
+
+# keep predictions and results
+clean:
+	-rm -rf $(MODELS) log *.gspan *.tmp* *.model *tmp *.feature *.affy
+
+.PHONY: debug
+debug:
+	@echo PROTEINS: $(PROTEINS)
+	@echo BASENAMES: $(BASENAMES)
+	@echo PERF_FILES: $(PERF_FILES)
