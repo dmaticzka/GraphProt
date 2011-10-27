@@ -24,11 +24,14 @@ PERF:=~/src/stat/perf
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 #PROTEINS:=test
 #PROTEINS:=U1A
-BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) $(patsubst %,%_data_full_B,$(PROTEINS))
+BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
+			$(patsubst %,%_data_full_B,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
-all: $(AUC_FILES) $(PERF_FILES)
+all: results_aucpr.csv
 
 %.gspan : $(FA_DIR)/%.fa
 	/usr/local/perl/bin/perl $(FA2SHREP) -fa $< -stdout -stack \
@@ -51,19 +54,33 @@ all: $(AUC_FILES) $(PERF_FILES)
 %.model : %.feature
 	$(SVRTRAIN) $< $@
 
-%_B.svrout : %_B.model %_A.feature
-	$(SVRPREDICT) $*_A.feature $< $@
+%full_B.svrout : %full_B.model %full_A.feature
+	$(SVRPREDICT) $*full_A.feature $< $@
 
-%_A.svrout : %_A.model %_B.feature
-	$(SVRPREDICT) $*_B.feature $< $@
+%full_A.svrout : %full_A.model %full_B.feature
+	$(SVRPREDICT) $*full_B.feature $< $@
 
-%_A.pred : %_A.svrout %_B.affy
+%full_A.pred : %full_A.svrout %full_B.affy
 	# combine affinities and predictions
-	paste $*_B.affy $< > $@
+	paste $*full_B.affy $< > $@
 
-%_B.pred : %_B.svrout %_A.affy
+%full_B.pred : %full_B.svrout %full_A.affy
 	# combine affinities and predictions
-	paste $*_A.affy $< > $@
+	paste $*full_A.affy $< > $@
+
+%bruijn_B.svrout : %bruijn_B.model %full_A.feature
+	$(SVRPREDICT) $*full_A.feature $< $@
+
+%bruijn_A.svrout : %bruijn_A.model %full_B.feature
+	$(SVRPREDICT) $*full_B.feature $< $@
+
+%bruijn_A.pred : %bruijn_A.svrout %full_B.affy
+	# combine affinities and predictions
+	paste $*full_B.affy $< > $@
+
+%bruijn_B.pred : %bruijn_B.svrout %full_A.affy
+	# combine affinities and predictions
+	paste $*full_A.affy $< > $@
 
 %.perf : BASENAME=$(firstword $(subst _, ,$<))
 %.perf : $(shell echo $(BASENAME))
