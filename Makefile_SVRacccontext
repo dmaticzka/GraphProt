@@ -20,8 +20,8 @@ SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
 
 # targets
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
+PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+#PROTEINS:=test
 #PROTEINS:=YB1
 BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_full_B,$(PROTEINS)) \
@@ -32,9 +32,14 @@ AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
 all: $(AUC_FILES) $(PERF_FILES) results_aucpr.csv
 
-%.gspan : $(FA_DIR)/%.fa
-	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
-	-fa $< --path $(ROOT)/data/accs/accs/ > $@
+# this is how to create the gspans
+# these were already precomputed
+#%.gspan : $(FA_DIR)/%.fa
+#	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+#	-fa $< --path $(ROOT)/data/accs/accs/ > $@
+
+%.gspan : %.gspan.gz
+	zcat $< > $@
 
 %.feature : %.gspan %.affy
 	# create features
