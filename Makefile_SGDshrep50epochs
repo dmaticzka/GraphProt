@@ -1,7 +1,7 @@
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
-#.SECONDARY:
+.SECONDARY:
 
 # parameters:
 EXPERIMENT_ID:=sgd_shrep50epochs
@@ -74,7 +74,7 @@ all: results_aucpr.csv
 
 %full_A.sgdout : %full_A.model %full_B.test.gspan.gz %full_B.test.class
 	mkdir -p $<.dir
-	cd $<.dir; $(SGDNSPDK) $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
+	cd $<.dir; $(SGDNSPDK) -b $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
 	-d ../$*full_B.test.gspan.gz -t ../$*full_B.test.class 
 	mv $<.dir/output.predictions $@
 	rm -rf $<.dir

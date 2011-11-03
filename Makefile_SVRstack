@@ -1,7 +1,7 @@
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
-#.SECONDARY:
+.SECONDARY:
 
 # parameters:
 EXPERIMENT_ID:=svr_stack
