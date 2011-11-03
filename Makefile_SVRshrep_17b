@@ -4,10 +4,10 @@
 .SECONDARY:
 
 # parameters:
-EXPERIMENT_ID:=svr_stack
+EXPERIMENT_ID:=svr_shrep
 R:=3
 D:=6
-b:=11
+b:=17
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -15,7 +15,6 @@ FA_DIR:=~/projects/RBPaffinity/data/fasta/
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
-FA2SHREP:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
@@ -31,10 +30,10 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
-all: results_aucpr.csv
+all: results_aucpr.csv $(AUC_FILES) $(PERF_FILES)
 
 %.gspan : $(FA_DIR)/%.fa
-	/usr/local/perl/bin/perl $(FA2SHREP) -fa $< -stdout -stack \
+	/usr/local/perl/bin/perl $(ROOT)/bin/create_shrep/RNAtools/fasta2shrep_gspan.pl -fa $< \
 	-t 3 -M 5 -wins 50 -shift 10 > $@
 
 %.feature : %.gspan %.affy
@@ -48,8 +47,8 @@ all: results_aucpr.csv
 	-rm -rf $@.tmp # clean up affinityless feature file
 
 %.affy : %.gspan
-	# extract affinities from fasta
-	cat $(FA_DIR)/$*.fa | grep '^>' | awk '{print $$2}' > $@
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
 %.model : %.feature
 	$(SVRTRAIN) $< $@
@@ -115,5 +114,12 @@ results_aucpr.csv : $(PERF_FILES)
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
 
+# keep predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan
+	-rm -rf $(MODELS) log *.gspan *.tmp* *.model *tmp *.feature *.affy
+
+.PHONY: debug
+debug:
+	@echo PROTEINS: $(PROTEINS)
+	@echo BASENAMES: $(BASENAMES)
+	@echo PERF_FILES: $(PERF_FILES)
