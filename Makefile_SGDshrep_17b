@@ -62,18 +62,18 @@ all: results_aucpr.csv
 	'{if($$NF<LT){print $$NF, -1 }else if($$NF>HT){print $$NF, 1 }else{print "nil"}}' > $@
 
 %.model : %.train.gspan.gz %.train.class
-	$(SGDNSPDK) $(b) -mode FILE -a TRAIN -d $< -t $*.train.class -m $@ -ll 1 $(R) $(D)
+	$(SGDNSPDK) -b $(b) -mode FILE -a TRAIN -d $< -t $*.train.class -m $@ -ll 1 $(R) $(D)
 
 %full_B.sgdout : %full_B.model %full_A.test.gspan.gz %full_A.test.class
 	mkdir -p $<.dir
-	cd $<.dir; $(SGDNSPDK) $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
+	cd $<.dir; $(SGDNSPDK) -b $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
 	-d ../$*full_A.test.gspan.gz -t ../$*full_A.test.class
 	mv $<.dir/output.predictions $@
 	rm -rf $<.dir
 
 %full_A.sgdout : %full_A.model %full_B.test.gspan.gz %full_B.test.class
 	mkdir -p $<.dir
-	cd $<.dir; $(SGDNSPDK) $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
+	cd $<.dir; $(SGDNSPDK) -b $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
 	-d ../$*full_B.test.gspan.gz -t ../$*full_B.test.class 
 	mv $<.dir/output.predictions $@
 	rm -rf $<.dir
@@ -88,14 +88,14 @@ all: results_aucpr.csv
 
 %bruijn_B.sgdout : %bruijn_B.model %full_A.test.gspan.gz %full_A.test.class
 	mkdir -p $<.dir
-	cd $<.dir; $(SGDNSPDK) $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
+	cd $<.dir; $(SGDNSPDK) -b $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
 	-d ../$*full_A.test.gspan.gz -t ../$*full_A.test.class
 	mv $<.dir/output.predictions $@
 	rm -rf $<.dir
 
 %bruijn_A.sgdout : %bruijn_A.model %full_B.test.gspan.gz %full_B.test.class
 	mkdir -p $<.dir
-	cd $<.dir; $(SGDNSPDK) $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
+	cd $<.dir; $(SGDNSPDK) -b $(b) -mode FILE -a TEST -m ../$< -ll 1 $(R) $(D) \
 	-d ../$*full_B.test.gspan.gz -t ../$*full_B.test.class 
 	mv $<.dir/output.predictions $@
 	rm -rf $<.dir
