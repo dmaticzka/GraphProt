@@ -7,7 +7,7 @@
 EXPERIMENT_ID:=svr_acccontext
 R:=3
 D:=6
-b:=11
+b:=17
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -24,9 +24,9 @@ PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 #PROTEINS:=test
 #PROTEINS:=YB1
 BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
-			$(patsubst %,%_data_full_B,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+			$(patsubst %,%_data_full_B,$(PROTEINS))
+#			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+#			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 

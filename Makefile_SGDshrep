@@ -7,7 +7,7 @@
 EXPERIMENT_ID:=sgd_shrep
 R:=3
 D:=6
-b:=11
+b:=17
 
 # paths
 ROOT:=~/projects/RBPaffinity
