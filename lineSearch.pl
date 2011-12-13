@@ -8,6 +8,7 @@ use List::Util qw/ min max /;
 use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
+use File::Copy;
 
 =head1 NAME
 
@@ -72,6 +73,9 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 # main
 ###############################################################################
 
+# global variables
+my $CURRDIR = dirname($0);
+
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
 my $libsvm_options = ' -v 5';
@@ -90,6 +94,10 @@ $parameters{'R'}{values} = [1, 2, 3, 4];
 $parameters{'D'}{default} = 4;
 $parameters{'D'}{values} = [1, 2, 3, 4, 5, 6];
 
+for my $par (@parameters) {
+	$parameters{$par}{current}=$parameters{$par}{default};
+}
+
 # print important variables
 if ($debug) {
 	say STDERR 'parameters to optimize: ', join(', ', @parameters);
@@ -101,8 +109,34 @@ if ($debug) {
 	}
 }
 
-# main loop
+# main loop: do until finished
 my $optimization_finished = 0;
 do {
+	# optimize each parameter
+	for my $par (@parameters) {
+		for my $try_this ($parameters{$par}{values}) {
+			$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
+			
+			# check if parameter combination is valid
+			# TODO
+			
+			# copy relevant files into tmp
+			copy($0, $tmpdir);
+			
+			# test parameter combination / get value from previous run
+			
+			chdir($tmpdir);
+			system('ls -l');
+			chdir();
+			
+			# save result
+			# TODO
+			
+			File::Temp::cleanup();
+		}
+		# set current to the best parameter combination
+	}
 	$optimization_finished = 1;
-} while (not $optimization_finished)
+} while (not $optimization_finished);
+
+chdir();
