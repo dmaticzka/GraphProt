@@ -31,11 +31,18 @@ AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
 all: $(AUC_FILES) $(PERF_FILES) results_aucpr.csv
 
-# this is how to create the gspans
-# these were already precomputed
-#%.gspan : $(FA_DIR)/%.fa
-#	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
-#	-fa $< --path $(ROOT)/data/accs/accs/ > $@
+# if not available, copy fasta from data dir
+%.fa : $(FA_DIR)/%.fa
+	cp $< $@
+
+# if available, create gspan from precomputed files
+%.gspan : %.gspan.gz
+	zcat $< > $@
+
+# else, create gspan from fasta
+%.gspan : %.fa
+	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+	-fa $< --path $(ROOT)/data/accs/ > $@
 
 %.gspan : %.gspan.gz
 	zcat $< > $@
