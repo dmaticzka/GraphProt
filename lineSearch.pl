@@ -34,22 +34,22 @@ Options:
 # SIGUSR{1/2} are sent by the sge prior to the uncatchable SIGKILL if the
 # option -notify was set
 ###############################################################################
-#my $tmp_template = 'template-XXXXXX';
-#my $tmp_prefix = '/var/tmp/';
-#my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
-#$SIG{'INT'} = 'end_handler';
-#$SIG{'TERM'} = 'end_handler';
-#$SIG{'ABRT'} = 'end_handler';
-#$SIG{'USR1'} = 'end_handler';
-#$SIG{'USR2'} = 'end_handler';
-#sub end_handler {
-#	print STDERR "signal ", $_[0], " caught, cleaning up temporary files\n";
-#	# change into home directory. deletion of the temporary directory will
-#	# fail if it is the current working directory
-#	chdir();
-#	File::Temp::cleanup();
-#	die();
-#}
+my $tmp_template = 'lineSearch-XXXXXX';
+my $tmp_prefix = '/var/tmp/';
+my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
+$SIG{'INT'} = 'end_handler';
+$SIG{'TERM'} = 'end_handler';
+$SIG{'ABRT'} = 'end_handler';
+$SIG{'USR1'} = 'end_handler';
+$SIG{'USR2'} = 'end_handler';
+sub end_handler {
+	print STDERR "signal ", $_[0], " caught, cleaning up temporary files\n";
+	# change into home directory. deletion of the temporary directory will
+	# fail if it is the current working directory
+	chdir();
+	File::Temp::cleanup();
+	die();
+}
 
 ###############################################################################
 # parse command line options
@@ -72,3 +72,37 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 # main
 ###############################################################################
 
+# binaries
+my $libsvm = '~/src/libsvm-3.0/svm-train';
+my $libsvm_options = ' -v 5';
+
+# we optimize these parameters
+my @parameters = qw/ epsilon c R D /;
+
+# valid values for parameters
+my %parameters;
+$parameters{'epsilon'}{default} = 0.1;
+$parameters{'epsilon'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
+$parameters{'c'}{default} = 1;
+$parameters{'c'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
+$parameters{'R'}{default} = 1;
+$parameters{'R'}{values} = [1, 2, 3, 4];
+$parameters{'D'}{default} = 4;
+$parameters{'D'}{values} = [1, 2, 3, 4, 5, 6];
+
+# print important variables
+if ($debug) {
+	say STDERR 'parameters to optimize: ', join(', ', @parameters);
+	say STDERR 'keys in hash: ', join(', ', keys %{$parameters{'epsilon'}});
+	while (my ($param, $param_h) = each %parameters) {
+		while (my ($key, $values) = each %{$param_h}) {
+			say STDERR join('/', $param, $key), ': ', $values;
+		}
+	}
+}
+
+# main loop
+my $optimization_finished = 0;
+do {
+	$optimization_finished = 1;
+} while (not $optimization_finished)
