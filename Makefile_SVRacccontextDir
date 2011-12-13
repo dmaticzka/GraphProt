@@ -4,8 +4,8 @@
 .SECONDARY:
 
 # parameters:
-EXPERIMENT_ID:=svr_stackDir_newNSPDK
-R:=3
+EXPERIMENT_ID:=svr_acccontextDir
+R:=1
 D:=6
 b:=14
 
@@ -15,7 +15,6 @@ FA_DIR:=~/projects/RBPaffinity/data/fasta/
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
-FA2SHREP:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
@@ -31,16 +30,23 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 AUC_FILES:=$(patsubst %,%.auc,$(BASENAMES))
 
-all: results_aucpr.csv
+all: $(AUC_FILES) $(PERF_FILES) results_aucpr.csv
 
-%.gspan : $(FA_DIR)/%.fa
-	/usr/local/perl/bin/perl $(FA2SHREP) -fa $< -stdout -stack \
-	-t 3 -M 5 -wins 50 -shift 10 > $@
+# this is how to create the gspans
+# these were already precomputed
+#%.gspan : $(FA_DIR)/%.fa
+#	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+#	-fa $< --path $(ROOT)/data/accs/accs/ > $@
 
+%.gspan : %.gspan.gz
+	zcat $< > $@
+
+# feature creation for this type of graph has to set an additional parameter
+# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : %.gspan %.affy
 	# create features
 	ln -fs $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(R) -D $(D) -b $(b) -gt DIRECTED
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(R) -D $(D) -b $(b) -T nspdkvp -gt DIRECTED
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
@@ -48,8 +54,8 @@ all: results_aucpr.csv
 	-rm -rf $@.tmp # clean up affinityless feature file
 
 %.affy : %.gspan
-	# extract affinities from fasta
-	cat $(FA_DIR)/$*.fa | grep '^>' | awk '{print $$2}' > $@
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
 %.model : %.feature
 	$(SVRTRAIN) $< $@
@@ -92,7 +98,7 @@ all: results_aucpr.csv
 	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
 	# compute performance measures
 	$(PERF) < $@.threshold > $@
-	#rm -rf $@.thresold*
+	rm -rf $@.threshold*
 
 %.auc : BASENAME=$(firstword $(subst _, ,$<))
 %.auc : $(shell echo $(BASENAME))
@@ -104,7 +110,7 @@ all: results_aucpr.csv
 	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print $$1, "\t" 0}' ) > $@.threshold
 	# compute auc and auc-pr
 	java -jar ~/local/auc/auc.jar $@.threshold LIST | tail -n 2 > $@
-	#rm -rf $@.threshold.*
+	rm -rf $@.threshold.*
 
 results_aucpr.csv : $(PERF_FILES)
 	grep ROC $(PERF_FILES) | tr ':' ' ' | \
@@ -115,5 +121,6 @@ results_aucpr.csv : $(PERF_FILES)
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
 
+# keep predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy *.svrout
