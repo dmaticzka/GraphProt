@@ -5,9 +5,6 @@
 
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
-R:=1
-D:=1
-b:=11
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -57,6 +54,10 @@ all: $(PERF_FILES) results_aucpr.csv
 	# rename for convenience
 	ln -f $< $@
 
+# link for simpler handling
+%.pred.param : %.param
+	ln -sf $< $@
+
 # just link default parameters; for using optimized parameters just supply
 # alternative parameter files
 %.param :
@@ -64,10 +65,13 @@ all: $(PERF_FILES) results_aucpr.csv
 
 # feature creation for this type of graph has to set an additional parameter
 # in order to center only on nucleotides and not on annotation -> -T nspdkvp
-%.feature : %.gspan %.affy $$(subst .pred,,$$*).param
+%.feature : RADIUS=$(shell grep '^R' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D' $*.param | cut -f 2 -d' ')
+%.feature : bitsize=$(shell grep '^b' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan %.affy %.param
 	# create features
-	ln -fs $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(R) -D $(D) -b $(b) -T nspdkvp -gt DIRECTED
+	ln -sf $< $* # remove suffix to have shorter filenames
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
