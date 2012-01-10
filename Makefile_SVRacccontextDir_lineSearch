@@ -6,8 +6,8 @@
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
 R:=1
-D:=6
-b:=14
+D:=1
+b:=11
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -57,9 +57,14 @@ all: $(PERF_FILES) results_aucpr.csv
 	# rename for convenience
 	ln -f $< $@
 
+# just link default parameters; for using optimized parameters just supply
+# alternative parameter files
+%.param :
+	ln -sf default.parameters $@
+
 # feature creation for this type of graph has to set an additional parameter
 # in order to center only on nucleotides and not on annotation -> -T nspdkvp
-%.feature : %.gspan %.affy
+%.feature : %.gspan %.affy $$(subst .pred,,$$*).param
 	# create features
 	ln -fs $< $* # remove suffix to have shorter filenames
 	$(ROOT)/bin/NSPDK -fg $* -of -R $(R) -D $(D) -b $(b) -T nspdkvp -gt DIRECTED
@@ -73,8 +78,10 @@ all: $(PERF_FILES) results_aucpr.csv
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
-%.model : %.feature
-	$(SVRTRAIN) $< $@
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature %.param
+	$(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 %.svrout : %.model %.pred.feature
 	$(SVRPREDICT) $*.pred.feature $< $@
