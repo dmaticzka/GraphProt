@@ -24,6 +24,7 @@ Options:
     -gspan      optimize parameters for these graphs
     -affy       affinities for graphs
     -mf         makefile to use for crossvalidation
+    -of         write optimal parameters to this file
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -61,12 +62,14 @@ sub end_handler {
 my $gspan;
 my $affy;
 my $mf;
+my $of;
 my $help;
 my $man;
 my $debug;
 my $result = GetOptions (	"gspan=s"	=> \$gspan,
 							"affy=s"    => \$affy,
 							"mf=s"		=> \$mf,
+							"of=s"		=> \$of,
 							"help"	=> \$help,
 							"man"	=> \$man,
 							"debug" => \$debug);
@@ -85,6 +88,11 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 # global variables
 my $CURRDIR = cwd();
 ($debug) and say STDERR "cwd: $CURRDIR";
+my $top_correlation = 0;
+my @top_rounds = 0;
+my $n_rounds = 1;
+my $basename = $gspan;
+$basename =~ s/.gspan//;
 
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
@@ -100,9 +108,9 @@ $parameters{'e'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
 $parameters{'c'}{default} = 1;
 $parameters{'c'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
 $parameters{'R'}{default} = 1;
-$parameters{'R'}{values} = [1, 2, 3, 4];
+$parameters{'R'}{values} = [4, 3, 2, 1];
 $parameters{'D'}{default} = 4;
-$parameters{'D'}{values} = [1, 2, 3, 4, 5, 6];
+$parameters{'D'}{values} = [6, 5, 4, 3, 2, 1];
 
 for my $par (@parameters) {
 	$parameters{$par}{current}=$parameters{$par}{default};
@@ -124,16 +132,17 @@ my $optimization_finished = 0;
 do {
 	# optimize each parameter
 	for my $par (@parameters) {
-		for my $try_this ($parameters{$par}{values}) {
-			say STDERR "optimizing $gspan";
+		say STDERR "\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
+		for my $try_this (@{$parameters{$par}{values}}) {
+			# set new parameter
+			$parameters{$par}{current} = $try_this;
+			
 			$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
-			my $basename = $gspan;
-			$basename =~ s/.gspan//;
 			my $param_file = $basename . '.param';
 			my $cv_file = $basename . '.cv';
 			
 			# check if parameter combination is valid
-			# TODO
+			next if ($parameters{'R'}{current} > $parameters{'D'}{current});
 			
 			# copy relevant files into tmp
 			copy($gspan, $tmpdir);
@@ -144,35 +153,79 @@ do {
 			# create parameter file
 			chdir($tmpdir);
 			open PARS, '>', $param_file;
+			print STDERR 'parameters: ';
 			for my $par (@parameters) {
-				($debug) and print STDERR $par, ' ', $parameters{$par}{current}, ";";
+				print STDERR $par, ' ', $parameters{$par}{current}, ";";
 				say PARS $par, ' ', $parameters{$par}{current};
 			}
-			say STDERR '';
+			print STDERR "\n";
 			say PARS 'b 14';
 			close PARS;
 			# call Makefile for cv
-			system("make cv -e CV_FILES=$cv_file");
+			my $exec = "make cv -e CV_FILES=$cv_file";
+			$debug and say STDERR $exec;
+			system("time $exec");
 			
 			# parse result
 			open RES, '<', $cv_file;
 			my @lines = <RES>;
 			close RES;
+			if (not ($lines[-2] =~ /Cross Validation Mean squared error/) or
+				not ($lines[-1] =~ /Cross Validation Squared correlation coefficient/)) {
+				say STDERR 'error parsing crossvalidation output:';
+				system("cat $cv_file > /dev/stderr");
+				end_handler();
+			}
 			my @error = split(' ', $lines[-2]);
 			my $error = pop(@error);
 			my @correlation = split(' ', $lines[-1]);
 			my $correlation = pop(@correlation);
+			say STDERR "correlation: $correlation, error: $error";
 			
 			# exit temp directory
 			chdir($CURRDIR);
 			File::Temp::cleanup();
 			
-			# save result
-			# TODO
+			# save state info
+			if ($correlation > $top_correlation) {
+				# if the new result is better, save these parameters
+				$top_correlation = $correlation;
+				for my $par (@parameters) {
+					$parameters{$par}{currentbest}=$parameters{$par}{current};
+				}
+			}
 		}
+
 		# set current to the best parameter combination
+		for my $par (@parameters) {
+			$parameters{$par}{current}=$parameters{$par}{currentbest};
+		}
 	}
-	$optimization_finished = 1;
+	# do a maximum of 5 rounds
+	if ($n_rounds++ > 5) {
+		say STDERR "\n";
+		say STDERR "maximum of 5 rounds reached, stopping";
+		$optimization_finished = 1
+	};
+	# stop if the last round improved correlation by less than 0.01
+	push @top_rounds, $top_correlation;
+	if ($top_rounds[-1] - $top_rounds[-2] < 0.01) {
+		say STDERR "\n";
+		say STDERR "improvement to last round < 0.01, stopping";
+		$optimization_finished = 1
+	};
 } while (not $optimization_finished);
+
+say STDERR "top values from rounds: ", join('; ', @top_rounds);
+
+# write final parameters
+open OUT, '>', $of;
+for my $par (@parameters) {
+	print STDERR $par, ' ', $parameters{$par}{current}, ";";
+	say OUT $par, ' ', $parameters{$par}{current};
+}
+print STDERR "\n";
+say OUT 'b 14';
+close OUT;
 
 chdir();

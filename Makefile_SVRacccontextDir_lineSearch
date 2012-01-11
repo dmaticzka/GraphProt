@@ -5,7 +5,7 @@
 
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
-LINESEARCH_INPUT_SIZE:=500
+LINESEARCH_INPUT_SIZE:=5000
 CV_FOLD:=5
 
 # paths
@@ -21,7 +21,7 @@ LINESEARCH:=./lineSearch.pl
 
 # targets
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
+PROTEINS:=YB1
 BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_full_B,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
@@ -79,7 +79,7 @@ cv : $(CV_FILES)
 
 # do parameter optimization by line search
 %.param : %.ls.gspan %.ls.affy
-	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -debug > $@
+	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -of $@ > $@
 
 # subset original fasta
 %.ls.fa : %.fa
