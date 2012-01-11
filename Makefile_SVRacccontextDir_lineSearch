@@ -5,6 +5,7 @@
 
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
+LINESEARCH_INPUT_SIZE:=500
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -15,6 +16,7 @@ THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
+LINESEARCH:=./lineSearch.pl
 
 # targets
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -24,8 +26,11 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
+PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 
 all: $(PERF_FILES) results_aucpr.csv
+
+ls : $(PARAM_FILES)
 
 # if not available, copy fasta from data dir
 %.fa : $(FA_DIR)/%.fa
@@ -58,10 +63,22 @@ all: $(PERF_FILES) results_aucpr.csv
 %.pred.param : %.param
 	ln -sf $< $@
 
-# just link default parameters; for using optimized parameters just supply
-# alternative parameter files
-%.param :
-	ln -sf default.parameters $@
+## just link default parameters; for using optimized parameters just supply
+## alternative parameter files
+#%.param :
+#	ln -sf default.parameters $@
+
+# do parameter optimization by line search
+%.param : %.ls.gspan
+	$(LINESEARCH) -gspan $< > $@
+
+# subset original fasta
+%.ls.fa : %.fa
+	cat $< | \
+	fastapl -e 'print ">", $$head, "\t", $$seq, "\n"' | sort -R | \
+	head -n $(LINESEARCH_INPUT_SIZE) | \
+	perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
+	$@
 
 # feature creation for this type of graph has to set an additional parameter
 # in order to center only on nucleotides and not on annotation -> -T nspdkvp
