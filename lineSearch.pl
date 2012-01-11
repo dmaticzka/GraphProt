@@ -127,6 +127,10 @@ do {
 		for my $try_this ($parameters{$par}{values}) {
 			say STDERR "optimizing $gspan";
 			$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
+			my $basename = $gspan;
+			$basename =~ s/.gspan//;
+			my $param_file = $basename . '.param';
+			my $cv_file = $basename . '.cv';
 			
 			# check if parameter combination is valid
 			# TODO
@@ -137,31 +141,24 @@ do {
 			copy($mf, $tmpdir);
 			
 			# test parameter combination / get value from previous run
-			chdir($tmpdir);
-			($debug) and say STDERR "changed directory: ", cwd();
 			# create parameter file
-			my $param_file = $gspan;
-			$param_file =~ s/.gspan//;
-			$param_file .= '.pars';
-			$debug and say STDERR "param_file: $param_file";
+			chdir($tmpdir);
 			open PARS, '>', $param_file;
 			for my $par (@parameters) {
-				($debug) and say STDERR $par, ' ', $parameters{$par}{current};
+				($debug) and print STDERR $par, ' ', $parameters{$par}{current}, ";";
 				say PARS $par, ' ', $parameters{$par}{current};
 			}
+			say STDERR '';
 			say PARS 'b 14';
 			close PARS;
-			# TODO
 			# call Makefile for cv
-			# TODO
+			system("make cv -e CV_FILES=$cv_file");
+			
 			# parse result
-			# TODO
-			# run test			
-			system('ls -l');
+			
 			
 			# exit temp directory
 			chdir($CURRDIR);
-			($debug) and say STDERR "changed directory: ", cwd();
 			File::Temp::cleanup();
 			
 			# save result

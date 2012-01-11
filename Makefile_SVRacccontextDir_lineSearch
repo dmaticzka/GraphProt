@@ -6,6 +6,7 @@
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
 LINESEARCH_INPUT_SIZE:=500
+CV_FOLD:=5
 
 # paths
 ROOT:=~/projects/RBPaffinity
@@ -27,10 +28,18 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
+CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 
 all: $(PERF_FILES) results_aucpr.csv
 
 ls : $(PARAM_FILES)
+
+cv : $(CV_FILES)
+
+%.cv : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.cv : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.cv : %.feature %.param
+	$(SVRTRAIN) -c $(C) -p $(EPSILON) -v $(CV_FOLD) $< > $@
 
 # if not available, copy fasta from data dir
 %.fa : $(FA_DIR)/%.fa
@@ -70,7 +79,7 @@ ls : $(PARAM_FILES)
 
 # do parameter optimization by line search
 %.param : %.ls.gspan %.ls.affy
-	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile > $@
+	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -debug > $@
 
 # subset original fasta
 %.ls.fa : %.fa
