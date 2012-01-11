@@ -43,7 +43,7 @@ all: $(PERF_FILES) results_aucpr.csv
 # when computing predictions, the same parameters should be used as when training
 # the model. in order to be able to use simple name substitution in the
 # relevant rules, this Makefile has to map the original input to files of
-# the form %.pred.gpsan. this mapping is accomplished by these rules, emplying
+# the form %.pred.gpsan. this mapping is accomplished by these rules, employing
 # secondary expansion
 .SECONDEXPANSION:
 %_A.pred.gspan : $$(subst _A.,_B.,$$(subst _bruijn,_full,$$(subst .pred,,$$@)))
