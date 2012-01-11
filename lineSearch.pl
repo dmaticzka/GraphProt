@@ -9,6 +9,7 @@ use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
 use File::Copy;
+use Cwd;
 
 =head1 NAME
 
@@ -21,6 +22,8 @@ lineSearch.pl -gspan [gspan file]
 Options:
 
     -gspan      optimize parameters for these graphs
+    -affy       affinities for graphs
+    -mf         makefile to use for crossvalidation
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -56,10 +59,14 @@ sub end_handler {
 # parse command line options
 ###############################################################################
 my $gspan;
+my $affy;
+my $mf;
 my $help;
 my $man;
 my $debug;
 my $result = GetOptions (	"gspan=s"	=> \$gspan,
+							"affy=s"    => \$affy,
+							"mf=s"		=> \$mf,
 							"help"	=> \$help,
 							"man"	=> \$man,
 							"debug" => \$debug);
@@ -68,25 +75,28 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 ($result) or pod2usage(2);
 (defined $gspan) or pod2usage("error: -gspan parameter mandatory");
 (-f $gspan) or die "error: could not find file '$gspan'";
+(-f $mf) or die "error: could not find file '$mf'";
+(-f $affy) or die "error: could not find file '$affy'";
 
 ###############################################################################
 # main
 ###############################################################################
 
 # global variables
-my $CURRDIR = dirname($0);
+my $CURRDIR = cwd();
+($debug) and say STDERR "cwd: $CURRDIR";
 
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
-my $libsvm_options = ' -v 5';
+my $libsvm_options = ' -v 5 -s 3 -t 0';
 
 # we optimize these parameters
-my @parameters = qw/ epsilon c R D /;
+my @parameters = qw/ e c R D /;
 
 # valid values for parameters
 my %parameters;
-$parameters{'epsilon'}{default} = 0.1;
-$parameters{'epsilon'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
+$parameters{'e'}{default} = 0.1;
+$parameters{'e'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
 $parameters{'c'}{default} = 1;
 $parameters{'c'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
 $parameters{'R'}{default} = 1;
@@ -115,24 +125,47 @@ do {
 	# optimize each parameter
 	for my $par (@parameters) {
 		for my $try_this ($parameters{$par}{values}) {
+			say STDERR "optimizing $gspan";
 			$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
 			
 			# check if parameter combination is valid
 			# TODO
 			
 			# copy relevant files into tmp
-			copy($0, $tmpdir);
+			copy($gspan, $tmpdir);
+			copy($affy, $tmpdir);
+			copy($mf, $tmpdir);
 			
 			# test parameter combination / get value from previous run
-			
 			chdir($tmpdir);
+			($debug) and say STDERR "changed directory: ", cwd();
+			# create parameter file
+			my $param_file = $gspan;
+			$param_file =~ s/.gspan//;
+			$param_file .= '.pars';
+			$debug and say STDERR "param_file: $param_file";
+			open PARS, '>', $param_file;
+			for my $par (@parameters) {
+				($debug) and say STDERR $par, ' ', $parameters{$par}{current};
+				say PARS $par, ' ', $parameters{$par}{current};
+			}
+			say PARS 'b 14';
+			close PARS;
+			# TODO
+			# call Makefile for cv
+			# TODO
+			# parse result
+			# TODO
+			# run test			
 			system('ls -l');
-			chdir();
+			
+			# exit temp directory
+			chdir($CURRDIR);
+			($debug) and say STDERR "changed directory: ", cwd();
+			File::Temp::cleanup();
 			
 			# save result
 			# TODO
-			
-			File::Temp::cleanup();
 		}
 		# set current to the best parameter combination
 	}

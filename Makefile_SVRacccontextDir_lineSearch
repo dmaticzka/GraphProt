@@ -69,8 +69,8 @@ ls : $(PARAM_FILES)
 #	ln -sf default.parameters $@
 
 # do parameter optimization by line search
-%.param : %.ls.gspan
-	$(LINESEARCH) -gspan $< > $@
+%.param : %.ls.gspan %.ls.affy
+	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile > $@
 
 # subset original fasta
 %.ls.fa : %.fa
