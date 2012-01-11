@@ -155,7 +155,13 @@ do {
 			system("make cv -e CV_FILES=$cv_file");
 			
 			# parse result
-			
+			open RES, '<', $cv_file;
+			my @lines = <RES>;
+			close RES;
+			my @error = split(' ', $lines[-2]);
+			my $error = pop(@error);
+			my @correlation = split(' ', $lines[-1]);
+			my $correlation = pop(@correlation);
 			
 			# exit temp directory
 			chdir($CURRDIR);
