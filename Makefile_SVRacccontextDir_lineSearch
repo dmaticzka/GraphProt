@@ -18,7 +18,7 @@ SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
 LINESEARCH:=./lineSearch.pl
-SHUF:=~/src/coreutils-8.15/bin/shuf
+SHUF:=~/src/coreutils-8.15/src/shuf
 
 # targets
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
