@@ -19,6 +19,7 @@ SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
 LINESEARCH:=./lineSearch.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
+FASTAPL:=/usr/local/user/RNAtools/fastapl
 
 # targets
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -88,7 +89,7 @@ cv : $(CV_FILES)
 # subset original fasta
 %.ls.fa : %.fa
 	cat $< | \
-	fastapl -e 'print ">", $$head, "\t", $$seq, "\n"' | $(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
+	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | $(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
 	perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
