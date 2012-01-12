@@ -134,8 +134,17 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 (-f $fasta) or die "error: no such file '$fasta'";
 
 my ($fasta_ref, undef, $header_ref) = @{read_fasta_file($fasta)};
-
+my $n=0;
 while (my ($id, $seq) = each %{$fasta_ref}) {
+
+	# print out how many stuff we already computed
+	$n++;
+	if ($n % 100 == 0) {
+		print STDERR '.';
+		if ($n % 1000 == 0) {
+			print STDERR $n / 1000, 'K';
+		}
+	}
 
 	my $affinity = $header_ref->{$id};
 	say join(' ', 't', $id, $affinity);
