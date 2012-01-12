@@ -22,13 +22,13 @@ createGraph.pl
 createGraph.pl -fasta=FASTA -path-to-accs=PATH
 
 takes sequences of fasta file and generates graph output for
-fabrizio
+fabrizio. context accessibilities are computed using a modified version
+of RNAplfold that prints out a table of the context accessibilities for u=1
 
 Options:
 
     -nocontext  only use accessibilities, no context probabilities
 	-cutoff     do not use probabilities below or at this value (default: 0)
-    -u          use this accesibility width (default: 1)
     -nostruct   do not compute structure part
 	-fasta		fasta file including input sequences
 	-path-to-accs	path to computed accessibilities
@@ -73,7 +73,6 @@ my $man;
 my $fasta;
 my $path;
 my $nostruct;
-my $u;
 my $cutoff;
 my $nocontext;
 my $result = GetOptions (	"help"	=> \$help,
@@ -81,13 +80,11 @@ my $result = GetOptions (	"help"	=> \$help,
 							"fasta=s" => \$fasta,
 							"path-to-accs=s" => \$path,
 							"nostruct" => \$nostruct,
-							"u=i"   => \$u,
 							"cutoff=f" => \$cutoff,
 							"nocontext" => \$nocontext);
 pod2usage(-exitstatus => 1, -verbose => 1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 ($result) or pod2usage(2);
-(defined $u) or $u = 1;
 (defined $cutoff) or $cutoff = 0;
 
 ###############################################################################
@@ -120,16 +117,15 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 	next if ($nostruct);
 
 	# get sequence accessibilities
-	my @accs = (readAccessibilities($seq,$path,'', $u),
-		readAccessibilities($seq,$path,'_E', $u),
-		readAccessibilities($seq,$path,'_H', $u),
-		readAccessibilities($seq,$path,'_I', $u),
-		readAccessibilities($seq,$path,'_M', $u));
+	my @accs = (readAccessibilities($seq,$path,'', 1),
+		readAccessibilities($seq,$path,'_E', 1),
+		readAccessibilities($seq,$path,'_H', 1),
+		readAccessibilities($seq,$path,'_I', 1),
+		readAccessibilities($seq,$path,'_M', 1));
 
 	# for each seq position sort context acc labels
 	# and generate graph
 	for (my $pos = 0; $pos < length($seq); $pos++) {
-	    next if ($pos < $u-1);
 
 		# at first create the structure context subgraph
 		my %accs;

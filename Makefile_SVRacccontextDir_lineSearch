@@ -10,7 +10,7 @@ CV_FOLD:=5
 
 # paths
 ROOT:=~/projects/RBPaffinity
-FA_DIR:=~/projects/RBPaffinity/data/fasta/
+FA_DIR:=~/projects/RBPaffinity/data/fasta
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
@@ -20,15 +20,18 @@ PERF:=~/src/stat/perf
 LINESEARCH:=./lineSearch.pl
 
 # targets
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=YB1
-BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
-			$(patsubst %,%_data_full_B,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+#PROTEINS:=YB1
+BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS))
+#			$(patsubst %,%_data_full_B,$(PROTEINS))
+#			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+#			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
+
+debug:
+	echo $(FA_FILES)
 
 all: $(PERF_FILES) results_aucpr.csv
 
@@ -39,11 +42,11 @@ cv : $(CV_FILES)
 %.cv : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
 %.cv : %.feature %.param
-	$(SVRTRAIN) -c $(C) -p $(EPSILON) -v $(CV_FOLD) $< > $@
+	$(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
-# if not available, copy fasta from data dir
-%.fa : $(FA_DIR)/%.fa
-	cp $< $@
+## if not available, copy fasta from data dir
+#%.fa : $(FA_DIR)/%.fa
+#	cp $< $@
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -79,13 +82,12 @@ cv : $(CV_FILES)
 
 # do parameter optimization by line search
 %.param : %.ls.gspan %.ls.affy
-	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -of $@ > $@
+	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -of $@
 
 # subset original fasta
 %.ls.fa : %.fa
 	cat $< | \
-	fastapl -e 'print ">", $$head, "\t", $$seq, "\n"' | sort -R | \
-	head -n $(LINESEARCH_INPUT_SIZE) | \
+	fastapl -e 'print ">", $$head, "\t", $$seq, "\n"' | shuf -n $(LINESEARCH_INPUT_SIZE) | \
 	perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
