@@ -55,8 +55,8 @@ cv : $(CV_FILES)
 
 # else, create gspan from fasta
 %.gspan : %.fa
-	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
-	-fa $< --path $(ROOT)/data/accs/ > $@
+	time /usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+	-fa $< > $@
 
 # when computing predictions, the same parameters should be used as when training
 # the model. in order to be able to use simple name substitution in the

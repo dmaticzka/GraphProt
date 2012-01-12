@@ -19,7 +19,7 @@ createGraph.pl
 
 =head1 SYNOPSIS
 
-createGraph.pl -fasta=FASTA -path-to-accs=PATH
+createGraph.pl -fasta=FASTA
 
 takes sequences of fasta file and generates graph output for
 fabrizio. context accessibilities are computed using a modified version
@@ -31,7 +31,6 @@ Options:
 	-cutoff     do not use probabilities below or at this value (default: 0)
     -nostruct   do not compute structure part
 	-fasta		fasta file including input sequences
-	-path-to-accs	path to computed accessibilities
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -53,7 +52,7 @@ Options:
 #my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
 
 ###############################################################################
-# readAccessibilities
+# readAccessibilities [DEPRECATED]
 # in: id of acc file, path to files, suffix
 # out: reference to array of accessibilities
 ###############################################################################
@@ -63,6 +62,48 @@ sub readAccessibilities {
     my $fname = "$path${id}_RNAlfold.acc$suffix";
 	(-f $fname) or die ("error, file does not exist: '$fname');");
 	return parse_PUfile_get1u($fname, $u, 2);
+}
+
+###############################################################################
+# computeAccessibilities
+# in: RNA sequence
+# out: reference to array of accessibilities [P,E,H,I,M]
+###############################################################################
+sub computeAccessibilities {
+	my ($seq) = @_;
+	chomp $seq;
+	my $len = length($seq);
+	
+	# compute accessibilities
+	open ACCS, "echo $seq | /home/maticzkd/src/ViennaRNA-1.8.4-context_stdout/Progs/RNAplfold " .
+		"-u 1 -W $len |";
+	my @accs = <ACCS>;
+	close ACCS;
+	
+	# parse accs
+	my @P;
+	my @E;
+	my @H;
+	my @I;
+	my @M;
+	my $parsedseq = $accs[0];
+	chomp $parsedseq;
+	if ($parsedseq ne $seq) {
+		die "error parsing accessibilities: expecting sequence '$seq', got '$parsedseq'"
+	};
+	for (my $i=1; $i<=$len; $i++) {
+		my ($pos, $P, $E, $H, $I, $M) = split("\t", $accs[$i]);
+		if ($pos != $i) {
+			die "error parsing accessibilities: expecting position '$i', got '".$accs[$i]."'";
+		}
+		push @P, $P;
+		push @E, $E;
+		push @H, $H;
+		push @I, $I;
+		push @M, $M;
+	}
+	
+	return [\@P, \@E, \@H, \@I,  \@M];
 }
 
 ###############################################################################
@@ -78,7 +119,6 @@ my $nocontext;
 my $result = GetOptions (	"help"	=> \$help,
 							"man"	=> \$man,
 							"fasta=s" => \$fasta,
-							"path-to-accs=s" => \$path,
 							"nostruct" => \$nostruct,
 							"cutoff=f" => \$cutoff,
 							"nocontext" => \$nocontext);
@@ -92,8 +132,6 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 ###############################################################################
 ($fasta) or die "error: specify fasta file";
 (-f $fasta) or die "error: no such file '$fasta'";
-($path) or die "error: specify path";
-($nostruct or -d $path) or die "error: no such directory '$path'";
 
 my ($fasta_ref, undef, $header_ref) = @{read_fasta_file($fasta)};
 
@@ -116,12 +154,15 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 	# skip accessibility part if requested
 	next if ($nostruct);
 
-	# get sequence accessibilities
-	my @accs = (readAccessibilities($seq,$path,'', 1),
-		readAccessibilities($seq,$path,'_E', 1),
-		readAccessibilities($seq,$path,'_H', 1),
-		readAccessibilities($seq,$path,'_I', 1),
-		readAccessibilities($seq,$path,'_M', 1));
+	# compute accessibilities on the fly
+	my @accs = @{computeAccessibilities($seq)};
+
+#	# get sequence accessibilities from file [DEPRECATED}
+#	my @accs = (readAccessibilities($seq,$path,'', 1),
+#		readAccessibilities($seq,$path,'_E', 1),
+#		readAccessibilities($seq,$path,'_H', 1),
+#		readAccessibilities($seq,$path,'_I', 1),
+#		readAccessibilities($seq,$path,'_M', 1));
 
 	# for each seq position sort context acc labels
 	# and generate graph
@@ -201,7 +242,6 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 			
 			say join(' ', 'e', $pos, $paired_id, 'a'); # a like accessibility
 		}
-
 	}
 }
 
