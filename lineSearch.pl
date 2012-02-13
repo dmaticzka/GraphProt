@@ -17,12 +17,12 @@ lineSearch.pl
 
 =head1 SYNOPSIS
 
-lineSearch.pl -gspan [gspan file]
+lineSearch.pl -fa fasta_for_graphs
 
 Options:
 
-    -gspan      optimize parameters for these graphs
-    -affy       affinities for graphs
+	-fa         optimize parameters for this fasta
+    -param      parameter definition for linesearch
     -mf         makefile to use for crossvalidation
     -of         write optimal parameters to this file
     -debug      enable debug output
@@ -59,15 +59,15 @@ sub end_handler {
 ###############################################################################
 # parse command line options
 ###############################################################################
-my $gspan;
-my $affy;
+my $fa;
+my $param;
 my $mf;
 my $of;
 my $help;
 my $man;
 my $debug;
-my $result = GetOptions (	"gspan=s"	=> \$gspan,
-							"affy=s"    => \$affy,
+my $result = GetOptions (	"fa=s"		=> \$fa,
+							"param=s"	=> \$param,
 							"mf=s"		=> \$mf,
 							"of=s"		=> \$of,
 							"help"	=> \$help,
@@ -76,10 +76,10 @@ my $result = GetOptions (	"gspan=s"	=> \$gspan,
 pod2usage(-exitstatus => 1, -verbose => 1) if $help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 ($result) or pod2usage(2);
-(defined $gspan) or pod2usage("error: -gspan parameter mandatory");
-(-f $gspan) or die "error: could not find file '$gspan'";
+(defined $fa) or pod2usage("error: -fa parameter mandatory");
+(-f $fa) or die "error: could not find file '$fa'";
 (-f $mf) or die "error: could not find file '$mf'";
-(-f $affy) or die "error: could not find file '$affy'";
+(-f $param) or die "error: could not find file '$param'";
 
 ###############################################################################
 # main
@@ -91,29 +91,24 @@ my $CURRDIR = cwd();
 my $top_correlation = 0;
 my @top_rounds = 0;
 my $n_rounds = 1;
-my $basename = $gspan;
-$basename =~ s/.gspan//;
+my $basename = $fa;
+$basename =~ s/.fa//;
 
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
 my $libsvm_options = ' -v 5 -s 3 -t 0';
 
 # we optimize these parameters
-my @parameters = qw/ e c R D /;
-
+my @parameters;
 # valid values for parameters
 my %parameters;
-$parameters{'e'}{default} = 0.1;
-$parameters{'e'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
-$parameters{'c'}{default} = 1;
-$parameters{'c'}{values} = [0.001, 0.01, 0.1, 1, 10, 100];
-$parameters{'R'}{default} = 1;
-$parameters{'R'}{values} = [4, 3, 2, 1];
-$parameters{'D'}{default} = 4;
-$parameters{'D'}{values} = [6, 5, 4, 3, 2, 1];
-
-for my $par (@parameters) {
-	$parameters{$par}{current}=$parameters{$par}{default};
+open PARAM, $param;
+while (<PARAM>) {
+	my ($id, $default, @values) = split ' ';
+	push @parameters, $id;
+	$parameters{$id}{default} = $default;
+	$parameters{$id}{current} = $default;
+	$parameters{$id}{values} = \@values;
 }
 
 # print important variables
@@ -145,8 +140,7 @@ do {
 			next if ($parameters{'R'}{current} > $parameters{'D'}{current});
 			
 			# copy relevant files into tmp
-			copy($gspan, $tmpdir);
-			copy($affy, $tmpdir);
+			copy($fa, $tmpdir);
 			copy($mf, $tmpdir);
 			
 			# test parameter combination / get value from previous run

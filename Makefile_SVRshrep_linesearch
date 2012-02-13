@@ -17,7 +17,8 @@ THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
-LINESEARCH:=./lineSearch.pl
+LINESEARCH:=$(ROOT)/bin/lineSearch.pl
+COMBINEFEATURES:=$(ROOT)/bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
@@ -32,9 +33,6 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
-
-debug:
-	echo $(FA_FILES)
 
 all: $(PERF_FILES) results_aucpr.csv
 
@@ -56,10 +54,9 @@ cv : $(CV_FILES)
 	zcat $< > $@
 
 # else, create gspan from fasta
-%.gspan : %.fa
-	time $(FASTA2GSPAN) -stdout -q -Tp 0.001 -fasta t.fa  > t.gspan
-	time /usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
-	-fa $< > $@
+%.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION' $*.param | cut -f 2 -d' ')
+%.gspan : %.fa %.param
+	time $(FASTA2GSPAN) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 # when computing predictions, the same parameters should be used as when training
 # the model. in order to be able to use simple name substitution in the
@@ -85,8 +82,8 @@ cv : $(CV_FILES)
 #	ln -sf default.parameters $@
 
 # do parameter optimization by line search
-%.param : %.ls.gspan %.ls.affy
-	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -of $@
+%.param : %.ls.fa ls.param
+	$(LINESEARCH) -d -fa $< -param ls.param -mf Makefile -of $@
 
 # subset original fasta
 %.ls.fa : %.fa
@@ -102,13 +99,19 @@ cv : $(CV_FILES)
 %.feature : bitsize=$(shell grep '^b' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
 	# create features
-	ln -sf $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
-	-rm -f $* $@_bin # clean up after feature creation
+	# remove t and w, convert s to t
+	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
+	$(ROOT)/bin/NSPDK -fg $*_singleshreps -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -gt DIRECTED
+	-rm -f $*_singleshreps $*_singleshreps.feature_bin # clean up after feature creation
+	# write out probabilities
+	cat $< | grep '^s' | perl -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
+	# write out shrep membership
+	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
+	# go go perl
+	perl $(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
+	-rm -f $*_singleshreps.feature $*_probs $*_groups
 	# add affinities to features
-	mv $@ $@.tmp
-	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -rf $@.tmp # clean up affinityless feature file
+	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 
 %.affy : %.gspan
 	# extract affinities from gspan
