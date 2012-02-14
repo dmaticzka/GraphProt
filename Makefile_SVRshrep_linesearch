@@ -108,7 +108,7 @@ cv : $(CV_FILES)
 	# write out shrep membership
 	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
 	# go go perl
-	perl $(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
+	/usr/local/perl/bin/perl $(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
 	-rm -f $*_singleshreps.feature $*_probs $*_groups
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@

@@ -90,7 +90,7 @@ cv : $(CV_FILES)
 %.ls.fa : %.fa
 	cat $< | \
 	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | $(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
-	perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
+	/usr/local/perl/bin/perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
 # feature creation for this type of graph has to set an additional parameter
