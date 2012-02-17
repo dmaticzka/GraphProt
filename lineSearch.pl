@@ -104,6 +104,7 @@ my @parameters;
 my %parameters;
 open PARAM, $param;
 while (<PARAM>) {
+	next if /^\s*#/;
 	my ($id, $default, @values) = split ' ';
 	push @parameters, $id;
 	$parameters{$id}{default} = $default;
@@ -127,6 +128,7 @@ my $optimization_finished = 0;
 do {
 	# optimize each parameter
 	for my $par (@parameters) {
+		next if (@{$parameters{$par}{values}}<=1); # some parameters don't vary
 		say STDERR "\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
 		for my $try_this (@{$parameters{$par}{values}}) {
 			# set new parameter
@@ -153,7 +155,6 @@ do {
 				say PARS $par, ' ', $parameters{$par}{current};
 			}
 			print STDERR "\n";
-			say PARS 'b 14';
 			close PARS;
 			# call Makefile for cv
 			my $exec = "make cv -e CV_FILES=$cv_file";
@@ -219,7 +220,6 @@ for my $par (@parameters) {
 	say OUT $par, ' ', $parameters{$par}{current};
 }
 print STDERR "\n";
-say OUT 'b 14';
 close OUT;
 
 chdir();
