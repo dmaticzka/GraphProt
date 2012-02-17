@@ -6,6 +6,7 @@
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
 LINESEARCH_INPUT_SIZE:=5000
+SVR_CACHE:=10000
 CV_FOLD:=5
 
 # paths
@@ -14,7 +15,7 @@ FA_DIR:=~/projects/RBPaffinity/data/fasta
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
-SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
+SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
 LINESEARCH:=$(ROOT)/bin/lineSearch.pl
