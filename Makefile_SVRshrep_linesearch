@@ -1,7 +1,7 @@
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
-.SECONDARY:
+#.SECONDARY:
 
 # parameters:
 EXPERIMENT_ID:=svr_acccontextDir
@@ -22,6 +22,11 @@ COMBINEFEATURES:=$(ROOT)/bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
+
+# important files
+# parameters for line search (including defaults):
+LSPAR:=$(ROOT)/bin/ls.parameters
+DEFPAR:=$(ROOT)/bin/default.parameters
 
 # targets
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -45,9 +50,9 @@ cv : $(CV_FILES)
 %.cv : %.feature %.param
 	$(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
-## if not available, copy fasta from data dir
-#%.fa : $(FA_DIR)/%.fa
-#	cp $< $@
+# if not available, copy fasta from data dir
+%.fa : $(FA_DIR)/%.fa
+	cp $< $@
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -58,32 +63,18 @@ cv : $(CV_FILES)
 %.gspan : %.fa %.param
 	time $(FASTA2GSPAN) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
-# when computing predictions, the same parameters should be used as when training
-# the model. in order to be able to use simple name substitution in the
-# relevant rules, this Makefile has to map the original input to files of
-# the form %.pred.gpsan. this mapping is accomplished by these rules, employing
-# secondary expansion
-.SECONDEXPANSION:
-%_A.pred.gspan : $$(subst _A.,_B.,$$(subst _bruijn,_full,$$(subst .pred,,$$@)))
-	# rename for convenience
-	ln -f $< $@
-
-%_B.pred.gspan : $$(subst _B.,_A.,$$(subst _bruijn,_full,$$(subst .pred,,$$@)))
-	# rename for convenience
-	ln -f $< $@
-
-# link for simpler handling
+# link parameter file for simpler handling
 %.pred.param : %.param
 	ln -sf $< $@
 
 ## just link default parameters; for using optimized parameters just supply
 ## alternative parameter files
 #%.param :
-#	ln -sf default.parameters $@
+#	ln -sf $(DEFPAR) $@
 
 # do parameter optimization by line search
-%.param : %.ls.fa ls.param
-	$(LINESEARCH) -d -fa $< -param ls.param -mf Makefile -of $@
+%.param : %.ls.fa $(LSPAR)
+	$(LINESEARCH) -d -fa $< -param $(LSPAR) -mf Makefile -of $@
 
 # subset original fasta
 %.ls.fa : %.fa
