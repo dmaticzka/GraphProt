@@ -97,7 +97,7 @@ open GROUP, $group_f;
 my $current_gid = 1;
 my @vecs;
 my @probs;
-while (my $feat = <FEAT> and my $prob = <PROB> and my $group = <GROUP>) {
+while (defined(my $feat = <FEAT>) and defined(my $prob = <PROB>) and defined (my $group = <GROUP>)) {
 	if ($current_gid == $group) {
 		# add to queue
 		push @vecs, $feat;
