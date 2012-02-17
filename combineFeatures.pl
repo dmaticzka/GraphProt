@@ -94,7 +94,7 @@ open FEAT, $feat_f;
 open PROB, $prob_f;
 open GROUP, $group_f;
 
-my $current_gid = 0;
+my $current_gid = 1;
 my @vecs;
 my @probs;
 while (my $feat = <FEAT> and my $prob = <PROB> and my $group = <GROUP>) {
