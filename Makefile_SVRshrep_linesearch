@@ -4,6 +4,9 @@
 #.SECONDARY:
 
 # parameters:
+# SHREPTYPE = PROBSHREP | NORMSHREP
+# has to be specified IN Makefile because of lineSearch!
+SHREPTYPE:=NORMSHREP
 EXPERIMENT_ID:=svr_acccontextDir
 LINESEARCH_INPUT_SIZE:=5000
 SVR_CACHE:=10000
@@ -64,7 +67,11 @@ cv : $(CV_FILES)
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
+ifeq ($(SHREPTYPE),PROBSHREP)
 	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
+else
+	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+endif
 
 # link parameter file for simpler handling
 %.pred.param : %.param
@@ -93,6 +100,7 @@ cv : $(CV_FILES)
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
+ifeq ($(SHREPTYPE),PROBSHREP)
 	# create features
 	# remove t and w, convert s to t
 	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
@@ -107,6 +115,14 @@ cv : $(CV_FILES)
 	-rm -f $*_singleshreps.feature $*_probs $*_groups
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+else
+	ln -sf $< $* # remove suffix to have shorter filenames
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
+	-rm -f $* $@_bin # clean up after feature creation
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
+endif
 
 %.affy : %.gspan
 	# extract affinities from gspan
