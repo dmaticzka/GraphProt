@@ -21,7 +21,7 @@ lineSearch.pl -fa fasta_for_graphs
 
 Options:
 
-	-fa         optimize parameters for this fasta
+    -fa         optimize parameters for this fasta
     -param      parameter definition for linesearch
     -mf         makefile to use for crossvalidation
     -of         write optimal parameters to this file
