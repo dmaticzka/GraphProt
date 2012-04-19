@@ -93,6 +93,7 @@ my @top_rounds = 0;
 my $n_rounds = 1;
 my $basename = $fa;
 $basename =~ s/.fa//;
+my %result_cache;
 
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
@@ -133,54 +134,70 @@ do {
 		for my $try_this (@{$parameters{$par}{values}}) {
 			# set new parameter
 			$parameters{$par}{current} = $try_this;
-			
-			$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
-			my $param_file = $basename . '.param';
-			my $cv_file = $basename . '.cv';
-			
-			# check if parameter combination is valid
-			next if ($parameters{'R'}{current} > $parameters{'D'}{current});
-			
-			# copy relevant files into tmp
-			copy($fa, $tmpdir);
-			copy($mf, $tmpdir);
-			
-			# test parameter combination / get value from previous run
-			# create parameter file
-			chdir($tmpdir);
-			open PARS, '>', $param_file;
-			print STDERR 'parameters: ';
-			for my $par (@parameters) {
-				print STDERR $par, ' ', $parameters{$par}{current}, ";";
-				say PARS $par, ' ', $parameters{$par}{current};
+
+			my $error;
+			my $correlation;
+
+			# get current parameter key for hash lookup
+			my $param_key = get_current_param_key();
+			my $cached_value_found = defined $result_cache{$param_key};
+
+			# look for cached result
+			if ($cached_value_found) {
+				say STDERR 'cached value found: ', $param_key;
+				# retrieve cached result and be done
+				$correlation = $result_cache{$param_key};
+			} else {
+				$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
+				my $param_file = $basename . '.param';
+				my $cv_file = $basename . '.cv';
+
+				# check if parameter combination is valid
+				next if ($parameters{'R'}{current} > $parameters{'D'}{current});
+
+				# copy relevant files into tmp
+				copy($fa, $tmpdir);
+				copy($mf, $tmpdir);
+
+				# test parameter combination / get value from previous run
+				# create parameter file
+				chdir($tmpdir);
+				open PARS, '>', $param_file;
+				print STDERR 'parameters: ';
+				for my $par (@parameters) {
+					print STDERR $par, ' ', $parameters{$par}{current}, ";";
+					say PARS $par, ' ', $parameters{$par}{current};
+				}
+				print STDERR "\n";
+				close PARS;
+				# call Makefile for cv
+				my $exec = "make cv -e CV_FILES=$cv_file";
+				$debug and say STDERR $exec;
+				system("time $exec");
+
+				# parse result
+				open RES, '<', $cv_file;
+				my @lines = <RES>;
+				close RES;
+				if (not ($lines[-2] =~ /Cross Validation Mean squared error/) or
+					not ($lines[-1] =~ /Cross Validation Squared correlation coefficient/)) {
+					say STDERR 'error parsing crossvalidation output:';
+					system("cat $cv_file > /dev/stderr");
+					end_handler();
+				}
+				my @error = split(' ', $lines[-2]);
+				$error = pop(@error);
+				my @correlation = split(' ', $lines[-1]);
+				$correlation = pop(@correlation);
+				# save result for later reference
+				$result_cache{get_current_param_key()} = $correlation;
+				say STDERR "correlation: $correlation, error: $error";
+
+				# exit temp directory
+				chdir($CURRDIR);
+				File::Temp::cleanup();
 			}
-			print STDERR "\n";
-			close PARS;
-			# call Makefile for cv
-			my $exec = "make cv -e CV_FILES=$cv_file";
-			$debug and say STDERR $exec;
-			system("time $exec");
-			
-			# parse result
-			open RES, '<', $cv_file;
-			my @lines = <RES>;
-			close RES;
-			if (not ($lines[-2] =~ /Cross Validation Mean squared error/) or
-				not ($lines[-1] =~ /Cross Validation Squared correlation coefficient/)) {
-				say STDERR 'error parsing crossvalidation output:';
-				system("cat $cv_file > /dev/stderr");
-				end_handler();
-			}
-			my @error = split(' ', $lines[-2]);
-			my $error = pop(@error);
-			my @correlation = split(' ', $lines[-1]);
-			my $correlation = pop(@correlation);
-			say STDERR "correlation: $correlation, error: $error";
-			
-			# exit temp directory
-			chdir($CURRDIR);
-			File::Temp::cleanup();
-			
+
 			# save state info
 			if ($correlation > $top_correlation) {
 				# if the new result is better, save these parameters
@@ -223,3 +240,12 @@ print STDERR "\n";
 close OUT;
 
 chdir();
+
+sub get_current_param_key {
+	my $current_param_key;
+	for my $par (@parameters) {
+		my $value = $parameters{$par}{current};
+		$current_param_key .= $par . ';' . $value . ';';
+	}
+	return $current_param_key;
+}
