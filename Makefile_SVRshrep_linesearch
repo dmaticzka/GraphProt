@@ -29,8 +29,8 @@ FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 
 # important files
 # parameters for line search (including defaults):
-LSPAR:=$(ROOT)/bin/ls.parameters
-DEFPAR:=$(ROOT)/bin/default.parameters
+LSPAR:=$(ROOT)/bin/ls.shrep.parameters
+DEFPAR:=$(ROOT)/bin/default.shrep.parameters
 
 # targets
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1

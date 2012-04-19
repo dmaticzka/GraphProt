@@ -21,6 +21,11 @@ LINESEARCH:=./lineSearch.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 
+# important files
+# parameters for line search (including defaults):
+LSPAR:=$(ROOT)/bin/ls.AccContext.parameters
+DEFPAR:=$(ROOT)/bin/default.AccContext.parameters
+
 # targets
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 PROTEINS:=test
@@ -70,14 +75,15 @@ cv : $(CV_FILES)
 %.pred.param : %.param
 	ln -sf $< $@
 
+## TODO: enable by setting parameter
 ## just link default parameters; for using optimized parameters just supply
 ## alternative parameter files
 #%.param :
-#	ln -sf default.parameters $@
+#	ln -sf $(DEFPAR) $@
 
 # do parameter optimization by line search
-%.param : %.ls.gspan %.ls.affy
-	$(LINESEARCH) -gspan $< -affy $*.ls.affy -mf Makefile -of $@
+%.param : %.ls.fa $(LSPAR)
+	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@
 
 # subset original fasta
 %.ls.fa : %.fa
