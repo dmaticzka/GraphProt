@@ -99,10 +99,11 @@ cv : $(CV_FILES)
 %.feature : RADIUS=$(shell grep '^R' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D' $*.param | cut -f 2 -d' ')
 %.feature : bitsize=$(shell grep '^b' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
 	# create features
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
