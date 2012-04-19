@@ -23,7 +23,7 @@ FASTAPL:=/usr/local/user/RNAtools/fastapl
 
 # targets
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-#PROTEINS:=YB1
+PROTEINS:=test
 BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS))
 #			$(patsubst %,%_data_full_B,$(PROTEINS))
 #			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
@@ -31,9 +31,6 @@ BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
-
-debug:
-	echo $(FA_FILES)
 
 all: $(PERF_FILES) results_aucpr.csv
 
@@ -45,10 +42,6 @@ cv : $(CV_FILES)
 %.cv : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
 %.cv : %.feature %.param
 	$(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
-
-## if not available, copy fasta from data dir
-#%.fa : $(FA_DIR)/%.fa
-#	cp $< $@
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -89,8 +82,10 @@ cv : $(CV_FILES)
 # subset original fasta
 %.ls.fa : %.fa
 	cat $< | \
-	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | $(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
-	/usr/local/perl/bin/perl -ane '$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
+	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | \
+	$(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
+	/usr/local/perl/bin/perl -ane \
+	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
 # feature creation for this type of graph has to set an additional parameter
