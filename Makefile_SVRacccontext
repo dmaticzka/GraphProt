@@ -1,3 +1,5 @@
+SHELL:=/bin/bash
+
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
@@ -83,7 +85,7 @@ cv : $(CV_FILES)
 
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@
+	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ 2> >(tee $@.log >&2)
 
 # subset original fasta
 %.ls.fa : %.fa
