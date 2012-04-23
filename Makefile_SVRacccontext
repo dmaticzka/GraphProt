@@ -30,20 +30,26 @@ DEFPAR:=$(ROOT)/bin/default.AccContext.parameters
 
 # targets
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
-BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS))
-#			$(patsubst %,%_data_full_B,$(PROTEINS))
-#			$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
-#			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+#PROTEINS:=test
+FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
+			$(patsubst %,%_data_full_B,$(PROTEINS))
+BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
+CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
+
+.PHONY: all ls cv classstats
 
 all: $(PERF_FILES) results_aucpr.csv
 
 ls : $(PARAM_FILES)
 
 cv : $(CV_FILES)
+
+classstats : summary.cstats $(CSTAT_FILES)
 
 %.cv : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
@@ -148,6 +154,20 @@ results_aucpr.csv : $(PERF_FILES)
 	sort > aucpr.tmp
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
+
+%.cstats : BASENAME=$(firstword $(subst _, ,$<))
+%.cstats : TYPE=$(word 3,$(subst _, ,$<))
+%.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
+%.cstats : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.cstats : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.cstats : HN=$(shell cat $< | grep '^>' | awk '$$NF > $(HT)' | wc -l)
+%.cstats : LN=$(shell cat $< | grep '^>' | awk '$$NF < $(LT)' | wc -l)
+%.cstats : %.fa
+	perl -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
+
+summary.cstats : $(CSTAT_FILES)
+	( perl -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
+	cat $^ | sort -k1,2 ) > $@
 
 # keep predictions and results
 clean:
