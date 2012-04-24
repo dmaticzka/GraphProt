@@ -163,4 +163,8 @@ summary.cstats : $(CSTAT_FILES)
 
 # keep predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy *.svrout
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy *.svrout *.ls.fa *.log
+
+# delete all files
+distclean: clean
+	-rm -rf *.param *.fa *.perf *.pred
