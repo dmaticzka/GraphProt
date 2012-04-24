@@ -17,4 +17,4 @@ DO_LINESEARCH=YES
 # NORMSHREP: plain shrep graphs
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
-GRAPH_TYPE=STRUCTACC
+GRAPH_TYPE=CONTEXTSHREP

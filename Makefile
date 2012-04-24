@@ -182,6 +182,32 @@ else
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
 LSPAR:=./ls.shrep.parameters
+
+# else, create gspan from fasta
+%.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.gspan : %.fa %.param
+	time $(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+
+# feature creation for this type of graph has to set an additional parameter
+# in order to center only on nucleotides and not on annotation -> -T nspdkvp
+%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan %.affy %.param
+	ln -sf $< $* # remove suffix to have shorter filenames
+	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
+	-rm -f $* $@_bin # clean up after feature creation
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
+
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$5}' > $@
+
 endif
 endif
 endif
