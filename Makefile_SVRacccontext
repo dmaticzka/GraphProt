@@ -5,34 +5,40 @@ SHELL:=/bin/bash
 # don't delete intermediate files
 .SECONDARY:
 
+# set graph type:
+# ONLYSEQ: plain sequence TODO
+# STRUCTACC: sequence annotated with structural context TODO
+# NORMSHREP: plain shrep graphs TODO
+# PROBSHREP: plain shrep graphs, features weighted by shape probability TODO
+# CONTEXTSHREP: shrep graphs annotated with structural context TODO
+GRAPH_TYPE=STRUCTACC
+
+# enable/disable line search
+DO_LINESEARCH=NO
+
 # parameters:
 # SHREPTYPE = PROBSHREP | NORMSHREP
 # has to be specified IN Makefile because of lineSearch!
 SHREPTYPE:=NORMSHREP
-EXPERIMENT_ID:=svr_acccontextDir
+EXPERIMENT_ID:=default
 LINESEARCH_INPUT_SIZE:=5000
 SVR_CACHE:=10000
 CV_FOLD:=5
 
 # paths
 ROOT:=~/projects/RBPaffinity
-FA_DIR:=~/projects/RBPaffinity/data/fasta
-THR_DIR:=~/projects/RBPaffinity/data/thresholds/
+FA_DIR:=~$(ROOT)/data/fasta
+THR_DIR:=$(ROOT)/data/thresholds/
 
 # binaries
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
-LINESEARCH:=$(ROOT)/bin/lineSearch.pl
-COMBINEFEATURES:=$(ROOT)/bin/combineFeatures.pl
+LINESEARCH:=./lineSearch.pl
+COMBINEFEATURES:=./bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
-
-# important files
-# parameters for line search (including defaults):
-LSPAR:=$(ROOT)/bin/ls.AccContext.parameters
-DEFPAR:=$(ROOT)/bin/default.AccContext.parameters
 
 # targets
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -46,6 +52,42 @@ PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
+
+# evaluations specific to graph type
+################################################################################
+ifeq ($(GRAPH_TYPE),ONLYSEQ)
+	# line search parameters
+	LSPAR:=./ls.onlyseq.parameters
+else
+################################################################################
+ifeq ($(GRAPH_TYPE),STRUCTACC)
+# line search parameters
+LSPAR:=./ls.structacc.parameters
+
+%.gspan : %.fa
+	time /usr/local/perl/bin/perl ./bin/create_accgraph/createExtendedGraph.pl \
+	-fa $< > $@
+
+else
+################################################################################
+ifeq ($(GRAPH_TYPE),NORMSHREP)
+	# line search parameters
+	LSPAR:=./ls.shrep.parameters
+else
+################################################################################
+ifeq ($(GRAPH_TYPE),PROBSHREP)
+	# line search parameters
+	LSPAR:=./ls.shrep.parameters
+else
+################################################################################
+ifeq ($(GRAPH_TYPE),PROBSHREP)
+	# line search parameters
+	LSPAR:=./ls.shrep.parameters
+endif
+endif
+endif
+endif
+endif
 
 .PHONY: all ls cv classstats
 
@@ -66,20 +108,15 @@ classstats : summary.cstats $(CSTAT_FILES)
 %.gspan : %.gspan.gz
 	zcat $< > $@
 
-# else, create gspan from fasta
-%.gspan : %.fa
-	time /usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
-	-fa $< > $@
-
 # link parameter file for simpler handling
 %.pred.param : %.param
 	ln -sf $< $@
 
-## TODO: enable by setting parameter
-## just link default parameters; for using optimized parameters just supply
-## alternative parameter files
-#%.param :
-#	ln -sf $(DEFPAR) $@
+ifeq ($(DO_LINESEARCH),NO)
+# just use defaults instead of doing line search
+%.param : $(LSPAR)
+	cut -f 1,2 -d' ' < $< > $@
+endif
 
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
@@ -103,7 +140,7 @@ classstats : summary.cstats $(CSTAT_FILES)
 %.feature : %.gspan %.affy %.param
 	# create features
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
+	./bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
