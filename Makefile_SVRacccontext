@@ -5,11 +5,11 @@ EXPERIMENT_ID:=default
 
 # set graph type:
 # ONLYSEQ: plain sequence TODO
-# STRUCTACC: sequence annotated with structural context TODO
+# STRUCTACC: sequence annotated with structural context
 # NORMSHREP: plain shrep graphs TODO
 # PROBSHREP: plain shrep graphs, features weighted by shape probability TODO
 # CONTEXTSHREP: shrep graphs annotated with structural context TODO
-GRAPH_TYPE=STRUCTACC
+GRAPH_TYPE=NORMSHREP
 
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
@@ -99,21 +99,25 @@ LSPAR:=./ls.structacc.parameters
 	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -rf $@.tmp # clean up affinityless feature file
 
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$NF}' > $@
+
 else
 ################################################################################
 ifeq ($(GRAPH_TYPE),NORMSHREP)
-	# line search parameters
-	LSPAR:=./ls.shrep.parameters
+# line search parameters
+LSPAR:=./ls.shrep.parameters
 else
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
-	# line search parameters
-	LSPAR:=./ls.shrep.parameters
+# line search parameters
+LSPAR:=./ls.shrep.parameters
 else
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
-	# line search parameters
-	LSPAR:=./ls.shrep.parameters
+# line search parameters
+LSPAR:=./ls.shrep.parameters
 endif
 endif
 endif
@@ -147,11 +151,11 @@ ifeq ($(DO_LINESEARCH),NO)
 # just use defaults instead of doing line search
 %.param : $(LSPAR)
 	cut -f 1,2 -d' ' < $< > $@
-endif
-
+else
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
 	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ 2> >(tee $@.log >&2)
+endif
 
 # subset original fasta
 %.ls.fa : %.fa
@@ -161,10 +165,6 @@ endif
 	/usr/local/perl/bin/perl -ane \
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
