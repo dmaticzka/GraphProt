@@ -158,6 +158,7 @@ do {
 				# copy relevant files into tmp
 				copy($fa, $tmpdir);
 				copy($mf, $tmpdir);
+				copy('PARAMETERS', $tmpdir);
 
 				# test parameter combination / get value from previous run
 				# create parameter file

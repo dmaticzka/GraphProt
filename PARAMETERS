@@ -1,0 +1,20 @@
+# written out with end results
+EXPERIMENT_ID:=default
+
+# proteins to use
+#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=test
+
+# sets for training: FULL/WEAK/ALL
+TRAINING_SETS=FULL
+
+# enable/disable line search: YES/NO
+DO_LINESEARCH=YES
+
+# set graph type:
+# ONLYSEQ: plain sequence
+# STRUCTACC: sequence annotated with structural context
+# NORMSHREP: plain shrep graphs
+# PROBSHREP: plain shrep graphs, features weighted by shape probability
+# CONTEXTSHREP: shrep graphs annotated with structural context
+GRAPH_TYPE=STRUCTACC
