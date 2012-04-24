@@ -14,12 +14,12 @@ TRAINING_SETS=FULL
 DO_LINESEARCH=YES
 
 # set graph type:
-# ONLYSEQ: plain sequence TODO
+# ONLYSEQ: plain sequence
 # STRUCTACC: sequence annotated with structural context
-# NORMSHREP: plain shrep graphs TODO
-# PROBSHREP: plain shrep graphs, features weighted by shape probability TODO
-# CONTEXTSHREP: shrep graphs annotated with structural context TODO
-GRAPH_TYPE=NORMSHREP
+# NORMSHREP: plain shrep graphs
+# PROBSHREP: plain shrep graphs, features weighted by shape probability
+# CONTEXTSHREP: shrep graphs annotated with structural context
+GRAPH_TYPE=ONLYSEQ
 
 # main
 SHELL:=/bin/bash
@@ -47,6 +47,7 @@ COMBINEFEATURES:=./bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
+NSPDK:=~/projects/RBPaffinity/bin/NSPDK
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -71,8 +72,33 @@ CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 # evaluations specific to graph type
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
-	# line search parameters
-	LSPAR:=./ls.onlyseq.parameters
+# line search parameters
+LSPAR:=./ls.onlyseq.parameters
+
+%.gspan : %.fa
+	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+	--nostruct -fa $< > $@
+
+# feature creation for this type of graph has to set an additional parameter
+# in order to center only on nucleotides and not on annotation -> -T nspdkvp
+%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan %.affy %.param
+	# create features
+	ln -sf $< $* # remove suffix to have shorter filenames
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
+	-rm -f $* $@_bin # clean up after feature creation
+	# add affinities to features
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
+
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$NF}' > $@
+
 else
 ################################################################################
 ifeq ($(GRAPH_TYPE),STRUCTACC)
@@ -92,7 +118,7 @@ LSPAR:=./ls.structacc.parameters
 %.feature : %.gspan %.affy %.param
 	# create features
 	ln -sf $< $* # remove suffix to have shorter filenames
-	./bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp

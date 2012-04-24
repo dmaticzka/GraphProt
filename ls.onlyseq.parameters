@@ -1,0 +1,7 @@
+# [parameter] [default] [parameter list]
+e 0.1 0.001 0.01 0.1 1 10 100
+c 1 0.001 0.01 0.1 1 10 100
+R 1 4 3 2 1
+D 4 6 5 4 3 2 1
+b 14 10 11 12 13 14
+DIRECTED DIRECTED DIRECTED UNDIRECTED
