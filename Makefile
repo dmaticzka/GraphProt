@@ -52,7 +52,7 @@ CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
-LSPAR:=./ls.onlyseq.parameters
+LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
 	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
