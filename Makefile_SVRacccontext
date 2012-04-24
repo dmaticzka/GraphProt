@@ -1,9 +1,7 @@
-SHELL:=/bin/bash
+# user parameters
 
-.DELETE_ON_ERROR:
-
-# don't delete intermediate files
-.SECONDARY:
+# written out with end results
+EXPERIMENT_ID:=default
 
 # set graph type:
 # ONLYSEQ: plain sequence TODO
@@ -13,14 +11,24 @@ SHELL:=/bin/bash
 # CONTEXTSHREP: shrep graphs annotated with structural context TODO
 GRAPH_TYPE=STRUCTACC
 
-# enable/disable line search
-DO_LINESEARCH=NO
+# enable/disable line search: YES/NO
+DO_LINESEARCH=YES
+
+# proteins to use
+#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=test
+
+# sets for training: FULL/WEAK/ALL
+TRAINING_SETS=FULL
+
+# main
+SHELL:=/bin/bash
+.DELETE_ON_ERROR:
+
+# don't delete intermediate files
+.SECONDARY:
 
 # parameters:
-# SHREPTYPE = PROBSHREP | NORMSHREP
-# has to be specified IN Makefile because of lineSearch!
-SHREPTYPE:=NORMSHREP
-EXPERIMENT_ID:=default
 LINESEARCH_INPUT_SIZE:=5000
 SVR_CACHE:=10000
 CV_FOLD:=5
@@ -41,13 +49,20 @@ FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 
 # targets
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_full_B,$(PROTEINS))
 BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+ifeq ($(TRAINING_SETS),FULL)
+BASENAMES:=$(FULL_BASENAMES)
+else
+ifeq ($(TRAINING_SETS),WEAK)
+BASENAMES:=$(BRUIJN_BASENAMES)
+else
 BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
+endif
+endif
+
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
@@ -67,6 +82,22 @@ LSPAR:=./ls.structacc.parameters
 %.gspan : %.fa
 	time /usr/local/perl/bin/perl ./bin/create_accgraph/createExtendedGraph.pl \
 	-fa $< > $@
+
+# feature creation for this type of graph has to set an additional parameter
+# in order to center only on nucleotides and not on annotation -> -T nspdkvp
+%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan %.affy %.param
+	# create features
+	ln -sf $< $* # remove suffix to have shorter filenames
+	./bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
+	-rm -f $* $@_bin # clean up after feature creation
+	# add affinities to features
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
 
 else
 ################################################################################
@@ -130,22 +161,6 @@ endif
 	/usr/local/perl/bin/perl -ane \
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
-
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	# create features
-	ln -sf $< $* # remove suffix to have shorter filenames
-	./bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
-	-rm -f $* $@_bin # clean up after feature creation
-	# add affinities to features
-	mv $@ $@.tmp
-	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -rf $@.tmp # clean up affinityless feature file
 
 %.affy : %.gspan
 	# extract affinities from gspan
