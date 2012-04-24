@@ -6,8 +6,12 @@ SHELL:=/bin/bash
 .SECONDARY:
 
 # parameters:
+# SHREPTYPE = PROBSHREP | NORMSHREP
+# has to be specified IN Makefile because of lineSearch!
+SHREPTYPE:=NORMSHREP
 EXPERIMENT_ID:=svr_acccontextDir
 LINESEARCH_INPUT_SIZE:=5000
+SVR_CACHE:=10000
 CV_FOLD:=5
 
 # paths
@@ -16,12 +20,14 @@ FA_DIR:=~/projects/RBPaffinity/data/fasta
 THR_DIR:=~/projects/RBPaffinity/data/thresholds/
 
 # binaries
-SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m 2000
+SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
-LINESEARCH:=./lineSearch.pl
+LINESEARCH:=$(ROOT)/bin/lineSearch.pl
+COMBINEFEATURES:=$(ROOT)/bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
+FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 
 # important files
 # parameters for line search (including defaults):
@@ -29,8 +35,8 @@ LSPAR:=$(ROOT)/bin/ls.AccContext.parameters
 DEFPAR:=$(ROOT)/bin/default.AccContext.parameters
 
 # targets
-PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-#PROTEINS:=test
+#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=test
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
 			$(patsubst %,%_data_full_B,$(PROTEINS))
 BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
@@ -51,8 +57,8 @@ cv : $(CV_FILES)
 
 classstats : summary.cstats $(CSTAT_FILES)
 
-%.cv : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
-%.cv : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv : %.feature %.param
 	$(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
@@ -65,21 +71,7 @@ classstats : summary.cstats $(CSTAT_FILES)
 	time /usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
 	-fa $< > $@
 
-# when computing predictions, the same parameters should be used as when training
-# the model. in order to be able to use simple name substitution in the
-# relevant rules, this Makefile has to map the original input to files of
-# the form %.pred.gpsan. this mapping is accomplished by these rules, employing
-# secondary expansion
-.SECONDEXPANSION:
-%_A.pred.gspan : $$(subst _A.,_B.,$$(subst _bruijn,_full,$$(subst .pred,,$$@)))
-	# rename for convenience
-	ln -f $< $@
-
-%_B.pred.gspan : $$(subst _B.,_A.,$$(subst _bruijn,_full,$$(subst .pred,,$$@)))
-	# rename for convenience
-	ln -f $< $@
-
-# link for simpler handling
+# link parameter file for simpler handling
 %.pred.param : %.param
 	ln -sf $< $@
 
