@@ -81,13 +81,15 @@ while (<>) {
 		if ($plotno == $i) {
 			my (undef, $id, $affy) = split();
             ($id !~ /#/) or $id = $i;
-			open DOT, "| neato -Tsvg > $id.svg";
+			open DOT, ">tmp.dot";
 #            open DOT, ">&STDOUT";
 			say DOT "digraph $id {";
-			say DOT "affinity [label=$affy];";
+#			say DOT "affinity [label=$affy];";
 		}
 	} elsif (/^v/ and ($plotno == $i)) {
 		my (undef, $id, $label) = split();
+		$label =~ s/#//;
+		$label =~ s/\^//;
 		my $attr = getAttr($label);
 		say DOT "$id [label=$label $attr];";
 	} elsif (/^e/ and ($plotno == $i)) {

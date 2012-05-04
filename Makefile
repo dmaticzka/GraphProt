@@ -26,7 +26,8 @@ COMBINEFEATURES:=./bin/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
-NSPDK:=~/projects/RBPaffinity/bin/NSPDK
+NSPDK:=$(ROOT)/bin/NSPDK
+CREATE_EXTENDED_ACC_GRAPH:=$(ROOT)/bin/create_accgraph/createExtendedGraph.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -55,7 +56,7 @@ ifeq ($(GRAPH_TYPE),ONLYSEQ)
 LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
-	/usr/local/perl/bin/perl $(ROOT)/bin/create_accgraph/createExtendedGraph.pl \
+	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
 	--nostruct -fa $< > $@
 
 # feature creation for this type of graph has to set an additional parameter
@@ -85,7 +86,7 @@ ifeq ($(GRAPH_TYPE),STRUCTACC)
 LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
-	time /usr/local/perl/bin/perl ./bin/create_accgraph/createExtendedGraph.pl \
+	time /usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
 	-fa $< > $@
 
 # feature creation for this type of graph has to set an additional parameter
@@ -129,7 +130,7 @@ LSPAR:=./ls.shrep.parameters
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	mv $@ $@.tmp
 	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
@@ -161,7 +162,7 @@ LSPAR:=./ls.shrep.parameters
 	# create features
 	# remove t and w, convert s to t
 	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
-	$(ROOT)/bin/NSPDK -fg $*_singleshreps -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -gt $(DIRECTED)
+	$(NSPDK) -fg $*_singleshreps -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -gt $(DIRECTED)
 	-rm -f $*_singleshreps $*_singleshreps.feature_bin # clean up after feature creation
 	# write out probabilities
 	cat $< | grep '^s' | perl -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
@@ -198,7 +199,7 @@ LSPAR:=./ls.shrep.parameters
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(ROOT)/bin/NSPDK -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt DIRECTED
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	mv $@ $@.tmp
 	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
