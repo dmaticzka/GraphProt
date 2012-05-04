@@ -59,8 +59,6 @@ LSPAR:=./ls.structacc.parameters
 	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
 	--nostruct -fa $< > $@
 
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -68,7 +66,7 @@ LSPAR:=./ls.structacc.parameters
 %.feature : %.gspan %.affy %.param
 	# create features
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
@@ -122,15 +120,13 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : %.fa %.param
 	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	mv $@ $@.tmp
 	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
@@ -152,8 +148,6 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : %.fa %.param
 	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
