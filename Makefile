@@ -27,6 +27,7 @@ SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 NSPDK:=$(ROOT)/bin/NSPDK
+SVMSGDNSPDK:=$(ROOT)/bin/svmsgdnspdk_0.3
 CREATE_EXTENDED_ACC_GRAPH:=$(ROOT)/bin/create_accgraph/createExtendedGraph.pl
 
 # targets
@@ -192,12 +193,11 @@ LSPAR:=./ls.shrep.parameters
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
-	ln -sf $< $* # remove suffix to have shorter filenames
-	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -T nspdkvp -gt $(DIRECTED)
-	-rm -f $* $@_bin # clean up after feature creation
-	mv $@ $@.tmp
-	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -rf $@.tmp # clean up affinityless feature file
+	-rm -f R$(R)D$(D)$*output.vec
+	mkfifo R$(R)D$(D)$*output.vec
+	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf 400 -rR 2 -rD 4 -rW 0.1 -pfx $* &
+	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
 %.affy : %.gspan
 	# extract affinities from gspan
