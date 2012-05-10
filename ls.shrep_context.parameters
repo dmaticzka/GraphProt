@@ -1,0 +1,14 @@
+# [parameter] [default] [parameter list]
+e 0.1 0.001 0.01 0.1 1 10 100
+c 1 0.001 0.01 0.1 1 10 100
+R 1 4 3 2 1
+D 4 6 5 4 3 2 1
+b 14 14
+NHF	400 100 400 800
+RR 0 0 1 2
+RD 1 1 2 3 4
+RW 0.1 0.01 0.1 0.3
+ABSTRACTION 3 1 2 3 4 5
+DIRECTED DIRECTED DIRECTED UNDIRECTED
+CUE nil --cue nil
+STACK nil --stack nil

@@ -177,7 +177,7 @@ else
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
-LSPAR:=./ls.shrep.parameters
+LSPAR:=./ls.shrep_context.parameters
 
 # else, create gspan from fasta
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
@@ -192,10 +192,12 @@ LSPAR:=./ls.shrep.parameters
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : NHF=$(shell grep '^NHF ' $*.param | cut -f 2 -d' ')
+%.feature : RR=$(shell grep '^RR ' $*.param | cut -f 2 -d' ')
+%.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
+%.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
-	-rm -f R$(R)D$(D)$*output.vec
-	mkfifo R$(R)D$(D)$*output.vec
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf 400 -rR 2 -rD 4 -rW 0.1 -pfx $* &
+	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
