@@ -197,7 +197,7 @@ LSPAR:=./ls.shrep_context.parameters
 %.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
 %.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
+	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
