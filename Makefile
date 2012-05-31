@@ -87,7 +87,7 @@ ifeq ($(GRAPH_TYPE),STRUCTACC)
 LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
-	time /usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
+	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
 	-fa $< > $@
 
 # feature creation for this type of graph has to set an additional parameter
@@ -121,7 +121,7 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
-	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -149,7 +149,7 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
-	time $(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -186,7 +186,7 @@ LSPAR:=./ls.shrep_context.parameters
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
-	time $(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 # feature creation for this type of graph has to set an additional parameter
 # in order to center only on nucleotides and not on annotation -> -T nspdkvp
@@ -226,7 +226,7 @@ classstats : summary.cstats $(CSTAT_FILES)
 %.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv : %.feature %.param
-	$(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -258,10 +258,10 @@ endif
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
 %.model : %.feature %.param
-	$(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 %.svrout : %.model %.pred.feature
-	$(SVRPREDICT) $*.pred.feature $< $@
+	time $(SVRPREDICT) $*.pred.feature $< $@
 
 %.pred : %.svrout %.pred.affy
 	# combine affinities and predictions
