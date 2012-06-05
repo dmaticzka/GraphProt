@@ -10,6 +10,7 @@ require Exporter;
 			read_geneIDs_from_fasta_without_version_number
 			word_frequencies
 			write_hash_to_fasta
+			read_fasta_with_nonunique_headers
 			);
 @EXPORT_OK = qw(
 			words
@@ -38,6 +39,7 @@ require Exporter;
 #	(2)	An array reference including the ids in the order they are given in the
 #		input file, $file. This information is necessary if you need the exact 
 #		order, which is not given in the hash.
+#	(3) A hash reference of the rest of the header line in the fasta file (after the IDs)
 ##################################################################################
 sub read_fasta_file{
 	my($file) = @_;
@@ -49,8 +51,9 @@ sub read_fasta_file{
 	my %header		= ();
 	my @order 		= ();
 	my $line 		= "";
-	open(IN_HANDLE, "<$file") || die "ERROR in $FUNCTION:\nCouldn't open the following file in package Tool,".
-									 " sub read_fasta_file: $file/n";
+	open(IN_HANDLE, "<$file") || die "ERROR in $FUNCTION: ".
+									 "Couldn't open the following file in package Tool,".
+									 " sub read_fasta_file: $file\n";
 	
 	while($line = <IN_HANDLE>){
 		chomp($line);
@@ -58,6 +61,12 @@ sub read_fasta_file{
 		# header (can contain one space after > symbol)
 		if($line =~ /^\>\s?(\S+)\s*([\S*\s*]*)/){
 			if($id){
+				if (defined $fasta{$id} and ($fasta{$id} ne $seqstring)) {
+					die "ERROR in $FUNCTION: ".
+						"multiple sequence id '$id', consider using function " .
+						"read_fasta_with_nonunique_headers instead of read_fasta_file";
+				}
+				$seqstring =~ s/\s*//g; ## do not allow spaces in sequence
 				$fasta{$id} = $seqstring;
 				$seqstring = "";
 			}
@@ -70,11 +79,67 @@ sub read_fasta_file{
 	}
 	
 	if($id){
+				if (defined $fasta{$id} and ($fasta{$id} ne $seqstring)) {
+					die "ERROR in $FUNCTION: ".
+						"multiple sequence id '$id', consider using function " .
+						"read_fasta_with_nonunique_headers instead of read_fasta_file";
+				}
+				$seqstring =~ s/\s*//g; ## do not allow spaces in sequence
 				$fasta{$id} = $seqstring;
 				$seqstring = "";
 	}
-	my @return = (\%fasta, \@order, \%header);
-	return \@return;
+	return (\%fasta, \@order, \%header);
+}
+
+##################################################################################
+# This method parses a fasta file and is useful if the header ID is not-unique!!
+# It returns the header lines in an array and the sequence lines in the same 
+# order. It is then up to the user to extract the parts from the header that is
+# necessary for the script.
+# Furthermore, the method deals with multiple lines, and returns a single sequence
+# without line breaks.
+# Input: 
+#		file		The name of the fasta file
+# Output: 
+#	(1)	An array reference for each header line
+#	(2) An array reference for each sequence in same order as the headers
+##################################################################################
+sub read_fasta_with_nonunique_headers{
+	my($file) = @_;
+	my $FUNCTION = "read_fasta_file in Sequences.pm";
+	
+	my $header		= "";
+	my $seqstring 	= "";
+	my @headers		= ();
+	my @sequences	= ();
+	open(IN_HANDLE, "<$file") || die "ERROR in $FUNCTION:\n".
+									 "Couldn't open the following file in package Tool,".
+									 " sub read_fasta_file: $file\n";
+	
+	while(my $line = <IN_HANDLE>){
+		chomp($line);
+		
+		# header (can contain one space after > symbol)
+		if($line =~ /^\>(.*)/){
+			if($header){
+			    $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
+				push(@headers, $header);
+				push(@sequences, $seqstring);
+				$seqstring = "";
+			}
+			$header = $1;
+		} else {
+				$seqstring .= $line if ($header);
+		}
+	}
+	
+	if($header){
+	  $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
+	  push(@headers, $header);
+	  push(@sequences, $seqstring);
+      $seqstring = "";
+	}
+	return (\@headers, \@sequences);
 }
 
 ##################################################################################
@@ -102,13 +167,14 @@ sub read_fasta_without_version_number{
 	my @order		= ();
 	my $line 		= "";
 	open(IN_HANDLE, "<$file") || die "couldn't open the following file in package Tool,".
-									 " sub read_fasta_file: $file/n";
+									 " sub read_fasta_file: $file\n";
 	
 	while($line = <IN_HANDLE>){
 		
 		# header (can contain one space after > symbol)
 		if($line =~ /^\>\s?(\S+)\.?\d?\s*/){
 			if($id){
+			    $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
 				$fasta{$id} = $seqstring;
 				$seqstring = "";
 			}
@@ -120,11 +186,84 @@ sub read_fasta_without_version_number{
 	}
 	
 	if($id){
+	            $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
 				$fasta{$id} = $seqstring;
 				$seqstring = "";
 	}
 	my @return = (\%fasta, \@order);
 	return \@return;
+}
+
+##################################################################################
+# This method takes a DNA/RNA sequence and converts it to upper-case RNA characters,
+# which means T's are changed to U's and everything is in upper-case. Also if there
+# are any characters other than AGCU and N, they are converted to Ns.
+#
+# Input:
+#	rna_seq		The input sequence, either RNA or DNA 
+# Output: The cleaned sequence
+##################################################################################
+sub clean_RNA_sequence{
+	my $rna_seq = shift;
+
+	$rna_seq =~ s/[\s\n]//g; #remove newlines and spaces	
+	$rna_seq =~ uc($rna_seq); ## upper case
+	$rna_seq =~ tr/T/U/d; ## RNA characters
+	$rna_seq =~ s/[^ACGU]/N/g; ## change unkown characters into Ns
+	
+	return $rna_seq;
+}
+
+##################################################################################
+# This method takes a DNA/RNA sequence and converts it to upper-case DNA characters,
+# which means U's are changed to T's and everything is in upper-case. Also if there
+# are any characters other than AGCT and N, they are converted to Ns.
+#
+# Input:
+#	rna_seq		The input sequence, either RNA or DNA 
+# Output: The cleaned sequence
+##################################################################################
+sub clean_DNA_sequence{
+	my $dna_seq = shift;
+
+	$dna_seq =~ s/[\s\n]//g; ## remove newlines and spaces
+	$dna_seq =~ uc($dna_seq); ## upper case
+	$dna_seq =~ tr/U/T/d; ## RNA characters
+	$dna_seq =~ s/[^ACGT]/N/g; ## change unkown characters into Ns
+	
+	return $dna_seq;
+}
+
+##################################################################################
+# This method takes a DNA/RNA sequence and converts it to the reverse compliment.
+# The type of the sequence output is given by the parameter type (DNA/RNA)
+#
+# Input:
+#	seq		The input sequence, either RNA or DNA 
+#	type			The output sequence type [DNA|RNA]
+# Output: The reverse complement sequence as either DNA or RNA
+##################################################################################
+sub reverse_compliment{
+	my ($seq, $type) = @_;
+	my $FUNCTION = "Sequence::reverse_compliment";
+	
+	die "INPUT ERROR in $FUNCTION: Incorrect input parameters\n" 
+		unless ($seq && $type);
+	$seq =~ s/[\s\n]//g; #remove newlines and spaces
+	
+	if($type eq "RNA"){
+		$seq = uc($seq);
+		$seq =~ s/ACG[TU]/UGCA/g;
+		$seq = reverse($seq);
+		
+	} elsif($type eq "DNA"){
+		$seq = uc($seq);
+		$seq =~ s/ACG[TU]/TGCA/g;
+		$seq = reverse($seq);
+	} else {
+		die "ERROR in $FUNCTION: unkown type $type!\n";
+	}
+	return $seq;
 }
 
 
@@ -325,12 +464,12 @@ sub divide_into_x_equal_sequences{
 #		seq_len		(Optional) The length of seq. Can be passed on if already 
 #					calculated.
 # OUTPUT:
-#		An reference of an array of tuples. Each tuple contains
+#		An array of tuples. Each tuple contains
 # 		the information about one extracted sequence in the following order
-#		(position of motive in extract, extracted sequence)
+#		(position of motif in extract, extracted sequence)
 ##################################################################################
 sub extract_motif_with_flanks{
-	my ($seq,$motif_href, $motif_len, $lflank, $rflank, $seq_len) = @_;
+	my ($seq,$motif_aref, $motif_len, $lflank, $rflank, $seq_len) = @_;
 	my $FUNCTION = "extract_motif_with_flanks in Sequences.pm";
 	
 	# length of sequence
@@ -340,7 +479,7 @@ sub extract_motif_with_flanks{
 	my @extract = ();
 	my $ext_pos = $lflank + 1;
 	
-	foreach my $mpos (@{$motif_href}){
+	foreach my $mpos (@{$motif_aref}){
 		my $lborder = $mpos - $lflank;
 		my $extract_len = $lflank + $motif_len + $rflank;
 		my $rborder = $lborder + $extract_len - 1;
@@ -360,7 +499,7 @@ sub extract_motif_with_flanks{
 		push(@extracts, \@extract);
 		
 	}
-	return \@extracts;
+	return @extracts;
 }
 
 ##################################################################################
@@ -373,9 +512,9 @@ sub extract_motif_with_flanks{
 #		seq_len		(Optional) The length of the sequence in seq, so it 
 #					doesn't need to be computed.
 # OUTPUT:
-#		An array ref of all starting positions of the motif in the sequence
+#		An array of all starting positions of the motif in the sequence
 #		The array is empty if the motif is not found in the sequence.
-#		Counting: 1 to n-1.
+#		Counting: 0 to n-1.
 #
 # STATUS: checked!
 ##################################################################################
@@ -409,5 +548,5 @@ sub find_motif{
 			$curr_index = $index +1; # set current index to the right of occurrence
 		}
 	}
-	return \@starts;
+	return @starts;
 }

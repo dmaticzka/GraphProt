@@ -31,6 +31,7 @@ FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
 NSPDK:=$(ROOT)/bin/NSPDK
 SVMSGDNSPDK:=$(ROOT)/bin/svmsgdnspdk_0.3
 CREATE_EXTENDED_ACC_GRAPH:=$(ROOT)/bin/create_accgraph/createExtendedGraph.pl
+MERGE_GSPAN:=$(ROOT)/bin/merge_gspan.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -201,6 +202,44 @@ LSPAR:=./ls.shrep_context.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
+else
+################################################################################
+ifeq ($(GRAPH_TYPE),MEGA)
+# line search parameters
+LSPAR:=./ls.mega.parameters
+
+# accessibility graphs
+%.acc.gspan : %.fa
+	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
+	-fa $< > $@
+
+# shrep graphs
+%.shrep.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.shrep.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.shrep.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.shrep.gspan : %.fa %.param
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+
+# merge gspans
+%.gspan : %.shrep.gspan %.acc.gspan
+	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan > $@
+
+%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan %.affy %.param
+	ln -sf $< $* # remove suffix to have shorter filenames
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(bitsize) -gt $(DIRECTED)
+	-rm -f $* $@_bin # clean up after feature creation
+	mv $@ $@.tmp
+	cat $@.tmp | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.tmp # clean up affinityless feature file
+
+%.affy : %.shrep.gspan
+	cat $< | grep '^t' | awk '{print $$5}' > $@
+
+endif
 endif
 endif
 endif

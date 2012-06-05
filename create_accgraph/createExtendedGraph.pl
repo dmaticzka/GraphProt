@@ -73,13 +73,13 @@ sub computeAccessibilities {
 	my ($seq) = @_;
 	chomp $seq;
 	my $len = length($seq);
-	
+
 	# compute accessibilities
 	open ACCS, "echo $seq | /home/maticzkd/src/ViennaRNA-1.8.4-context_stdout/Progs/RNAplfold " .
 		"-u 1 -W $len |";
 	my @accs = <ACCS>;
 	close ACCS;
-	
+
 	# parse accs
 	my @P;
 	my @E;
@@ -102,7 +102,7 @@ sub computeAccessibilities {
 		push @I, $I;
 		push @M, $M;
 	}
-	
+
 	return [\@P, \@E, \@H, \@I,  \@M];
 }
 
@@ -133,9 +133,10 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 ($fasta) or die "error: specify fasta file";
 (-f $fasta) or die "error: no such file '$fasta'";
 
-my ($fasta_ref, undef, $header_ref) = @{read_fasta_file($fasta)};
+my ($fasta_ref, $order_aref, $header_ref) = read_fasta_file($fasta);
 my $n=0;
-while (my ($id, $seq) = each %{$fasta_ref}) {
+foreach my $id (@{$order_aref}) {
+	my $seq = $fasta_ref->{$id};
 
 	# print out how many stuff we already computed
 	$n++;
@@ -147,7 +148,7 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 	}
 
 	my $affinity = $header_ref->{$id};
-	say join(' ', 't', $id, $affinity);
+	say join(' ', 't', '#', $id, $affinity);
 	my $graph_id = 0;
 
 	# create sequence edges and vertices
@@ -190,7 +191,7 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 			    'I' => $accs[3][$pos],
 			    'M' => $accs[4][$pos]);
 		}
-		
+
 		foreach my $key (keys %accs) {
 			if ($accs{$key} <= $cutoff) {
 				delete $accs{$key};
@@ -201,7 +202,7 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 		my $unpaired_prob = $accs[0][$pos];
 		if ($num_vertices > 1 or $unpaired_prob > $cutoff) {
 			# if unpaired values above cutoff exist do the whole shebang
-			
+
 			my @keys = sort { $accs{$b} <=> $accs{$a} } keys %accs;
 			my @node_ids = ($pos, $graph_id..($graph_id+$num_vertices-1));
 			# save id of unpaired vertice for later
@@ -223,7 +224,7 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 			my $paired_prob = 1-$unpaired_prob;
 			if ($paired_prob > $cutoff) {
 				# do it the normal way
-				
+
 				# create the paired probability vertice
 				my $paired_id = $graph_id;
 				say join(' ', 'v', $paired_id, 'P', '0');
@@ -243,12 +244,12 @@ while (my ($id, $seq) = each %{$fasta_ref}) {
 			}
 		} else {
 			# else just print out the paired probability
-			
+
 			# create the paired probability vertice
 			my $paired_id = $graph_id;
 			say join(' ', 'v', $paired_id, 'P', '0');
 			$graph_id++;
-			
+
 			say join(' ', 'e', $pos, $paired_id, 'a'); # a like accessibility
 		}
 	}

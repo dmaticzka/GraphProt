@@ -17,4 +17,5 @@ DO_LINESEARCH=YES
 # SHREP: plain shrep graphs
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
-GRAPH_TYPE=SHREP
+# MEGA: pure sequence, shrep graphs and accessibility graphs
+GRAPH_TYPE=MEGA
