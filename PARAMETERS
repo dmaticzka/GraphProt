@@ -14,7 +14,7 @@ DO_LINESEARCH=YES
 # set graph type:
 # ONLYSEQ: plain sequence
 # STRUCTACC: sequence annotated with structural context
-# NORMSHREP: plain shrep graphs
+# SHREP: plain shrep graphs
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
-GRAPH_TYPE=CONTEXTSHREP
+GRAPH_TYPE=SHREP

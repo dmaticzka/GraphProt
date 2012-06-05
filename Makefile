@@ -112,11 +112,10 @@ LSPAR:=./ls.structacc.parameters
 
 else
 ################################################################################
-ifeq ($(GRAPH_TYPE),NORMSHREP)
+ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
 LSPAR:=./ls.shrep.parameters
 
-# else, create gspan from fasta
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
