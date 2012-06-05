@@ -90,8 +90,6 @@ LSPAR:=./ls.structacc.parameters
 	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
 	-fa $< > $@
 
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -99,7 +97,7 @@ LSPAR:=./ls.structacc.parameters
 %.feature : %.gspan %.affy %.param
 	# create features
 	ln -sf $< $* # remove suffix to have shorter filenames
-	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -T nspdkvp -gt $(DIRECTED)
+	$(NSPDK) -fg $* -of -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -gt $(DIRECTED)
 	-rm -f $* $@_bin # clean up after feature creation
 	# add affinities to features
 	mv $@ $@.tmp
@@ -180,15 +178,12 @@ ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
 LSPAR:=./ls.shrep_context.parameters
 
-# else, create gspan from fasta
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
 	$(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
-# feature creation for this type of graph has to set an additional parameter
-# in order to center only on nucleotides and not on annotation -> -T nspdkvp
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -303,7 +298,7 @@ summary.cstats : $(CSTAT_FILES)
 
 # keep predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy *.profile
 
 # delete all files
 distclean: clean
