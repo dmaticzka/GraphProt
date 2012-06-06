@@ -335,10 +335,10 @@ summary.cstats : $(CSTAT_FILES)
 	( perl -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
 	cat $^ | sort -k1,2 ) > $@
 
-# keep predictions and results
+# keep fasta, predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy *.profile
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
