@@ -309,7 +309,7 @@ endif
 	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
 	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
 	# compute performance measures
-	$(PERF) < $@.threshold > $@
+	$(PERF) -confusion < $@.threshold > $@
 	rm -rf $@.threshold*
 
 results_aucpr.csv : $(PERF_FILES)
