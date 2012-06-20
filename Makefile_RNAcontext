@@ -61,5 +61,8 @@ perf: results.csv
 	rm -rf $@.threshold*
 
 results.csv : $(PERF_FILES)
-	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$3,$$5,$$6,$$7,$$NF}' > results.csv
+	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$NF}' > results.csv
+
+best.csv.dummy : results.csv
+	R --slave < RNAcompete_Auswertung.R && touch $@
 
