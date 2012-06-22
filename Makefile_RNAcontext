@@ -39,10 +39,13 @@ all: $(RESULTDIRS)
 perf: results_aucpr.csv
 
 %.sequence : %.fa
-	cat $< | $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
+	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
 
 %.profile : %.fa
-	cat $< | ./RNAplfold_context_stdout -W 50 -L 50 -u 1 | perl ./pl2context.pl > $@
+	-rm -fv %@
+	mkdir $@.tmp /var/tmp/$@.tmp
+	cd $@.tmp; ln -s ../sfold-2.1/* ./;	ln -s /var/tmp/$@.tmp out; ./sfold_helper ../$< ../$@
+	-rm -rfv $@.tmp /var/tmp/$@.tmp
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
 	mkdir -p outputs
