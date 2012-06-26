@@ -25,7 +25,7 @@ BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 
-PROFILES:=$(patsubst %, %.profile, $(BASENAMES))
+PROFILES:=$(patsubst %, %.profile, $(BASENAMES)) $(patsubst %, %.pred.profile, $(BASENAMES))
 SEQUENCES:=$(patsubst %, %.sequence, $(BASENAMES))
 RESULTDIRS:=$(patsubst %, %.dummy, $(BASENAMES))
 
@@ -34,6 +34,9 @@ PERF_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.perf)
 
 .PHONY: all
 all: $(RESULTDIRS)
+
+.PHONY: profile
+profile: $(PROFILES)
 
 .PHONY: perf
 perf: results_aucpr.csv
