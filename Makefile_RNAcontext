@@ -1,3 +1,7 @@
+# secondary structure profiles can be computed using
+# PLFOLD or SFOLD
+PROFILE_COMP:=SFOLD
+
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 
@@ -25,7 +29,7 @@ BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
 			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
 BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 
-PROFILES:=$(patsubst %, %.profile, $(BASENAMES))
+PROFILES:=$(patsubst %, %.profile, $(BASENAMES)) $(patsubst %, %.pred.profile, $(BASENAMES))
 SEQUENCES:=$(patsubst %, %.sequence, $(BASENAMES))
 RESULTDIRS:=$(patsubst %, %.dummy, $(BASENAMES))
 
@@ -35,18 +39,38 @@ PERF_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.perf)
 .PHONY: all
 all: $(RESULTDIRS)
 
+.PHONY: profile
+profile: $(PROFILES)
+
 .PHONY: perf
 perf: results_aucpr.csv
 
 %.sequence : %.fa
-	cat $< | $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
+	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
+
+ifeq ($(PROFILE_COMP),SFOLD)
+
+%.profile : %.fa
+	-rm -rfv $@ $@.tmp /var/tmp/$@.tmp_data /var/tmp/$@.tmp_out
+	mkdir $@.tmp /var/tmp/$@.tmp_data /var/tmp/$@.tmp_out
+	cd $@.tmp; ln -s ../sfold-2.2/* ./;	ln -s /var/tmp/$@.tmp_data data; ln -s /var/tmp/$@.tmp_out out; ./sfold_helper ../$< ../$@
+	-rm -rfv $@.tmp /var/tmp/$@.tmp
+
+%.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
+	mkdir -p outputs
+	$(RNACONTEXT) -s 3 -w 4-12 -a ACGT -e PLMU -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
+
+else
+ifeq ($(PROFILE_COMP),PLFOLD)
 
 %.profile : %.fa
 	cat $< | ./RNAplfold_context_stdout -W 50 -L 50 -u 1 | perl ./pl2context.pl > $@
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
-	mkdir -p outputs
 	$(RNACONTEXT) -s 3 -w 4-12 -a ACGT -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
+
+endif
+endif
 
 %.perf : BASENAME=$(word 2,$(subst _, ,$<))
 %.perf : $(shell echo $(BASENAME))
