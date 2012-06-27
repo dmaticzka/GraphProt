@@ -36,7 +36,7 @@ PERF_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.perf)
 all: $(RESULTDIRS)
 
 .PHONY: perf
-perf: results.csv
+perf: results.csv best.csv.dummy
 
 %.sequence : %.fa
 	cat $< | $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@

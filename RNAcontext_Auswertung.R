@@ -1,32 +1,39 @@
-# first part: this is how RNAcontext does it
+# first part: this is how this is done for the RNAcontext paper:
+# A) using predictions on training data:
+# * select best parameters for each combination type,protein,set
+# * compute mean apr for each combination type,protein
+# * select full/weak type according to mean apr
+# B) predictions on test data:
+# * use selected models from selected type to report prediction score on test data
 
 # best for my own computations:
 d <- read.table("results.csv", col.names=c('pred','protein','type','set','length','apr'));
 
-# get best parameters from training data tests
-selection <- subset(ddply(subset(d, pred=='train'), .(protein,type,set), transform, max_apr=max(apr)), apr==max_apr)[,c(2,3,4,5)]
+# select best models using training data
+selection_best_model_train <- subset(ddply(subset(d, pred=='train'), .(protein,type,set), transform, max_apr=max(apr)), apr==max_apr)[,c(2,3,4,5,6)]
 
-# select results from "test on test"
-selected_values <- join(selection, subset(d, pred=='test'))
+# select best input type using training data
+selection_best_type_train <- subset(ddply(ddply(selection_best_model_train, .(protein,type), transform, mean_apr=mean(apr)), .(protein), transform, max_mean_apr=max(mean_apr)), mean_apr==max_mean_apr)[,c(1,2,3,4)]
 
-# compute mean and decide between full and weak
-selected_mean_apr <- ddply(selected_values, .(protein,type), summarize, mean_apr=mean(apr))
+# use selected models of selected type to extract results from test sets
+selection_models_test <- join(selection_best_type_train, subset(d, pred=='test'))
 
-# select type with maximum apr
-max_apr <- subset(ddply(selected_mean_apr, .(protein), transform, max_apr=max(mean_apr)), mean_apr==max_apr)
+# compute final results
+selection_models_test_result <- ddply(selection_models_test, .(protein), summarize, mean_apr=mean(apr))
 
-# get parameters for best values
-result <- join(max_apr,selected_values)
+# save
+write.table(selection_models_test, "selection_models_test.csv", quote=F, sep="\t", row.names=F)
+write.table(selection_models_test_result, "selection_models_test_result.csv", quote=F, sep="\t", row.names=F)
 
-write.table(result[,c(1,2,5,6,8,3)], "best.csv", quote=F, sep="\t", row.names=F)
 
+# second part: use all sets
 
-# second part: we just use the full sets
-fullselection <- subset(ddply(subset(d, pred=='train' & type=='full'), .(protein,type,set), transform, max_apr=max(apr)), apr==max_apr)[,c(2,3,4,5)]
-full_selected_values <- join(fullselection, subset(d, pred=='test'))
-mean_selected_values <- ddply(full_selected_values, .(protein,type), transform, mean_apr=mean(apr))
-write.table(mean_selected_values[,c(1,2,3,4,6,7)], "best_full_only.csv", quote=F, sep="\t", row.names=F)
-
-# everything
-best_separate_types <- join(selected_mean_apr, selected_values)
-write.table(best_separate_types[,c(1,2,4,5,7,3)], "best_all.csv", quote=F, sep="\t", row.names=F)
+# get best models using training data
+all_selection_best_models_train <- subset(ddply(subset(d, pred=='train'), .(protein,type,set), transform, max_apr=max(apr)), apr==max_apr)[,c(2,3,4,5)]
+# use selected models to extract results from test sets
+all_selection_models_test <- join(all_selection_best_models_train, subset(d, pred=='test'))
+# compute results
+all_selection_models_test_result <- ddply(all_selection_models_test, .(protein,type), summarize, mean_apr=mean(apr))
+# save
+write.table(all_selection_models_test, 'all_selection_models_test.csv', quote=F, sep="\t", row.names=F)
+write.table(all_selection_models_test_result, 'all_selection_models_test_result.csv', quote=F, sep="\t", row.names=F)
