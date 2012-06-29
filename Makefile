@@ -240,6 +240,16 @@ cv : $(CV_FILES)
 # generate staticstics on positive/negative composition
 classstats : summary.cstats $(CSTAT_FILES)
 
+# test various stuff
+test: test_data_full_A.fa test_data_full_A.pred.fa test_data_full_A.cv \
+	test_data_full_A.perf test_data_full_A.cstats test_data_full_A.param
+
+test_data_full_A.fa :
+	cp $(FA_DIR)/$@ $@
+
+test_data_full_A.pred.fa :
+	cp $(FA_DIR)/$@ $@
+
 # keep fasta, predictions and results
 clean:
 	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
