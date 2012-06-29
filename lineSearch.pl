@@ -24,6 +24,7 @@ Options:
     -fa         optimize parameters for this fasta
     -param      parameter definition for linesearch
     -mf         makefile to use for crossvalidation
+    -bindir     expect RBPaffinity-specific binaries to be in this directory
     -of         write optimal parameters to this file
     -debug      enable debug output
     -help       brief help message
@@ -62,6 +63,7 @@ sub end_handler {
 my $fa;
 my $param;
 my $mf;
+my $bindir;
 my $of;
 my $help;
 my $man;
@@ -69,6 +71,7 @@ my $debug;
 my $result = GetOptions (	"fa=s"		=> \$fa,
 							"param=s"	=> \$param,
 							"mf=s"		=> \$mf,
+							"bindir=s"	=> \$bindir,
 							"of=s"		=> \$of,
 							"help"	=> \$help,
 							"man"	=> \$man,
@@ -157,7 +160,6 @@ do {
 
 				# copy relevant files into tmp
 				copy($fa, $tmpdir);
-				copy($mf, $tmpdir);
 				copy('PARAMETERS', $tmpdir);
 
 				# test parameter combination / get value from previous run
@@ -172,7 +174,7 @@ do {
 				print STDERR "\n";
 				close PARS;
 				# call Makefile for cv
-				my $exec = "make cv -e CV_FILES=$cv_file";
+				my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
 				$debug and say STDERR $exec;
 				system("time $exec");
 

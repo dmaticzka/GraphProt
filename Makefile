@@ -16,22 +16,24 @@ CV_FOLD:=5
 PROJDIR:=~/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
 THR_DIR:=$(PROJDIR)/data/thresholds/
+# expect binaries to reside in pwd, otherwise this variable must be overwritten
+BINDIR:=$(shell pwd)
 
 # binaries
 PERL:=/usr/local/perl/bin/perl
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
-LINESEARCH:=$(PERL) ./lineSearch.pl
-COMBINEFEATURES:=$(PERL) ./combineFeatures.pl
+LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
+COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
 FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
 #FASTAPL:=~/repositories/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 #FASTA2GSPAN:=~/repositories/RNAtools/fasta2shrep_gspan.pl
 SVMSGDNSPDK:=~/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
-CREATE_EXTENDED_ACC_GRAPH:=$(PERL) ./create_accgraph/createExtendedGraph.pl
-MERGE_GSPAN:=$(PERL) ./merge_gspan.pl
+CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
+MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -241,7 +243,7 @@ cv : $(CV_FILES)
 classstats : summary.cstats $(CSTAT_FILES)
 
 # test various stuff
-test: test_data_full_A.fa test_data_full_A.pred.fa test_data_full_A.cv \
+test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.perf test_data_full_A.cstats test_data_full_A.param
 
 test_data_full_A.fa :
@@ -278,7 +280,7 @@ ifeq ($(DO_LINESEARCH),NO)
 else
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ 2> >(tee $@.log >&2)
+	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(BINDIR) 2> >(tee $@.log >&2)
 endif
 
 # subset original fasta
