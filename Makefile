@@ -226,15 +226,27 @@ endif
 endif
 endif
 
-.PHONY: all ls cv classstats
+.PHONY: all ls cv classstats clean distclean
 
+# do predictions for all PROTEINS
 all: $(PERF_FILES) results_aucpr.csv
 
+# do parameter line search for all PROTEINS
 ls : $(PARAM_FILES)
 
+# do crossvalidation
 cv : $(CV_FILES)
 
+# generate staticstics on positive/negative composition
 classstats : summary.cstats $(CSTAT_FILES)
+
+# keep fasta, predictions and results
+clean:
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
+
+# delete all files
+distclean: clean
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
 
 %.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
@@ -314,11 +326,3 @@ results_aucpr.csv : $(PERF_FILES)
 summary.cstats : $(CSTAT_FILES)
 	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
 	cat $^ | sort -k1,2 ) > $@
-
-# keep fasta, predictions and results
-clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
-
-# delete all files
-distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
