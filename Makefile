@@ -13,25 +13,25 @@ SVR_CACHE:=10000
 CV_FOLD:=5
 
 # paths
-ROOT:=~/repositories/RBPaffinity
 PROJDIR:=~/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
 THR_DIR:=$(PROJDIR)/data/thresholds/
 
 # binaries
+PERL:=/usr/local/perl/bin/perl
 SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=~/src/libsvm-3.0/svm-predict
 PERF:=~/src/stat/perf
-LINESEARCH:=./lineSearch.pl
-COMBINEFEATURES:=./combineFeatures.pl
+LINESEARCH:=$(PERL) ./lineSearch.pl
+COMBINEFEATURES:=$(PERL) ./combineFeatures.pl
 SHUF:=~/src/coreutils-8.15/src/shuf
-FASTAPL:=/usr/local/user/RNAtools/fastapl
+FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
 #FASTAPL:=~/repositories/RNAtools/fastapl
-FASTA2GSPAN:=/usr/local/user/RNAtools/fasta2shrep_gspan.pl
+FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 #FASTA2GSPAN:=~/repositories/RNAtools/fasta2shrep_gspan.pl
 SVMSGDNSPDK:=~/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
-CREATE_EXTENDED_ACC_GRAPH:=$(ROOT)/create_accgraph/createExtendedGraph.pl
-MERGE_GSPAN:=$(ROOT)/merge_gspan.pl
+CREATE_EXTENDED_ACC_GRAPH:=$(PERL) ./create_accgraph/createExtendedGraph.pl
+MERGE_GSPAN:=$(PERL) ./merge_gspan.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -60,8 +60,7 @@ ifeq ($(GRAPH_TYPE),ONLYSEQ)
 LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
-	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
-	--nostruct -fa $< > $@
+	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -83,8 +82,7 @@ ifeq ($(GRAPH_TYPE),STRUCTACC)
 LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
-	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
-	-fa $< > $@
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -144,13 +142,13 @@ LSPAR:=./ls.shrep.parameters
 	# remove t and w, convert s to t
 	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
 	# write out probabilities
-	cat $< | grep '^s' | perl -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
+	cat $< | grep '^s' | $(PERL) -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
 	# write out shrep membership
 	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
 	# compute features
 	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $*_singleshreps -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*_singleshreps
 	# compute probability-weighted features
-	/usr/local/perl/bin/perl $(COMBINEFEATURES) R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec $*_probs $*_groups > $*
+	$(COMBINEFEATURES) R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec $*_probs $*_groups > $*
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec
@@ -196,8 +194,7 @@ LSPAR:=./ls.mega.parameters
 
 # accessibility graphs
 %.acc.gspan : %.fa
-	/usr/local/perl/bin/perl $(CREATE_EXTENDED_ACC_GRAPH) \
-	-fa $< > $@
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
 
 # shrep graphs
 %.shrep.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
@@ -267,7 +264,7 @@ endif
 	cat $< | \
 	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | \
 	$(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
-	/usr/local/perl/bin/perl -ane \
+	$(PERL) -ane \
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
@@ -312,10 +309,10 @@ results_aucpr.csv : $(PERF_FILES)
 %.cstats : HN=$(shell cat $< | grep '^>' | awk '$$NF > $(HT)' | wc -l)
 %.cstats : LN=$(shell cat $< | grep '^>' | awk '$$NF < $(LT)' | wc -l)
 %.cstats : %.fa
-	perl -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
+	$(PERL) -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
 
 summary.cstats : $(CSTAT_FILES)
-	( perl -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
+	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
 	cat $^ | sort -k1,2 ) > $@
 
 # keep fasta, predictions and results
