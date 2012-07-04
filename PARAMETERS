@@ -12,7 +12,7 @@ TRAINING_SETS=FULL
 DO_LINESEARCH=YES
 
 # set SVM type: SVR / SGD
-SVM=SVR
+SVM=SGD
 
 # set graph type:
 # ONLYSEQ: plain sequence
@@ -21,4 +21,4 @@ SVM=SVR
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=MEGA
+GRAPH_TYPE=ONLYSEQ

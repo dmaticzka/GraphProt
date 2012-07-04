@@ -256,7 +256,27 @@ ifeq ($(SVM),SGD)
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
 %.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
 %.class : %.affy
-	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }'
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+
+# TODO:
+# %.pred
+
+# train model; this one directly works on gspans
+%.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.model : %.gspan %.class %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+
+# this version of SGD reads all parameters from model
+%.output.predictions : %.model %.pred.gspan %.pred.class
+	$(SVMSGDNSPDK) -gt DIRECTED -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
+
+# affinities and predictions: default format
+%.pred : %.output.predictions %.pred.affy
+	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
+
 endif
 
 .PHONY: all ls cv classstats clean distclean
@@ -287,11 +307,15 @@ test_data_full_A.pred.fa :
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
+	-rm -rf $(MODELS) log *.gspan *.gspan.gz *.threshold* *.model *.feature *.affy
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.output.predictions *.ls.fa *.log results_aucpr.csv
+
+# we can save some disk space here
+%.gspan.gz : %.gspan
+	gzip -f $<;
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
