@@ -77,7 +77,8 @@ LSPAR:=./ls.structacc.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
-else
+endif
+
 ################################################################################
 ifeq ($(GRAPH_TYPE),STRUCTACC)
 # line search parameters
@@ -99,7 +100,8 @@ LSPAR:=./ls.structacc.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
 
-else
+endif
+
 ################################################################################
 ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
@@ -124,7 +126,8 @@ LSPAR:=./ls.shrep.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
-else
+endif
+
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
 # line search parameters
@@ -159,7 +162,8 @@ LSPAR:=./ls.shrep.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
-else
+endif
+
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
@@ -188,7 +192,8 @@ LSPAR:=./ls.shrep_context.parameters
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
-else
+endif
+
 ################################################################################
 ifeq ($(GRAPH_TYPE),MEGA)
 # line search parameters
@@ -221,11 +226,6 @@ LSPAR:=./ls.mega.parameters
 %.affy : %.shrep.gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
-endif
-endif
-endif
-endif
-endif
 endif
 
 .PHONY: all ls cv classstats clean distclean
