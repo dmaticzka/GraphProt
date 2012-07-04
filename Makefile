@@ -260,6 +260,14 @@ clean:
 distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
 
+## class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }'
+
+# results from crossvalidation
 %.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv : %.feature %.param
