@@ -55,7 +55,7 @@ PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 
-# evaluations specific to graph type
+# receipes specific to graph type
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
@@ -76,7 +76,6 @@ LSPAR:=./ls.structacc.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
-
 endif
 
 ################################################################################
@@ -99,7 +98,6 @@ LSPAR:=./ls.structacc.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
-
 endif
 
 ################################################################################
@@ -125,7 +123,6 @@ LSPAR:=./ls.shrep.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
-
 endif
 
 ################################################################################
@@ -161,7 +158,6 @@ LSPAR:=./ls.shrep.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
-
 endif
 
 ################################################################################
@@ -191,7 +187,6 @@ LSPAR:=./ls.shrep_context.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
-
 endif
 
 ################################################################################
@@ -225,7 +220,43 @@ LSPAR:=./ls.mega.parameters
 
 %.affy : %.shrep.gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
+endif
 
+# receipes specific to SVM type
+################################################################################
+# support vector regression
+ifeq ($(SVM),SVR)
+# results from crossvalidation
+%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+# SVR model
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+
+# SVR predictions
+%.svrout : %.model %.pred.feature
+	time $(SVRPREDICT) $*.pred.feature $< $@
+
+# affinities and predictions: default format
+%.pred : %.svrout %.pred.affy
+	# combine affinities and predictions
+	paste $*.pred.affy $< > $@
+endif
+
+# stochastic gradient descent
+################################################################################
+ifeq ($(SVM),SGD)
+## class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }'
 endif
 
 .PHONY: all ls cv classstats clean distclean
@@ -246,9 +277,11 @@ classstats : summary.cstats $(CSTAT_FILES)
 test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.perf test_data_full_A.cstats test_data_full_A.param
 
+# helper receipe for test
 test_data_full_A.fa :
 	cp $(FA_DIR)/$@ $@
 
+# helper receipe for test
 test_data_full_A.pred.fa :
 	cp $(FA_DIR)/$@ $@
 
@@ -259,19 +292,6 @@ clean:
 # delete all files
 distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
-
-## class memberships {-1,0,1}
-%.class : BASENAME=$(firstword $(subst _, ,$<))
-%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.class : %.affy
-	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }'
-
-# results from crossvalidation
-%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv : %.feature %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -300,18 +320,6 @@ endif
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
-%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
-%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
-
-%.svrout : %.model %.pred.feature
-	time $(SVRPREDICT) $*.pred.feature $< $@
-
-%.pred : %.svrout %.pred.affy
-	# combine affinities and predictions
-	paste $*.pred.affy $< > $@
-
 %.perf : BASENAME=$(firstword $(subst _, ,$<))
 %.perf : $(shell echo $(BASENAME))
 %.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
@@ -324,6 +332,7 @@ endif
 	$(PERF) -confusion < $@.threshold > $@
 	rm -rf $@.threshold*
 
+# final results summary
 results_aucpr.csv : $(PERF_FILES)
 	grep ROC $(PERF_FILES) | tr ':' ' ' | \
 	awk '{print $$1, "$(EXPERIMENT_ID)", $$NF}' | sort > roc.tmp
@@ -333,6 +342,7 @@ results_aucpr.csv : $(PERF_FILES)
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
 
+# some statistics about class distribution
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
 %.cstats : TYPE=$(word 3,$(subst _, ,$<))
 %.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
@@ -343,6 +353,7 @@ results_aucpr.csv : $(PERF_FILES)
 %.cstats : %.fa
 	$(PERL) -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
 
+# final class summary
 summary.cstats : $(CSTAT_FILES)
 	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
 	cat $^ | sort -k1,2 ) > $@

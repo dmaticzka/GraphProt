@@ -11,6 +11,9 @@ TRAINING_SETS=FULL
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
 
+# set SVM type: SVR / SGD
+SVM=SVR
+
 # set graph type:
 # ONLYSEQ: plain sequence
 # STRUCTACC: sequence annotated with structural context
