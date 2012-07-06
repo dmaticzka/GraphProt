@@ -251,10 +251,10 @@ test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.perf test_data_full_A.correlation \
 	test_data_full_A.cstats test_data_full_A.param
 
-test_data_full_A.fa :
+test_data_full_%.fa :
 	cp $(FA_DIR)/$@ $@
 
-test_data_full_A.pred.fa :
+test_data_full_%.pred.fa :
 	cp $(FA_DIR)/$@ $@
 
 # keep fasta, predictions and results
