@@ -4,8 +4,10 @@ include PARAMETERS
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 
+ifeq ($(SECONDARY),YES)
 # don't delete intermediate files
 .SECONDARY:
+endif
 
 # parameters:
 LINESEARCH_INPUT_SIZE:=5000
