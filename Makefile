@@ -262,9 +262,6 @@ ifeq ($(SVM),SGD)
 %.class : %.affy
 	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
 
-# TODO:
-# %.pred
-
 # train model; this one directly works on gspans
 %.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
