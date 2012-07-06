@@ -13,7 +13,7 @@ SVR_CACHE:=10000
 CV_FOLD:=5
 
 # paths
-PROJDIR:=~/projects/RBPaffinity
+PROJDIR:=/home/maticzkd/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
 THR_DIR:=$(PROJDIR)/data/thresholds/
 # expect binaries to reside in pwd, otherwise this variable must be overwritten
@@ -21,17 +21,17 @@ BINDIR:=$(shell pwd)
 
 # binaries
 PERL:=/usr/local/perl/bin/perl
-SVRTRAIN:=~/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
-SVRPREDICT:=~/src/libsvm-3.12/svm-predict
-PERF:=~/src/stat/perf
+SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
+SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
+PERF:=/home/maticzkd/src/stat/perf
 LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
 COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
-SHUF:=~/src/coreutils-8.15/src/shuf
+SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
 FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
-#FASTAPL:=~/repositories/RNAtools/fastapl
+#FASTAPL:=/home/maticzkd/repositories/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
-#FASTA2GSPAN:=~/repositories/RNAtools/fasta2shrep_gspan.pl
-SVMSGDNSPDK:=~/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
+#FASTA2GSPAN:=/home/maticzkd/repositories/RNAtools/fasta2shrep_gspan.pl
+SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
