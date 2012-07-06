@@ -5,7 +5,7 @@ SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
-#.SECONDARY:
+.SECONDARY:
 
 # parameters:
 LINESEARCH_INPUT_SIZE:=5000
@@ -34,6 +34,7 @@ FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 SVMSGDNSPDK:=~/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
+CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -50,6 +51,7 @@ BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 endif
 endif
 
+CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
@@ -231,7 +233,7 @@ endif
 .PHONY: all ls cv classstats clean distclean
 
 # do predictions for all PROTEINS
-all: $(PERF_FILES) results_aucpr.csv
+all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
 
 # do parameter line search for all PROTEINS
 ls : $(PARAM_FILES)
@@ -244,7 +246,8 @@ classstats : summary.cstats $(CSTAT_FILES)
 
 # test various stuff
 test: test_data_full_A.fa test_data_full_A.pred.fa \
-	test_data_full_A.perf test_data_full_A.cstats test_data_full_A.param
+	test_data_full_A.perf test_data_full_A.correlation \
+	test_data_full_A.cstats test_data_full_A.param
 
 test_data_full_A.fa :
 	cp $(FA_DIR)/$@ $@
@@ -316,6 +319,9 @@ endif
 	$(PERF) -confusion < $@.threshold > $@
 	rm -rf $@.threshold*
 
+%.correlation : %.pred
+	cat $< | R --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+
 results_aucpr.csv : $(PERF_FILES)
 	grep ROC $(PERF_FILES) | tr ':' ' ' | \
 	awk '{print $$1, "$(EXPERIMENT_ID)", $$NF}' | sort > roc.tmp
@@ -324,6 +330,9 @@ results_aucpr.csv : $(PERF_FILES)
 	sort > aucpr.tmp
 	join roc.tmp aucpr.tmp > $@
 	rm -rf roc.tmp aucpr.tmp
+
+results_correlation.csv : $(CORRELATION_FILES)
+	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
 %.cstats : TYPE=$(word 3,$(subst _, ,$<))
