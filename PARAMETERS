@@ -11,6 +11,9 @@ TRAINING_SETS=FULL
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
 
+# set SVM type: SVR / SGD
+SVM=SGD
+
 # set graph type:
 # ONLYSEQ: plain sequence
 # STRUCTACC: sequence annotated with structural context
@@ -18,4 +21,4 @@ DO_LINESEARCH=YES
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=MEGA
+GRAPH_TYPE=ONLYSEQ

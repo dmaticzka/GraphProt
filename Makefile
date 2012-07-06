@@ -59,7 +59,7 @@ PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 
-# evaluations specific to graph type
+# receipes specific to graph type
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
@@ -80,8 +80,8 @@ LSPAR:=./ls.structacc.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
+endif
 
-else
 ################################################################################
 ifeq ($(GRAPH_TYPE),STRUCTACC)
 # line search parameters
@@ -102,8 +102,8 @@ LSPAR:=./ls.structacc.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$NF}' > $@
+endif
 
-else
 ################################################################################
 ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
@@ -127,8 +127,8 @@ LSPAR:=./ls.shrep.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
+endif
 
-else
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
 # line search parameters
@@ -162,8 +162,8 @@ LSPAR:=./ls.shrep.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
+endif
 
-else
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
@@ -191,8 +191,8 @@ LSPAR:=./ls.shrep_context.parameters
 %.affy : %.gspan
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
+endif
 
-else
 ################################################################################
 ifeq ($(GRAPH_TYPE),MEGA)
 # line search parameters
@@ -224,12 +224,62 @@ LSPAR:=./ls.mega.parameters
 
 %.affy : %.shrep.gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
+endif
 
+# receipes specific to SVM type
+################################################################################
+# support vector regression
+ifeq ($(SVM),SVR)
+# results from crossvalidation
+%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+# SVR model
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+
+# SVR predictions
+%.svrout : %.model %.pred.feature
+	time $(SVRPREDICT) $*.pred.feature $< $@
+
+# affinities and predictions: default format
+%.pred : %.svrout %.pred.affy
+	# combine affinities and predictions
+	paste $*.pred.affy $< > $@
 endif
-endif
-endif
-endif
-endif
+
+# stochastic gradient descent
+################################################################################
+ifeq ($(SVM),SGD)
+## class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+
+# TODO:
+# %.pred
+
+# train model; this one directly works on gspans
+%.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.model : %.gspan %.class %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+
+# this version of SGD reads all parameters from model
+%.output.predictions : %.model %.pred.gspan %.pred.class
+	$(SVMSGDNSPDK) -gt DIRECTED -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
+
+# affinities and predictions: default format
+%.pred : %.output.predictions %.pred.affy
+	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
 endif
 
 .PHONY: all ls cv classstats test clean distclean
@@ -251,24 +301,25 @@ test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.perf test_data_full_A.correlation \
 	test_data_full_A.cstats test_data_full_A.param
 
+# helper receipe for test
 test_data_full_%.fa :
 	cp $(FA_DIR)/$@ $@
 
+# helper receipe for test
 test_data_full_%.pred.fa :
 	cp $(FA_DIR)/$@ $@
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.feature *.affy
+	-rm -rf log *.gspan *.threshold* *.feature *.affy
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv *.model
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *.model
 
-%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv : %.feature %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+# we can save some disk space here
+%.gspan.gz : %.gspan
+	gzip -f $<;
 
 # if available, create gspan from precomputed files
 %.gspan : %.gspan.gz
@@ -297,18 +348,6 @@ endif
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
-%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
-%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
-
-%.svrout : %.model %.pred.feature
-	time $(SVRPREDICT) $*.pred.feature $< $@
-
-%.pred : %.svrout %.pred.affy
-	# combine affinities and predictions
-	paste $*.pred.affy $< > $@
-
 %.perf : BASENAME=$(firstword $(subst _, ,$<))
 %.perf : $(shell echo $(BASENAME))
 %.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
@@ -321,6 +360,7 @@ endif
 	$(PERF) -confusion < $@.threshold > $@
 	rm -rf $@.threshold*
 
+# final results summary
 %.correlation : %.pred
 	cat $< | R --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
@@ -330,6 +370,7 @@ results_aucpr.csv : $(PERF_FILES)
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
+# some statistics about class distribution
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
 %.cstats : TYPE=$(word 3,$(subst _, ,$<))
 %.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
@@ -340,6 +381,7 @@ results_correlation.csv : $(CORRELATION_FILES)
 %.cstats : %.fa
 	$(PERL) -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
 
+# final class summary
 summary.cstats : $(CSTAT_FILES)
 	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
 	cat $^ | sort -k1,2 ) > $@
