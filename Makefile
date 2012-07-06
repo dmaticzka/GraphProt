@@ -232,7 +232,7 @@ endif
 endif
 endif
 
-.PHONY: all ls cv classstats clean distclean
+.PHONY: all ls cv classstats test clean distclean
 
 # do predictions for all PROTEINS
 all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
@@ -259,11 +259,11 @@ test_data_full_A.pred.fa :
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf $(MODELS) log *.gspan *.threshold* *.model *.feature *.affy
+	-rm -rf $(MODELS) log *.gspan *.threshold* *.feature *.affy
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log results_aucpr.csv *.model
 
 %.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
