@@ -21,8 +21,8 @@ BINDIR:=$(shell pwd)
 
 # binaries
 PERL:=/usr/local/perl/bin/perl
-SVRTRAIN:=~/src/libsvm-3.0/svm-train -s 3 -t 0 -m $(SVR_CACHE)
-SVRPREDICT:=~/src/libsvm-3.0/svm-predict
+SVRTRAIN:=~/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
+SVRPREDICT:=~/src/libsvm-3.12/svm-predict
 PERF:=~/src/stat/perf
 LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
 COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
