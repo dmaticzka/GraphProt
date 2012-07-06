@@ -1,4 +1,5 @@
 *.affy
+*.csv
 *.e??????
 *.fa
 *.feature
@@ -13,6 +14,5 @@ Makefile
 *.param
 *.perf
 *.pred
-results_aucpr.csv
 *.svrout
 test_*
