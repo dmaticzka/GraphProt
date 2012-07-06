@@ -5,7 +5,7 @@ SHELL:=/bin/bash
 .DELETE_ON_ERROR:
 
 # don't delete intermediate files
-.SECONDARY:
+#.SECONDARY:
 
 # parameters:
 LINESEARCH_INPUT_SIZE:=5000
