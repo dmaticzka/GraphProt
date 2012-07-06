@@ -325,13 +325,7 @@ endif
 	cat $< | R --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
-	grep ROC $(PERF_FILES) | tr ':' ' ' | \
-	awk '{print $$1, "$(EXPERIMENT_ID)", $$NF}' | sort > roc.tmp
-	grep APR $(PERF_FILES) | tr ':' ' ' | \
-	awk '{print $$1, "$(EXPERIMENT_ID)", $$NF}' | cut -f 1,3 -d' ' | \
-	sort > aucpr.tmp
-	join roc.tmp aucpr.tmp > $@
-	rm -rf roc.tmp aucpr.tmp
+	grep -H -e APR -e ROC $^ | tr ':' "\t" | R --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
 
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
