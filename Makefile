@@ -23,6 +23,7 @@ BINDIR:=$(shell pwd)
 
 # binaries
 PERL:=/usr/local/perl/bin/perl
+RBIN:=/usr/local/R/2.12.1-lx/bin/R
 SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
 PERF:=/home/maticzkd/src/stat/perf
@@ -359,10 +360,10 @@ endif
 
 # final results summary
 %.correlation : %.pred
-	cat $< | R --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
-	grep -H -e APR -e ROC $^ | tr ':' "\t" | R --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
+	grep -H -e APR -e ROC $^ | tr ':' "\t" | $(RBIN) --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
 
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
