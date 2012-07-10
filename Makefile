@@ -300,11 +300,19 @@ test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.cstats test_data_full_A.param
 
 # helper receipe for test
-test_data_full_%.fa :
+test_data_full_A.fa :
 	cp $(FA_DIR)/$@ $@
 
 # helper receipe for test
-test_data_full_%.pred.fa :
+test_data_full_B.fa :
+	cp $(FA_DIR)/$@ $@
+
+# helper receipe for test
+test_data_full_A.pred.fa :
+	cp $(FA_DIR)/$@ $@
+
+# helper receipe for test
+test_data_full_B.pred.fa :
 	cp $(FA_DIR)/$@ $@
 
 # keep fasta, predictions and results
