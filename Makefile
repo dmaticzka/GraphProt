@@ -280,6 +280,31 @@ ifeq ($(SVM),SGD)
 	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
 endif
 
+# stochastic gradient descent
+################################################################################
+ifeq ($(SVM),TOPSVR)
+# results from crossvalidation
+%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+# SVR model
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+
+# SVR predictions
+%.svrout : %.model %.pred.feature
+	time $(SVRPREDICT) $*.pred.feature $< $@
+
+# affinities and predictions: default format
+%.pred : %.svrout %.pred.affy
+	# combine affinities and predictions
+	paste $*.pred.affy $< > $@
+endif
+
 .PHONY: all ls cv classstats test clean distclean
 
 # do predictions for all PROTEINS
