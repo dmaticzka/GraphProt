@@ -256,7 +256,7 @@ endif
 # stochastic gradient descent
 ################################################################################
 ifeq ($(SVM),SGD)
-## class memberships {-1,0,1}
+# class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
 %.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
@@ -289,6 +289,28 @@ ifeq ($(SVM),TOPSVR)
 %.cv : %.feature %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
+# class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+
+# train model; this one directly works on gspans
+%.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.sgd_model : %.gspan %.class %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+
+%.filter : %.sgd_model
+	echo TODO
+
+%.feature_filtered : %.feature %.filter
+	echo TODO
+	ln -s $< $@
+
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
@@ -296,8 +318,8 @@ ifeq ($(SVM),TOPSVR)
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
-%.svrout : %.model %.pred.feature
-	time $(SVRPREDICT) $*.pred.feature $< $@
+%.svrout : %.model %.pred.feature_filtered
+	time $(SVRPREDICT) $*.pred.feature_filtered $< $@
 
 # affinities and predictions: default format
 %.pred : %.svrout %.pred.affy
