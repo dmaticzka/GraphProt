@@ -38,7 +38,7 @@ SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
-FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features
+FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -310,8 +310,11 @@ ifeq ($(SVM),TOPSVR)
 %.filter : %.sgd_model
 	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
 
+%.pred.filter : %.filter
+	ln -s $< $@
+
 %.feature_filtered : %.feature %.filter
-	$(FILTER_FEATURES) --features $< --filter $*.filter > $@
+	$(FILTER_FEATURES) --feature $< --filter $*.filter > $@
 
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
