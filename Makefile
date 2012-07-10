@@ -38,6 +38,7 @@ SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
+FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -304,12 +305,13 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : %.gspan %.class %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
+%.filter : NFEAT=$(shell cat test_data_full_A.sgd_model | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
+%.filter : TENP=$(shell echo "$(NFEAT) / 10" | bc)
 %.filter : %.sgd_model
-	echo TODO
+	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
 
 %.feature_filtered : %.feature %.filter
-	echo TODO
-	ln -s $< $@
+	$(FILTER_FEATURES) --features $< --filter $*.filter > $@
 
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
