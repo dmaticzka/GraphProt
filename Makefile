@@ -369,7 +369,7 @@ test_data_full_B.pred.fa :
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf log *.gspan *.threshold* *.feature *.affy
+	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered *.filter
 
 # delete all files
 distclean: clean
