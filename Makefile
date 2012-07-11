@@ -313,7 +313,7 @@ clean:
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *.model
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model *.sgeout *.class
 
 # we can save some disk space here
 %.gspan.gz : %.gspan
