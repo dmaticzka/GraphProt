@@ -274,7 +274,7 @@ ifeq ($(SVM),SGD)
 
 # this version of SGD reads all parameters from model
 %.output.predictions : %.model %.pred.gspan %.pred.class
-	$(SVMSGDNSPDK) -gt DIRECTED -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
 
 # affinities and predictions: default format
 %.pred : %.output.predictions %.pred.affy
