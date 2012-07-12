@@ -61,15 +61,6 @@ PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 
-# receipes specific to graph type
-################################################################################
-ifeq ($(GRAPH_TYPE),ONLYSEQ)
-# line search parameters
-LSPAR:=./ls.structacc.parameters
-
-%.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
-
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -78,6 +69,19 @@ LSPAR:=./ls.structacc.parameters
 	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
+
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$5}' > $@
+
+# receipes specific to graph type
+################################################################################
+ifeq ($(GRAPH_TYPE),ONLYSEQ)
+# line search parameters
+LSPAR:=./ls.structacc.parameters
+
+%.gspan : %.fa
+	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
 
 %.affy : %.gspan
 	# extract affinities from gspan
@@ -91,15 +95,6 @@ LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
 %.affy : %.gspan
 	# extract affinities from gspan
@@ -116,19 +111,6 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
 	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -160,10 +142,6 @@ LSPAR:=./ls.shrep.parameters
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -189,10 +167,6 @@ LSPAR:=./ls.shrep_context.parameters
 	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -214,15 +188,6 @@ LSPAR:=./ls.mega.parameters
 # merge gspans
 %.gspan : %.shrep.gspan %.acc.gspan
 	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan > $@
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
 %.affy : %.shrep.gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
