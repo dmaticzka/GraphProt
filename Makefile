@@ -319,7 +319,7 @@ ifeq ($(SVM),TOPSVR)
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature %.param
+%.model : %.feature_filtered %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
