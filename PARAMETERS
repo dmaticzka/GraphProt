@@ -3,7 +3,7 @@ EXPERIMENT_ID:=default
 
 # proteins to use
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
+PROTEINS:=VTS1
 
 # sets for training: FULL/WEAK/ALL
 TRAINING_SETS=FULL
@@ -22,3 +22,6 @@ SVM=TOPSVR
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
 GRAPH_TYPE=MEGA
+
+# wether to keep intermediate files
+SECONDARY=YES
