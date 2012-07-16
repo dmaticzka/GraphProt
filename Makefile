@@ -270,7 +270,7 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : %.gspan %.class %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
-%.filter : NFEAT=$(shell cat test_data_full_A.sgd_model | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
+%.filter : NFEAT=$(shell cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
 %.filter : TENP=$(shell echo "$(NFEAT) / 10" | bc)
 %.filter : %.sgd_model
 	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
