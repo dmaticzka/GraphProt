@@ -180,7 +180,7 @@ do {
 
 				# parse result
 				open RES, '<', $cv_file;
-				my $correlation = <RES>;
+				$correlation = <RES>;
 				close RES;
 				chomp $correlation;
 				# save result for later reference
