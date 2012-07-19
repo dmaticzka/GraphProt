@@ -232,10 +232,13 @@ endif
 # support vector regression
 ifeq ($(SVM),SVR)
 # results from crossvalidation
-%.cv : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv : %.feature %.param
+%.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv_svr : %.feature %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+%.cv : %.cv_svr
+	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
 
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')

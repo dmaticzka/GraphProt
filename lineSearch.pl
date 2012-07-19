@@ -180,21 +180,12 @@ do {
 
 				# parse result
 				open RES, '<', $cv_file;
-				my @lines = <RES>;
+				my $correlation = <RES>;
 				close RES;
-				if (not ($lines[-2] =~ /Cross Validation Mean squared error/) or
-					not ($lines[-1] =~ /Cross Validation Squared correlation coefficient/)) {
-					say STDERR 'error parsing crossvalidation output:';
-					system("cat $cv_file > /dev/stderr");
-					end_handler();
-				}
-				my @error = split(' ', $lines[-2]);
-				$error = pop(@error);
-				my @correlation = split(' ', $lines[-1]);
-				$correlation = pop(@correlation);
+				chomp $correlation;
 				# save result for later reference
 				$result_cache{get_current_param_key()} = $correlation;
-				say STDERR "correlation: $correlation, error: $error";
+				say STDERR "correlation: $correlation";
 
 				# exit temp directory
 				chdir($CURRDIR);
