@@ -259,6 +259,21 @@ endif
 # stochastic gradient descent
 ################################################################################
 ifeq ($(SVM),SGD)
+# results from crossvalidation
+%.cv_sgd : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.cv_sgd : %.gspan %.class %.param
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
+	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
+	-rm -f $*output.cv_predictions
+
+%.cv : %.cv_sgd
+	cat $< | grep 'APR' | awk '{print $$NF}' > $@
+
 ## class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
