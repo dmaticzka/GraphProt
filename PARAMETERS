@@ -3,7 +3,7 @@ EXPERIMENT_ID:=default
 
 # proteins to use
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
+PROTEINS:=VTS1
 
 # sets for training: FULL/WEAK/ALL
 TRAINING_SETS=FULL
@@ -11,8 +11,8 @@ TRAINING_SETS=FULL
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
 
-# set SVM type: SVR / SGD
-SVM=SGD
+# set SVM type: SVR / SGD / TOPSVR
+SVM=TOPSVR
 
 # set graph type:
 # ONLYSEQ: plain sequence
@@ -21,4 +21,7 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=ONLYSEQ
+GRAPH_TYPE=MEGA
+
+# wether to keep intermediate files
+SECONDARY=YES

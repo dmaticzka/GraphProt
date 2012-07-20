@@ -38,6 +38,7 @@ SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
+FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -60,15 +61,6 @@ PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 
-# receipes specific to graph type
-################################################################################
-ifeq ($(GRAPH_TYPE),ONLYSEQ)
-# line search parameters
-LSPAR:=./ls.structacc.parameters
-
-%.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
-
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -77,6 +69,19 @@ LSPAR:=./ls.structacc.parameters
 	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
+
+%.affy : %.gspan
+	# extract affinities from gspan
+	cat $< | grep '^t' | awk '{print $$5}' > $@
+
+# receipes specific to graph type
+################################################################################
+ifeq ($(GRAPH_TYPE),ONLYSEQ)
+# line search parameters
+LSPAR:=./ls.structacc.parameters
+
+%.gspan : %.fa
+	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
 
 %.affy : %.gspan
 	# extract affinities from gspan
@@ -90,15 +95,6 @@ LSPAR:=./ls.structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
 %.affy : %.gspan
 	# extract affinities from gspan
@@ -115,19 +111,6 @@ LSPAR:=./ls.shrep.parameters
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa %.param
 	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -159,10 +142,6 @@ LSPAR:=./ls.shrep.parameters
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -188,10 +167,6 @@ LSPAR:=./ls.shrep_context.parameters
 	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 ################################################################################
@@ -214,15 +189,6 @@ LSPAR:=./ls.mega.parameters
 %.gspan : %.shrep.gspan %.acc.gspan
 	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan > $@
 
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : bitsize=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
-
 %.affy : %.shrep.gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
@@ -231,12 +197,13 @@ endif
 ################################################################################
 # support vector regression
 ifeq ($(SVM),SVR)
-# results from crossvalidation
+# results from cross validation
 %.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv_svr : %.feature %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
+# final result of cross validation: squared correlation coefficient
 %.cv : %.cv_svr
 	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
 
@@ -274,7 +241,7 @@ ifeq ($(SVM),SGD)
 %.cv : %.cv_sgd
 	cat $< | grep 'APR' | awk '{print $$NF}' > $@
 
-## class memberships {-1,0,1}
+# class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
 %.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
@@ -296,6 +263,61 @@ ifeq ($(SVM),SGD)
 # affinities and predictions: default format
 %.pred : %.output.predictions %.pred.affy
 	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
+endif
+
+# stochastic gradient descent
+################################################################################
+ifeq ($(SVM),TOPSVR)
+# results from cross validation
+%.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv_svr : %.feature %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+# final result of cross validation: squared correlation coefficient
+%.cv : %.cv_svr
+	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
+
+# class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+
+# train model; this one directly works on gspans
+%.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.sgd_model : %.gspan %.class %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+
+%.pred.filter : %.filter
+	ln -s $< $@
+
+%.filter : NFEAT=$(shell cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
+%.filter : TENP=$(shell echo "$(NFEAT) / 5" | bc)
+%.filter : %.sgd_model
+	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
+
+%.feature_filtered : %.feature %.filter
+	$(FILTER_FEATURES) --feature $< --filter $*.filter > $@
+
+# SVR model
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature_filtered %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+
+# SVR predictions
+%.svrout : %.model %.pred.feature_filtered
+	time $(SVRPREDICT) $*.pred.feature_filtered $< $@
+
+# affinities and predictions: default format
+%.pred : %.svrout %.pred.affy
+	# combine affinities and predictions
+	paste $*.pred.affy $< > $@
 endif
 
 .PHONY: all ls cv classstats test clean distclean
@@ -325,6 +347,7 @@ test_data_full_A.fa :
 test_data_full_A.pred.fa :
 	cp -f $(FA_DIR)/$@ $@
 
+# helper receipe for test
 test_data_full_B.fa :
 	cp -f $(FA_DIR)/$@ $@
 
@@ -334,7 +357,7 @@ test_data_full_B.pred.fa :
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf log *.gspan *.threshold* *.feature *.affy
+	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered *.filter
 
 # delete all files
 distclean: clean
