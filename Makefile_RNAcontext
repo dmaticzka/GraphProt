@@ -67,7 +67,7 @@ test_data_full_B.pred.fa :
 profile: $(PROFILES)
 
 .PHONY: perf
-perf: results.csv best.csv.dummy
+perf: results_aucpr.csv results_correlation.csv best.csv.dummy
 
 %.sequence : %.fa
 	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
