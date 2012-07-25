@@ -19,6 +19,8 @@ PERF:=~/src/stat/perf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 # this includes the modifications from RNAcontext for computing structure accs
 SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
+CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
+RBIN:=/usr/local/R/2.12.1-lx/bin/R
 
 # proteins to use
 # PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -37,12 +39,13 @@ RESULTDIRS:=$(patsubst %, %.dummy, $(BASENAMES))
 
 RNACONTEXT_OUTPUTS:=$(wildcard outputs/train*.txt) $(wildcard outputs/test*.txt)
 PERF_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.perf)
+CORRELATION_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.correlation)
 
 .PHONY: all
 all: $(RESULTDIRS)
 
 .PHONY: test
-test: test_data_full_A.dummy test_data_full_A.perf test_data_full_A.correlation
+test: test_data_full_A.dummy results_aucpr.csv results_correlation.csv
 
 # helper receipe for test
 test_data_full_A.fa :
@@ -105,14 +108,14 @@ endif
 	$(PERF) < $@.threshold > $@
 	rm -rf $@.threshold*
 
-# %.correlation : %.txt
-# 	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+%.correlation : %.txt
+	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("measurement","prediction")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
-	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$NF}' > results.csv
+	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$NF}' > $@
 
-# results_correlation.csv : $(CORRELATION_FILES)
-# 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
+results_correlation.csv : $(CORRELATION_FILES)
+	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
 best.csv.dummy : results.csv
 	R --slave < RNAcontext_Auswertung.R && touch $@
