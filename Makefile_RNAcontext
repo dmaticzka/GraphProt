@@ -45,7 +45,7 @@ CORRELATION_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.correlation)
 all: $(RESULTDIRS)
 
 .PHONY: test
-test: test_data_full_A.dummy results_aucpr.csv results_correlation.csv
+test: test_data_full_A.dummy results_aucpr.csv results_correlation.csv best.csv.dummy
 
 # helper receipe for test
 test_data_full_A.fa :
@@ -115,7 +115,7 @@ results_aucpr.csv : $(PERF_FILES)
 	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$NF}' > $@
 
 results_correlation.csv : $(CORRELATION_FILES)
-	$(CAT_TABLES) $(CORRELATION_FILES) > $@
+	$(CAT_TABLES) $(CORRELATION_FILES) | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.correlation//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$8,$$9}' > $@
 
 best.csv.dummy : results_aucpr.csv
 	R --slave < RNAcontext_Auswertung.R && touch $@
