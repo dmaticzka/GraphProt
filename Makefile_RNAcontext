@@ -86,8 +86,14 @@ endif
 	$(PERF) < $@.threshold > $@
 	rm -rf $@.threshold*
 
-results.csv : $(PERF_FILES)
+# %.correlation : %.txt
+# 	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+
+results_aucpr.csv : $(PERF_FILES)
 	grep APR $^ | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.perf:APR//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$NF}' > results.csv
+
+# results_correlation.csv : $(CORRELATION_FILES)
+# 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
 best.csv.dummy : results.csv
 	R --slave < RNAcontext_Auswertung.R && touch $@
