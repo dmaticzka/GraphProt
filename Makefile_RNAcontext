@@ -117,6 +117,5 @@ results_aucpr.csv : $(PERF_FILES)
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
-best.csv.dummy : results.csv
+best.csv.dummy : results_aucpr.csv
 	R --slave < RNAcontext_Auswertung.R && touch $@
-

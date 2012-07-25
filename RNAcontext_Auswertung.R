@@ -7,7 +7,7 @@
 # * use selected models from selected type to report prediction score on test data
 
 # best for my own computations:
-d <- read.table("results.csv", col.names=c('pred','protein','type','set','length','apr'));
+d <- read.table("results_aucpr.csv", col.names=c('pred','protein','type','set','length','apr'));
 
 # select best models using training data
 selection_best_model_train <- subset(ddply(subset(d, pred=='train'), .(protein,type,set), transform, max_apr=max(apr)), apr==max_apr)[,c(2,3,4,5,6)]
