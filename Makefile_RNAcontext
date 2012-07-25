@@ -21,8 +21,8 @@ FASTAPL:=/usr/local/user/RNAtools/fastapl
 SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
 
 # proteins to use
-PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-#PROTEINS:=test
+# PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=test
 
 # targets
 FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
@@ -40,6 +40,25 @@ PERF_FILES:=$(RNACONTEXT_OUTPUTS:.txt=.perf)
 
 .PHONY: all
 all: $(RESULTDIRS)
+
+.PHONY: test
+test: test_data_full_A.dummy test_data_full_A.perf test_data_full_A.correlation
+
+# helper receipe for test
+test_data_full_A.fa :
+	cp -f $(FA_DIR)/$@ $@
+
+# helper receipe for test
+test_data_full_A.pred.fa :
+	cp -f $(FA_DIR)/$@ $@
+
+# helper receipe for test
+test_data_full_B.fa :
+	cp -f $(FA_DIR)/$@ $@
+
+# helper receipe for test
+test_data_full_B.pred.fa :
+	cp -f $(FA_DIR)/$@ $@
 
 .PHONY: profile
 profile: $(PROFILES)
