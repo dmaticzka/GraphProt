@@ -10,7 +10,7 @@ SHELL:=/bin/bash
 
 # paths
 ROOT:=~/projects/RBPaffinity
-FA_DIR:=~$(ROOT)/data/fasta
+FA_DIR:=$(ROOT)/data/fasta
 THR_DIR:=$(ROOT)/data/thresholds/
 
 # progs
