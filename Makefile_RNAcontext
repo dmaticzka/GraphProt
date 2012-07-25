@@ -17,6 +17,8 @@ THR_DIR:=$(ROOT)/data/thresholds/
 RNACONTEXT=~/src/RNAcontext/bin/rnacontext
 PERF:=~/src/stat/perf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
+# this includes the modifications from RNAcontext for computing structure accs
+SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
 
 # proteins to use
 PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -53,7 +55,7 @@ ifeq ($(PROFILE_COMP),SFOLD)
 %.profile : %.fa
 	-rm -rfv $@ $@.tmp /var/tmp/$@.tmp_data /var/tmp/$@.tmp_out
 	mkdir $@.tmp /var/tmp/$@.tmp_data /var/tmp/$@.tmp_out
-	cd $@.tmp; ln -s ../sfold-2.2/* ./;	ln -s /var/tmp/$@.tmp_data data; ln -s /var/tmp/$@.tmp_out out; ./sfold_helper ../$< ../$@
+	cd $@.tmp; ln -s $(SFOLD_DIR)/* ./;	ln -s /var/tmp/$@.tmp_data data; ln -s /var/tmp/$@.tmp_out out; ./sfold_helper ../$< ../$@
 	-rm -rfv $@.tmp /var/tmp/$@.tmp
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
