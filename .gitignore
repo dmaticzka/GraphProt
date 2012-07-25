@@ -16,3 +16,6 @@ Makefile
 *.pred
 *.svrout
 test_*
+*.sequence
+*.dummy
+*.bz2
