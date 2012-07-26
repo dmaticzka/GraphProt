@@ -55,6 +55,17 @@ BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 endif
 endif
 
+# set appropriate id (used to determine which parameter sets to use)
+ifeq ($(SVM),SVR)
+METHOD_ID=svr
+endif
+ifeq ($(SVM),TOPSVR)
+METHOD_ID=svr
+endif
+ifeq ($(SVM),SGD)
+METHOD_ID=sgd
+endif
+
 CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
 PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
@@ -78,7 +89,7 @@ CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
-LSPAR:=./ls.structacc.parameters
+LSPAR:=./ls.$(METHOD_ID).structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
@@ -91,7 +102,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),STRUCTACC)
 # line search parameters
-LSPAR:=./ls.structacc.parameters
+LSPAR:=./ls.$(METHOD_ID).structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
@@ -104,7 +115,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
-LSPAR:=./ls.shrep.parameters
+LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -116,7 +127,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
 # line search parameters
-LSPAR:=./ls.shrep.parameters
+LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -147,7 +158,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
-LSPAR:=./ls.shrep_context.parameters
+LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -172,7 +183,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),MEGA)
 # line search parameters
-LSPAR:=./ls.mega.parameters
+LSPAR:=./ls.$(METHOD_ID).mega.parameters
 
 # accessibility graphs
 %.acc.gspan : %.fa
