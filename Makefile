@@ -268,6 +268,7 @@ ifeq ($(SVM),SGD)
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
 # this version of SGD reads all parameters from model
+%.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.output.predictions : %.model %.pred.gspan %.pred.class
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
 
