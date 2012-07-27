@@ -369,11 +369,13 @@ test_data_full_B.pred.fa :
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered *.filter
+	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered \
+	*.filter
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model *.sgeout *.class
+	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
+	*.sgeout *.class *.output.predictions *.correlation
 
 # we can save some disk space here
 %.gspan.gz : %.gspan
