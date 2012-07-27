@@ -23,5 +23,5 @@ SVM=SGD
 # MEGA: pure sequence, shrep graphs and accessibility graphs
 GRAPH_TYPE=MEGA
 
-# wether to keep intermediate files
+# whether to keep intermediate files
 SECONDARY=YES
