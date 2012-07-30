@@ -113,15 +113,16 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
+# extract affinities from fasta
+# expected to reside in last field of fasta header
+%.affy : %.fa
+	$(FASTAPL) -e 'print $$head[-1], "\n"' < $< > $@
 
 # combine input sequences
 %.fa : %.positives.fa %.negatives.fa %.unknowns.fa
 	( $(FASTAPL) -p -1 -e '$$head .= " 1";' < $*.positives.fa; \
-	$(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
-	$(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
+	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
+	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
 
 %.unknowns.fa :
 	echo "doing supervised training only"
@@ -135,10 +136,6 @@ LSPAR:=./ls.$(METHOD_ID).structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$NF}' > $@
 endif
 
 ################################################################################
@@ -148,10 +145,6 @@ LSPAR:=./ls.$(METHOD_ID).structacc.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
-
-%.affy : %.gspan
-	# extract affinities from gspan
-	cat $< | grep '^t' | awk '{print $$NF}' > $@
 endif
 
 ################################################################################
@@ -241,9 +234,6 @@ LSPAR:=./ls.$(METHOD_ID).mega.parameters
 # merge gspans
 %.gspan : %.shrep.gspan %.acc.gspan
 	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan > $@
-
-%.affy : %.shrep.gspan
-	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
 
@@ -416,9 +406,6 @@ endif
 ## evaluations specific to CLIP analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
-# with CLIP, use class values instead of affinities
-# %.affy : %.class
-# 	ln -sf $< $@
 endif
 
 

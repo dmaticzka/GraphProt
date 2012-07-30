@@ -23,7 +23,7 @@ SVM=SGD
 GRAPH_TYPE=MEGA
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+DO_LINESEARCH=NO
 
 # how many sequences to sample for parameter line search
 LINESEARCH_INPUT_SIZE:=5000
