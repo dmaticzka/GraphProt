@@ -415,7 +415,20 @@ endif
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
-test: testclip.fa testclip.gspan testclip.affy testclip.class testclip.cv
+test: testclip.train.fa testclip.train.gspan testclip.train.affy \
+	testclip.train.class testclip.train.cv \
+	testclip.test.pred testclip.test.perf
+
+# this version of SGD reads all parameters from model
+%.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.train.param | cut -f 2 -d' ')
+%.test.output.predictions : %.train.model %.test.gspan %.test.class
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
+
+%.test.pred : %.test.output.predictions %.test.affy
+	cat $< | awk '{print $$2}' | paste $*.test.affy - > $@
+
+%.perf : %.pred
+	cat $< | sed 's/^-1/0/g' | $(PERF) -confusion > $@
 
 # for clip data, affinities are actually the class
 %.class : %.affy
