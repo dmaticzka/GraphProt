@@ -1,6 +1,11 @@
 ## General parameters ##########################################################
+# prefix of train/test data
+# RNAcompete proteins
+#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=testclip
+
 # select evaluation type: RNACOMPETE / CLIP
-EVAL_TYPE=RNACOMPETE
+EVAL_TYPE=CLIP
 
 # whether to keep intermediate files
 SECONDARY=YES
@@ -32,10 +37,6 @@ SVR_CACHE:=10000
 
 ## RNAcompete specific parameters ##############################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
-# proteins for all target
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
-
 # sets for training: FULL/WEAK/ALL
 TRAINING_SETS=FULL
 endif

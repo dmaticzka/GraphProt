@@ -1,9 +1,9 @@
-## user defined  parameters are located here ###################################
+## user defined  parameters are located here
 ################################################################################
 include PARAMETERS
 
 
-## general behaviour ###########################################################
+## general behaviour
 ################################################################################
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
@@ -13,7 +13,7 @@ ifeq ($(SECONDARY),YES)
 endif
 
 
-## paths #######################################################################
+## paths
 ################################################################################
 PROJDIR:=/home/maticzkd/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
@@ -22,7 +22,7 @@ THR_DIR:=$(PROJDIR)/data/thresholds/
 BINDIR:=$(shell pwd)
 
 
-## binaries ####################################################################
+## binaries
 ################################################################################
 PERL:=/usr/local/perl/bin/perl
 RBIN:=/usr/local/R/2.12.1-lx/bin/R
@@ -43,7 +43,7 @@ CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
 FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 
 
-## set appropriate id (used to determine which parameter sets to use) ##########
+## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
 ifeq ($(SVM),SVR)
 METHOD_ID=svr
@@ -56,7 +56,7 @@ METHOD_ID=sgd
 endif
 
 
-## set targets for the RNAcompete evaluation ###################################
+## set targets for RNAcompete evaluation
 ################################################################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # filenames for full data sets
@@ -78,6 +78,20 @@ BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
 endif
 endif
 
+# general class statistics
+CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
+endif
+
+
+## set targets for CLIP-seq evaluation
+################################################################################
+ifeq ($(EVAL_TYPE),CLIP)
+BASENAMES=$(PROTEINS)
+endif
+
+
+## set targets common to all evaluations
+################################################################################
 # final results spearman correlation
 CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
 # final results from perf
@@ -86,12 +100,9 @@ PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 # results of crossvalidations
 CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
-# general class statistics
-CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
-endif
 
 
-## general feature and affinity creation (overridden where apropriate) #########
+## general feature and affinity creation (overridden where apropriate)
 ################################################################################
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
