@@ -1,8 +1,8 @@
 # [parameter] [default] [parameter list]
-R 1 4 3 2 1
-D 4 6 5 4 3 2 1
+R 1 4 3
+D 4 4 3
 b 14 14
-ABSTRACTION 3 1 2 3 4 5
+ABSTRACTION 3 3
 DIRECTED DIRECTED DIRECTED UNDIRECTED
 CUE nil --cue nil
 STACK nil --stack nil

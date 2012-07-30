@@ -117,6 +117,15 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
+# combine input sequences
+%.fa : %.positives.fa %.negatives.fa %.unknowns.fa
+	( $(FASTAPL) -p -1 -e '$$head .= " 1";' < $*.positives.fa; \
+	$(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
+	$(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
+
+%.unknowns.fa :
+	echo "doing supervised training only"
+	touch $@
 
 ## receipes specific to graph type
 ################################################################################
@@ -404,6 +413,15 @@ summary.cstats : $(CSTAT_FILES)
 endif
 
 
+## evaluations specific to CLIP analysis
+################################################################################
+ifeq ($(EVAL_TYPE),CLIP)
+# with CLIP, use class values instead of affinities
+# %.affy : %.class
+# 	ln -sf $< $@
+endif
+
+
 ## misc helper receipes
 ################################################################################
 # we can save some disk space here
@@ -469,19 +487,13 @@ test: test_data_full_A.fa test_data_full_A.pred.fa \
 	test_data_full_A.perf test_data_full_A.correlation \
 	test_data_full_A.cstats test_data_full_A.param
 
-# helper receipe for test
+# helper receipes for test
 test_data_full_A.fa :
 	cp -f $(FA_DIR)/$@ $@
-
-# helper receipe for test
 test_data_full_A.pred.fa :
 	cp -f $(FA_DIR)/$@ $@
-
-# helper receipe for test
 test_data_full_B.fa :
 	cp -f $(FA_DIR)/$@ $@
-
-# helper receipe for test
 test_data_full_B.pred.fa :
 	cp -f $(FA_DIR)/$@ $@
 
