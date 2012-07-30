@@ -132,7 +132,7 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).structacc.parameters
+LSPAR:=./ls.$(METHOD_ID).onlyseq.parameters
 
 %.gspan : %.fa
 	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
