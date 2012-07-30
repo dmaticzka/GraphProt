@@ -1,27 +1,29 @@
-# user parameters
+## user defined  parameters are located here ###################################
+################################################################################
 include PARAMETERS
 
+
+## general behaviour ###########################################################
+################################################################################
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
-
 ifeq ($(SECONDARY),YES)
 # don't delete intermediate files
 .SECONDARY:
 endif
 
-# parameters:
-LINESEARCH_INPUT_SIZE:=5000
-SVR_CACHE:=10000
-CV_FOLD:=5
 
-# paths
+## paths #######################################################################
+################################################################################
 PROJDIR:=/home/maticzkd/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
 THR_DIR:=$(PROJDIR)/data/thresholds/
 # expect binaries to reside in pwd, otherwise this variable must be overwritten
 BINDIR:=$(shell pwd)
 
-# binaries
+
+## binaries ####################################################################
+################################################################################
 PERL:=/usr/local/perl/bin/perl
 RBIN:=/usr/local/R/2.12.1-lx/bin/R
 SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
@@ -40,22 +42,9 @@ MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
 FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 
-# targets
-FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
-			$(patsubst %,%_data_full_B,$(PROTEINS))
-BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
-			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
-ifeq ($(TRAINING_SETS),FULL)
-BASENAMES:=$(FULL_BASENAMES)
-else
-ifeq ($(TRAINING_SETS),WEAK)
-BASENAMES:=$(BRUIJN_BASENAMES)
-else
-BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
-endif
-endif
 
-# set appropriate id (used to determine which parameter sets to use)
+## set appropriate id (used to determine which parameter sets to use) ##########
+################################################################################
 ifeq ($(SVM),SVR)
 METHOD_ID=svr
 endif
@@ -66,12 +55,44 @@ ifeq ($(SVM),SGD)
 METHOD_ID=sgd
 endif
 
-CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
-PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
-PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
-CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
-CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 
+## set targets for the RNAcompete evaluation ###################################
+################################################################################
+ifeq ($(EVAL_TYPE),RNACOMPETE)
+# filenames for full data sets
+FULL_BASENAMES:=$(patsubst %,%_data_full_A,$(PROTEINS)) \
+			$(patsubst %,%_data_full_B,$(PROTEINS))
+
+# filenames of data sets containing only weakly structured sequences
+BRUIJN_BASENAMES:=$(patsubst %,%_data_bruijn_A,$(PROTEINS)) \
+			$(patsubst %,%_data_bruijn_B,$(PROTEINS))
+
+# extract prefixes for further assembling of target filenames
+ifeq ($(TRAINING_SETS),FULL)
+BASENAMES:=$(FULL_BASENAMES)
+else
+ifeq ($(TRAINING_SETS),WEAK)
+BASENAMES:=$(BRUIJN_BASENAMES)
+else
+BASENAMES:=$(FULL_BASENAMES) $(BRUIJN_BASENAMES)
+endif
+endif
+
+# final results spearman correlation
+CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
+# final results from perf
+PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
+# parameter files (from linesearch or default values)
+PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
+# results of crossvalidations
+CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
+# general class statistics
+CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
+endif
+
+
+## general feature and affinity creation (overridden where apropriate) #########
+################################################################################
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
@@ -85,7 +106,8 @@ CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
 	# extract affinities from gspan
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 
-# receipes specific to graph type
+
+## receipes specific to graph type
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
@@ -204,7 +226,8 @@ LSPAR:=./ls.$(METHOD_ID).mega.parameters
 	cat $< | grep '^t' | awk '{print $$5}' > $@
 endif
 
-# receipes specific to SVM type
+
+## receipes specific to SVM type
 ################################################################################
 # support vector regression
 ifeq ($(SVM),SVR)
@@ -234,7 +257,8 @@ ifeq ($(SVM),SVR)
 	paste $*.pred.affy $< > $@
 endif
 
-# stochastic gradient descent
+
+## stochastic gradient descent
 ################################################################################
 ifeq ($(SVM),SGD)
 # results from crossvalidation
@@ -277,7 +301,8 @@ ifeq ($(SVM),SGD)
 	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
 endif
 
-# stochastic gradient descent
+
+## support vector regression using sgd-derived subset of top features
 ################################################################################
 ifeq ($(SVM),TOPSVR)
 # results from cross validation
@@ -332,6 +357,88 @@ ifeq ($(SVM),TOPSVR)
 	paste $*.pred.affy $< > $@
 endif
 
+
+## evaluations specific to RNAcompete analysis
+################################################################################
+ifeq ($(EVAL_TYPE),RNACOMPETE)
+# compute performance measures
+# .perf is tab separated: affinity \t prediction
+%.perf : BASENAME=$(firstword $(subst _, ,$<))
+%.perf : $(shell echo $(BASENAME))
+%.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.perf : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.perf : %.pred
+	# select by threshold
+	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
+	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
+	# compute performance measures
+	$(PERF) -confusion < $@.threshold > $@
+	rm -rf $@.threshold*
+
+# some statistics about class distribution
+%.cstats : BASENAME=$(firstword $(subst _, ,$<))
+%.cstats : TYPE=$(word 3,$(subst _, ,$<))
+%.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
+%.cstats : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.cstats : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.cstats : HN=$(shell cat $< | grep '^>' | awk '$$NF > $(HT)' | wc -l)
+%.cstats : LN=$(shell cat $< | grep '^>' | awk '$$NF < $(LT)' | wc -l)
+%.cstats : %.fa
+	$(PERL) -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
+
+# final class summary
+summary.cstats : $(CSTAT_FILES)
+	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
+	cat $^ | sort -k1,2 ) > $@
+endif
+
+
+## misc helper receipes
+################################################################################
+# we can save some disk space here
+# %.gspan.gz : %.gspan
+# 	gzip -f $<;
+
+# if available, create gspan from precomputed files
+%.gspan : %.gspan.gz
+	zcat $< > $@
+
+# link parameter file for simpler handling
+%.pred.param : %.param
+	ln -sf $< $@
+
+ifeq ($(DO_LINESEARCH),NO)
+# just use defaults instead of doing line search
+%.param : $(LSPAR)
+	cut -f 1,2 -d' ' < $< > $@
+else
+# do parameter optimization by line search
+%.param : %.ls.fa $(LSPAR)
+	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(BINDIR) 2> >(tee $@.log >&2)
+endif
+
+# subset fastas prior to line search
+%.ls.fa : %.fa
+	cat $< | \
+	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | \
+	$(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
+	$(PERL) -ane \
+	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
+	$@
+
+# final results summary
+%.correlation : %.pred
+	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+
+results_aucpr.csv : $(PERF_FILES)
+	grep -H -e APR -e ROC $^ | tr ':' "\t" | $(RBIN) --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
+
+results_correlation.csv : $(CORRELATION_FILES)
+	$(CAT_TABLES) $(CORRELATION_FILES) > $@
+
+
+## phony target section
+################################################################################
 .PHONY: all ls cv classstats test clean distclean
 
 # do predictions for all PROTEINS
@@ -376,72 +483,3 @@ clean:
 distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.output.predictions *.correlation
-
-# we can save some disk space here
-%.gspan.gz : %.gspan
-	gzip -f $<;
-
-# if available, create gspan from precomputed files
-%.gspan : %.gspan.gz
-	zcat $< > $@
-
-# link parameter file for simpler handling
-%.pred.param : %.param
-	ln -sf $< $@
-
-ifeq ($(DO_LINESEARCH),NO)
-# just use defaults instead of doing line search
-%.param : $(LSPAR)
-	cut -f 1,2 -d' ' < $< > $@
-else
-# do parameter optimization by line search
-%.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(BINDIR) 2> >(tee $@.log >&2)
-endif
-
-# subset original fasta
-%.ls.fa : %.fa
-	cat $< | \
-	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | \
-	$(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
-	$(PERL) -ane \
-	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
-	$@
-
-%.perf : BASENAME=$(firstword $(subst _, ,$<))
-%.perf : $(shell echo $(BASENAME))
-%.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.perf : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.perf : %.pred
-	# select by threshold
-	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
-	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
-	# compute performance measures
-	$(PERF) -confusion < $@.threshold > $@
-	rm -rf $@.threshold*
-
-# final results summary
-%.correlation : %.pred
-	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
-
-results_aucpr.csv : $(PERF_FILES)
-	grep -H -e APR -e ROC $^ | tr ':' "\t" | $(RBIN) --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
-
-results_correlation.csv : $(CORRELATION_FILES)
-	$(CAT_TABLES) $(CORRELATION_FILES) > $@
-
-# some statistics about class distribution
-%.cstats : BASENAME=$(firstword $(subst _, ,$<))
-%.cstats : TYPE=$(word 3,$(subst _, ,$<))
-%.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
-%.cstats : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.cstats : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.cstats : HN=$(shell cat $< | grep '^>' | awk '$$NF > $(HT)' | wc -l)
-%.cstats : LN=$(shell cat $< | grep '^>' | awk '$$NF < $(LT)' | wc -l)
-%.cstats : %.fa
-	$(PERL) -e 'print join("\t", "$(BASENAME)", "$(SET)", "$(LT)", "$(LN)", "$(HT)", "$(HN)"),"\n"' > $@
-
-# final class summary
-summary.cstats : $(CSTAT_FILES)
-	( $(PERL) -e 'print join("\t", "protein", "set", "negative threshold", "negative instances", "positive threshold", "positive instances"),"\n"'; \
-	cat $^ | sort -k1,2 ) > $@

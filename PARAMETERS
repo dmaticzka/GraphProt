@@ -1,15 +1,9 @@
-# written out with end results
-EXPERIMENT_ID:=default
+## General parameters ##########################################################
+# select evaluation type: RNACOMPETE / CLIP
+EVAL_TYPE=RNACOMPETE
 
-# proteins to use
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=test
-
-# sets for training: FULL/WEAK/ALL
-TRAINING_SETS=FULL
-
-# enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+# whether to keep intermediate files
+SECONDARY=YES
 
 # set SVM type: SVR / SGD / TOPSVR
 SVM=SGD
@@ -23,5 +17,25 @@ SVM=SGD
 # MEGA: pure sequence, shrep graphs and accessibility graphs
 GRAPH_TYPE=MEGA
 
-# whether to keep intermediate files
-SECONDARY=YES
+# enable/disable line search: YES/NO
+DO_LINESEARCH=YES
+
+# how many sequences to sample for parameter line search
+LINESEARCH_INPUT_SIZE:=5000
+
+# number of crossvalidation sets to use
+CV_FOLD:=5
+
+# amount of cache in MB used by libSVM
+SVR_CACHE:=10000
+
+
+## RNAcompete specific parameters ##############################################
+ifeq ($(EVAL_TYPE),RNACOMPETE)
+# proteins for all target
+#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+PROTEINS:=test
+
+# sets for training: FULL/WEAK/ALL
+TRAINING_SETS=FULL
+endif
