@@ -399,6 +399,9 @@ endif
 ## evaluations specific to CLIP analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
+# for clip data, affinities are actually the class
+%.class : %.affy
+	ln -sf $< $@
 endif
 
 
