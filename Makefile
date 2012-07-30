@@ -286,13 +286,6 @@ ifeq ($(SVM),SGD)
 %.cv : %.cv_sgd
 	cat $< | grep 'APR' | awk '{print $$NF}' > $@
 
-# class memberships {-1,0,1}
-%.class : BASENAME=$(firstword $(subst _, ,$<))
-%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.class : %.affy
-	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
-
 # train model; this one directly works on gspans
 %.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -324,13 +317,6 @@ ifeq ($(SVM),TOPSVR)
 # final result of cross validation: squared correlation coefficient
 %.cv : %.cv_svr
 	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
-
-# class memberships {-1,0,1}
-%.class : BASENAME=$(firstword $(subst _, ,$<))
-%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.class : %.affy
-	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
 
 # train model; this one directly works on gspans
 %.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
@@ -371,6 +357,13 @@ endif
 ## evaluations specific to RNAcompete analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
+# class memberships {-1,0,1}
+%.class : BASENAME=$(firstword $(subst _, ,$<))
+%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : %.affy
+	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+
 # compute performance measures
 # .perf is tab separated: affinity \t prediction
 %.perf : BASENAME=$(firstword $(subst _, ,$<))
