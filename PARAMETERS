@@ -20,10 +20,10 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=MEGA
+GRAPH_TYPE=ONLYSEQ
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=NO
+DO_LINESEARCH=YES
 
 # how many sequences to sample for parameter line search
 LINESEARCH_INPUT_SIZE:=5000
