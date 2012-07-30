@@ -36,7 +36,7 @@ FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
 #FASTAPL:=/home/maticzkd/repositories/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 #FASTA2GSPAN:=/home/maticzkd/repositories/RNAtools/fasta2shrep_gspan.pl
-SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_dev/svmsgdnspdk
+SVMSGDNSPDK:=/home/maticzkd/repositories/svmsgdnspdk_dir_nspdkvp/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
@@ -281,7 +281,7 @@ ifeq ($(SVM),SGD)
 %.cv_sgd : %.gspan %.class %.param
 	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
 	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
-	-rm -f $*output.cv_predictions
+	-rm -f $*output.cv_predictions $*model_*
 
 %.cv : %.cv_sgd
 	cat $< | grep 'APR' | awk '{print $$NF}' > $@
@@ -357,6 +357,21 @@ endif
 ## evaluations specific to RNAcompete analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
+# test various stuff
+test: test_data_full_A.fa test_data_full_A.pred.fa \
+	test_data_full_A.perf test_data_full_A.correlation \
+	test_data_full_A.cstats test_data_full_A.param
+
+# helper receipes for test
+test_data_full_A.fa :
+	cp -f $(FA_DIR)/$@ $@
+test_data_full_A.pred.fa :
+	cp -f $(FA_DIR)/$@ $@
+test_data_full_B.fa :
+	cp -f $(FA_DIR)/$@ $@
+test_data_full_B.pred.fa :
+	cp -f $(FA_DIR)/$@ $@
+
 # class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
@@ -399,6 +414,9 @@ endif
 ## evaluations specific to CLIP analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
+# test various stuff
+test: testclip.fa testclip.gspan testclip.affy testclip.class testclip.cv
+
 # for clip data, affinities are actually the class
 %.class : %.affy
 	ln -sf $< $@
@@ -464,21 +482,6 @@ cv : $(CV_FILES)
 
 # generate staticstics on positive/negative composition
 classstats : summary.cstats $(CSTAT_FILES)
-
-# test various stuff
-test: test_data_full_A.fa test_data_full_A.pred.fa \
-	test_data_full_A.perf test_data_full_A.correlation \
-	test_data_full_A.cstats test_data_full_A.param
-
-# helper receipes for test
-test_data_full_A.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_A.pred.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_B.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_B.pred.fa :
-	cp -f $(FA_DIR)/$@ $@
 
 # keep fasta, predictions and results
 clean:
