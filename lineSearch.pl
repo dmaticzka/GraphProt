@@ -176,7 +176,7 @@ do {
 				# call Makefile for cv
 				my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
 				$debug and say STDERR $exec;
-				system("time $exec");
+				system("time $exec") == 0 or die "$exec failed: $?"; 
 
 				# parse result
 				open RES, '<', $cv_file;
