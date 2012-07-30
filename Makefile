@@ -491,4 +491,5 @@ clean:
 # delete all files
 distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.output.predictions *.correlation
+	*.sgeout *.class *.output.predictions *.correlation *.cv *.cv_sgd \
+	*.cv_svr
