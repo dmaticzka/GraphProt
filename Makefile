@@ -511,3 +511,10 @@ distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.output.predictions *.correlation *.cv *.cv_sgd \
 	*.cv_svr
+
+## insert additional rules into this file
+################################################################################
+EXPERIMENT_SPECIFIC_RULES :
+	touch EXPERIMENT_SPECIFIC_RULES
+
+include EXPERIMENT_SPECIFIC_RULES
