@@ -108,7 +108,7 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
+%.feature : %.gspan %.affy | %.param
 	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
@@ -155,7 +155,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa %.param
+%.gspan : %.fa | %.param
 	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 endif
 
@@ -167,14 +167,14 @@ LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa %.param
+%.gspan : %.fa | %.param
 	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
+%.feature : %.gspan %.affy | %.param
 	# remove t and w, convert s to t
 	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
 	# write out probabilities
@@ -198,7 +198,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 %.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa %.param
+%.gspan : %.fa | %.param
 	$(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
@@ -209,7 +209,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 %.feature : RR=$(shell grep '^RR ' $*.param | cut -f 2 -d' ')
 %.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
 %.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy %.param
+%.feature : %.gspan %.affy | %.param
 	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
@@ -228,7 +228,7 @@ LSPAR:=./ls.$(METHOD_ID).mega.parameters
 %.shrep.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.shrep.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan : %.fa %.param
+%.shrep.gspan : %.fa | %.param
 	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
 
 # merge gspans
@@ -244,7 +244,7 @@ ifeq ($(SVM),SVR)
 # results from cross validation
 %.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv_svr : %.feature %.param
+%.cv_svr : %.feature | %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # final result of cross validation: squared correlation coefficient
@@ -254,7 +254,7 @@ ifeq ($(SVM),SVR)
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature %.param
+%.model : %.feature | %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
@@ -278,7 +278,7 @@ ifeq ($(SVM),SGD)
 %.cv_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : %.gspan %.class %.param
+%.cv_sgd : %.gspan %.class | %.param
 	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
 	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
 	-rm -f $*output.cv_predictions $*model_*
@@ -291,7 +291,7 @@ ifeq ($(SVM),SGD)
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.model : %.gspan %.class %.param
+%.model : %.gspan %.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
 # this version of SGD reads all parameters from model
@@ -311,7 +311,7 @@ ifeq ($(SVM),TOPSVR)
 # results from cross validation
 %.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv_svr : %.feature %.param
+%.cv_svr : %.feature | %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # final result of cross validation: squared correlation coefficient
@@ -323,7 +323,7 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.sgd_model : %.gspan %.class %.param
+%.sgd_model : %.gspan %.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
 %.pred.filter : %.filter
@@ -340,7 +340,7 @@ ifeq ($(SVM),TOPSVR)
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature_filtered %.param
+%.model : %.feature_filtered | %.param
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
@@ -419,9 +419,13 @@ test: testclip.train.fa testclip.train.gspan testclip.train.affy \
 	testclip.train.class testclip.train.cv \
 	testclip.test.pred testclip.test.perf
 
+# link parameter file for simpler handling
+%.test.param : %.train.param
+	ln -sf $< $@
+
 # this version of SGD reads all parameters from model
-%.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.train.param | cut -f 2 -d' ')
-%.test.output.predictions : %.train.model %.test.gspan %.test.class
+%.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
+%.test.output.predictions : %.train.model %.test.gspan %.test.class | %.test.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
 
 %.test.pred : %.test.output.predictions %.test.affy
