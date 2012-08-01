@@ -116,7 +116,8 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 # extract affinities from fasta
 # expected to reside in last field of fasta header
 %.affy : %.fa
-	$(FASTAPL) -e 'print $$head[-1], "\n"' < $< > $@
+	$(FASTAPL) -e '@ry = split(/\s/,$$head); print $$ry[-1], "\n"' < $< > $@
+#	$(FASTAPL) -e 'print $$head[-1], "\n"' < $< > $@
 
 # combine input sequences
 %.fa : %.positives.fa %.negatives.fa %.unknowns.fa
