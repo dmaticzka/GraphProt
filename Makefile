@@ -279,7 +279,7 @@ ifeq ($(SVM),SGD)
 %.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : %.gspan %.class %.param
-	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
 	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
 	-rm -f $*output.cv_predictions $*model_*
 
@@ -292,12 +292,12 @@ ifeq ($(SVM),SGD)
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.model : %.gspan %.class %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
 # this version of SGD reads all parameters from model
 %.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.output.predictions : %.model %.pred.gspan %.pred.class
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode $(NSPDK_MODE) -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
 
 # affinities and predictions: default format
 %.pred : %.output.predictions %.pred.affy
@@ -324,7 +324,7 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.sgd_model : %.gspan %.class %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode FILE -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
 
 %.pred.filter : %.filter
 	ln -s $< $@
@@ -422,7 +422,7 @@ test: testclip.train.fa testclip.train.gspan testclip.train.affy \
 # this version of SGD reads all parameters from model
 %.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.train.param | cut -f 2 -d' ')
 %.test.output.predictions : %.train.model %.test.gspan %.test.class
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode FILE -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode $(NSPDK_MODE) -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
 
 %.test.pred : %.test.output.predictions %.test.affy
 	cat $< | awk '{print $$2}' | paste $*.test.affy - > $@

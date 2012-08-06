@@ -174,9 +174,9 @@ do {
 				print STDERR "\n";
 				close PARS;
 				# call Makefile for cv
-				my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
+				my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir -e NSPDK_MODE=MEMORY";
 				$debug and say STDERR $exec;
-				system("time $exec") == 0 or die "$exec failed: $?"; 
+				system("time $exec") == 0 or die "$exec failed: $?";
 
 				# parse result
 				open RES, '<', $cv_file;

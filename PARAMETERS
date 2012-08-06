@@ -46,6 +46,9 @@ CV_FOLD:=5
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
 
+# how to handle recomputing features: FILE/MEMORY
+NSPDK_MODE=FILE
+
 
 ## RNAcompete specific parameters ##############################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
