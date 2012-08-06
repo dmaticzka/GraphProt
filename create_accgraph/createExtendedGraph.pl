@@ -28,9 +28,9 @@ of RNAplfold that prints out a table of the context accessibilities for u=1
 Options:
 
     -nocontext  only use accessibilities, no context probabilities
-	-cutoff     do not use probabilities below or at this value (default: 0)
+    -cutoff     do not use probabilities below or at this value (default: 0)
     -nostruct   do not compute structure part
-	-fasta		fasta file including input sequences
+    -fasta      fasta file including input sequences
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
