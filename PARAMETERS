@@ -26,7 +26,7 @@ GRAPH_TYPE=MEGA
 DO_LINESEARCH=YES
 
 # how many sequences to sample for parameter line search
-LINESEARCH_INPUT_SIZE:=2000
+LINESEARCH_INPUT_SIZE:=1000
 
 # number of crossvalidation sets to use
 CV_FOLD:=5
