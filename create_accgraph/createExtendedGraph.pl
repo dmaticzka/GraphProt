@@ -27,6 +27,8 @@ of RNAplfold that prints out a table of the context accessibilities for u=1
 
 Options:
 
+    -W          RNAplfold window size (default: 150)
+    -L          RNAplfold bp-span (default: 100)
     -nocontext  only use accessibilities, no context probabilities
     -cutoff     do not use probabilities below or at this value (default: 0)
     -nostruct   do not compute structure part
@@ -38,6 +40,33 @@ Options:
 =head1 DESCRIPTION
 
 =cut
+
+###############################################################################
+# parse command line options
+###############################################################################
+my $help;
+my $man;
+my $fasta;
+my $path;
+my $nostruct;
+my $cutoff;
+my $nocontext;
+my $W;
+my $L;
+my $result = GetOptions (	"help"		=> \$help,
+							"man"		=> \$man,
+							"fasta=s"	=> \$fasta,
+							"nostruct"	=> \$nostruct,
+							"cutoff=f"	=> \$cutoff,
+							"nocontext"	=> \$nocontext,
+							"W=i"		=> \$W,
+							"L=i"		=> \$L);
+pod2usage(-exitstatus => 1, -verbose => 1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+($result) or pod2usage(2);
+(defined $cutoff) or $cutoff = 0;
+(defined $W) or $W = 150;
+(defined $L) or $L = 100;
 
 ###############################################################################
 # get filename parts of input files
@@ -73,10 +102,12 @@ sub computeAccessibilities {
 	my ($seq) = @_;
 	chomp $seq;
 	my $len = length($seq);
+	my $W_call = min($len, $W);
+	my $L_call = min($len, $L);
 
 	# compute accessibilities
 	open ACCS, "echo $seq | /home/maticzkd/src/ViennaRNA-1.8.4-context_stdout/Progs/RNAplfold " .
-		"-u 1 -W $len |";
+		"-u 1 -W ${W_call} -L ${L_call} |";
 	my @accs = <ACCS>;
 	close ACCS;
 
@@ -105,27 +136,6 @@ sub computeAccessibilities {
 
 	return [\@P, \@E, \@H, \@I,  \@M];
 }
-
-###############################################################################
-# parse command line options
-###############################################################################
-my $help;
-my $man;
-my $fasta;
-my $path;
-my $nostruct;
-my $cutoff;
-my $nocontext;
-my $result = GetOptions (	"help"	=> \$help,
-							"man"	=> \$man,
-							"fasta=s" => \$fasta,
-							"nostruct" => \$nostruct,
-							"cutoff=f" => \$cutoff,
-							"nocontext" => \$nocontext);
-pod2usage(-exitstatus => 1, -verbose => 1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-($result) or pod2usage(2);
-(defined $cutoff) or $cutoff = 0;
 
 ###############################################################################
 # main

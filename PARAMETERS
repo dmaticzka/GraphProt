@@ -22,6 +22,18 @@ SVM=SGD
 # MEGA: pure sequence, shrep graphs and accessibility graphs
 GRAPH_TYPE=MEGA
 
+# folding parameters:
+# The primary window sizes are used for both shreps and accessibilities.
+# Secondary window size is only used for shreps.
+# W_PRIMARY defaults to 150 according to Lange & Maticzka et al. 2011.
+# L_PRIMARY is used for RNAplfold computation of accessibilities. Defaults to
+# W_PRIMARY-50 according to Lange & Maticzka et al. 2011.
+W_PRIMARY=150
+L_PRIMARY=100
+W_SECONDARY=75
+SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
+SHAPES_SHIFT=25
+
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
 
