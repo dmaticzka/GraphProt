@@ -169,7 +169,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 %.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -fasta $< > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -223,14 +223,14 @@ LSPAR:=./ls.$(METHOD_ID).mega.parameters
 
 # accessibility graphs
 %.acc.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< > $@
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) > $@
 
 # shrep graphs
 %.shrep.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.shrep.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -fasta $< > $@
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
 
 # merge gspans
 %.gspan : %.shrep.gspan %.acc.gspan
