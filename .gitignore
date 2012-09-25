@@ -19,3 +19,4 @@ test_*
 *.sequence
 *.dummy
 *.bz2
+*.class
