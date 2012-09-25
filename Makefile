@@ -95,11 +95,11 @@ endif
 # final results spearman correlation
 CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
 # final results from perf
-PERF_FILES:=$(patsubst %,%.perf,$(BASENAMES))
+PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # parameter files (from linesearch or default values)
-PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
+PARAM_FILES:=$(patsubst %,%.train.param,$(BASENAMES))
 # results of crossvalidations
-CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
+CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
 
 
 ## general feature and affinity creation (overridden where apropriate)
@@ -109,9 +109,9 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy | %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
+	$(SVMSGDNSPDK) -a FEATURE -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED)
+	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -f $<.feature
 
 # extract affinities from fasta
 # expected to reside in last field of fasta header
@@ -183,12 +183,12 @@ LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 	# write out shrep membership
 	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
 	# compute features
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $*_singleshreps -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -pfx $*_singleshreps
+	$(SVMSGDNSPDK) -a FEATURE -d $*_singleshreps -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED)
 	# compute probability-weighted features
-	$(COMBINEFEATURES) R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec $*_probs $*_groups > $*
+	$(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
 	# add affinities to features
 	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec
+	-rm -f $*_singleshreps.feature
 endif
 
 ################################################################################
@@ -211,9 +211,9 @@ LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 %.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
 %.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy | %.param
-	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
-	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
+	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATURE -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW)
+	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -f $<.feature
 endif
 
 ################################################################################
@@ -280,9 +280,9 @@ ifeq ($(SVM),SGD)
 %.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : %.gspan %.class | %.param
-	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -pfx $*
-	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
-	-rm -f $*output.cv_predictions $*model_*
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
+	cat output.cv_predictions$* |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
+	-rm -f output.cv_predictions$* $*.model_*
 
 %.cv : %.cv_sgd
 	cat $< | grep 'APR' | awk '{print $$NF}' > $@
@@ -295,13 +295,8 @@ ifeq ($(SVM),SGD)
 %.model : %.gspan %.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
-# this version of SGD reads all parameters from model
-%.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.output.predictions : %.model %.pred.gspan %.pred.class
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
-
 # affinities and predictions: default format
-%.pred : %.output.predictions %.pred.affy
+%.pred : %.output_predictions %.pred.affy
 	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
 endif
 
@@ -415,11 +410,15 @@ ifeq ($(EVAL_TYPE),CLIP)
 	ln -sf $< $@
 
 # this version of SGD reads all parameters from model
-%.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
-%.test.output.predictions : %.train.model %.test.gspan %.test.class | %.test.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
+%.test.output_predictions : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
+%.test.output_predictions : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
+%.test.output_predictions : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
+%.test.output_predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
+%.test.output_predictions : %.train.model %.test.gspan %.test.class | %.test.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
+	mv $*.test.gspan.prediction $*.test.output_predictions
 
-%.test.pred : %.test.output.predictions %.test.affy
+%.test.pred : %.test.output_predictions %.test.affy
 	cat $< | awk '{print $$2}' | paste $*.test.affy - > $@
 
 %.perf : %.pred
@@ -494,13 +493,13 @@ classstats : summary.cstats $(CSTAT_FILES)
 # keep fasta, predictions and results
 clean:
 	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered \
-	*.filter
+	*.filter *.class
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.output.predictions *.correlation *.cv *.cv_sgd \
-	*.cv_svr
+	-rm -rf *.param *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
+	*.sgeout *.class *.output_predictions *.correlation *.cv *.cv_sgd \
+	*.cv_svr *.model_*
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff

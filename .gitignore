@@ -22,3 +22,6 @@ test_*
 *.class
 *.cv
 *.cv_sgd
+*.model_*
+output.cv_predictions.*
+*.output_predictions
