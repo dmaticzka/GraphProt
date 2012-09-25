@@ -20,3 +20,5 @@ test_*
 *.dummy
 *.bz2
 *.class
+*.cv
+*.cv_sgd
