@@ -5,6 +5,13 @@
 PROTEINS:=testclip
 
 # select evaluation type: RNACOMPETE / CLIP
+# RNACOMPETE:
+#   filename handling specific to the training sets derived from RNAcompete
+# CLIP:
+#   filename handling for generic input
+#   fasta input ID.train.fa built automatically from
+#   ID.train.positives.fa, ID.train.negatives,fa [and ID.train.unknowns.fa]
+#   test input ID.test.fa built the same way
 EVAL_TYPE=CLIP
 
 # whether to keep intermediate files
