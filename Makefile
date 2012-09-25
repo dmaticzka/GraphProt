@@ -119,16 +119,6 @@ CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
 	$(FASTAPL) -e '@ry = split(/\s/,$$head); print $$ry[-1], "\n"' < $< > $@
 #	$(FASTAPL) -e 'print $$head[-1], "\n"' < $< > $@
 
-# combine input sequences
-%.fa : %.positives.fa %.negatives.fa %.unknowns.fa
-	( $(FASTAPL) -p -1 -e '$$head .= " 1";' < $*.positives.fa; \
-	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
-	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
-
-%.unknowns.fa :
-	echo "doing supervised training only"
-	touch $@
-
 ## receipes specific to graph type
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
@@ -259,13 +249,62 @@ ifeq ($(SVM),SVR)
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
-%.svrout : %.model %.pred.feature
-	time $(SVRPREDICT) $*.pred.feature $< $@
+%.test.svr_out : %.train.model %.test.feature
+	time $(SVRPREDICT) $*.test.feature $< $@
 
 # affinities and predictions: default format
-%.pred : %.svrout %.pred.affy
+%.predictions : %.svr_out %.affy
 	# combine affinities and predictions
-	paste $*.pred.affy $< > $@
+	paste $*.affy $< > $@
+endif
+
+
+## support vector regression using sgd-derived subset of top features
+################################################################################
+ifeq ($(SVM),TOPSVR)
+# results from cross validation
+%.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv_svr : %.feature | %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+
+# final result of cross validation: squared correlation coefficient
+%.cv : %.cv_svr
+	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
+
+# train model; this one directly works on gspans
+%.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.sgd_model : %.gspan %.class | %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
+
+%.test.filter : %.train.filter
+	ln -s $< $@
+
+%.filter : NFEAT=$(shell cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
+%.filter : TENP=$(shell echo "$(NFEAT) / 5" | bc)
+%.filter : %.sgd_model
+	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
+
+%.feature_filtered : %.feature %.filter
+	$(FILTER_FEATURES) --feature $< --filter $*.filter > $@
+
+# SVR model
+%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
+%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
+%.model : %.feature_filtered | %.param
+	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+
+# SVR predictions
+%.test.svr_out : %.train.model %.test.feature_filtered
+	time $(SVRPREDICT) $*.test.feature_filtered $< $@
+
+# affinities and predictions: default format
+%.predictions : %.svr_out %.affy
+	# combine affinities and predictions
+	paste $*.affy $< > $@
 endif
 
 
@@ -295,73 +334,24 @@ ifeq ($(SVM),SGD)
 %.model : %.gspan %.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
-# affinities and predictions: default format
-%.pred : %.output_predictions %.pred.affy
-	cat $< | awk '{print $$2}' | paste $*.pred.affy - > $@
-endif
-
-
-## support vector regression using sgd-derived subset of top features
-################################################################################
-ifeq ($(SVM),TOPSVR)
-# results from cross validation
-%.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv_svr : %.feature | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
-
-# final result of cross validation: squared correlation coefficient
-%.cv : %.cv_svr
-	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
-
-# train model; this one directly works on gspans
-%.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.sgd_model : %.gspan %.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
-
-%.pred.filter : %.filter
-	ln -s $< $@
-
-%.filter : NFEAT=$(shell cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
-%.filter : TENP=$(shell echo "$(NFEAT) / 5" | bc)
-%.filter : %.sgd_model
-	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
-
-%.feature_filtered : %.feature %.filter
-	$(FILTER_FEATURES) --feature $< --filter $*.filter > $@
-
-# SVR model
-%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
-%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature_filtered | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
-
-# SVR predictions
-%.svrout : %.model %.pred.feature_filtered
-	time $(SVRPREDICT) $*.pred.feature_filtered $< $@
+# evaluate model
+%.test.sgd_out : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
+%.test.sgd_out : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
+%.test.sgd_out : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
+%.test.sgd_out : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
+%.test.sgd_out : %.train.model %.test.gspan %.test.class | %.test.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
+	mv $*.test.gspan.prediction $*.test.sgd_out
 
 # affinities and predictions: default format
-%.pred : %.svrout %.pred.affy
-	# combine affinities and predictions
-	paste $*.pred.affy $< > $@
+%.predictions : %.sgd_out %.affy
+	cat $< | awk '{print $$2}' | paste $*.affy - > $@
 endif
 
 
 ## evaluations specific to RNAcompete analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
-# helper receipes for test
-test_data_full_A.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_A.pred.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_B.fa :
-	cp -f $(FA_DIR)/$@ $@
-test_data_full_B.pred.fa :
-	cp -f $(FA_DIR)/$@ $@
 
 # class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
@@ -376,7 +366,7 @@ test_data_full_B.pred.fa :
 %.perf : $(shell echo $(BASENAME))
 %.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
 %.perf : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.perf : %.pred
+%.perf : %.predictions
 	# select by threshold
 	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
 	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
@@ -405,23 +395,17 @@ endif
 ## evaluations specific to CLIP analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
-# link parameter file for simpler handling
-%.test.param : %.train.param
-	ln -sf $< $@
+# combine input sequences
+%.fa : %.positives.fa %.negatives.fa %.unknowns.fa
+	( $(FASTAPL) -p -1 -e '$$head .= " 1";' < $*.positives.fa; \
+	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
+	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
 
-# this version of SGD reads all parameters from model
-%.test.output_predictions : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
-%.test.output_predictions : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
-%.test.output_predictions : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
-%.test.output_predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
-%.test.output_predictions : %.train.model %.test.gspan %.test.class | %.test.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
-	mv $*.test.gspan.prediction $*.test.output_predictions
+%.unknowns.fa :
+	echo "doing supervised training only"
+	touch $@
 
-%.test.pred : %.test.output_predictions %.test.affy
-	cat $< | awk '{print $$2}' | paste $*.test.affy - > $@
-
-%.perf : %.pred
+%.perf : %.predictions
 	cat $< | sed 's/^-1/0/g' | $(PERF) -confusion > $@
 
 # for clip data, affinities are actually the class
@@ -441,7 +425,7 @@ endif
 	zcat $< > $@
 
 # link parameter file for simpler handling
-%.pred.param : %.param
+%.test.param : %.train.param
 	ln -sf $< $@
 
 ifeq ($(DO_LINESEARCH),NO)
@@ -464,7 +448,7 @@ endif
 	$@
 
 # final results summary
-%.correlation : %.pred
+%.correlation : %.predictions
 	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
@@ -497,21 +481,19 @@ clean:
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.output_predictions *.correlation *.cv *.cv_sgd \
+	-rm -rf *.param *.perf *.predictions *.svr_out *.ls.fa *.log *.csv *model \
+	*.sgeout *.class *.sgd_out *.correlation *.cv *.cv_sgd \
 	*.cv_svr *.model_*
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
-test: testclip.train.fa testclip.train.gspan testclip.train.affy \
-	testclip.train.class testclip.train.cv \
-	testclip.test.pred testclip.test.perf
+test: testclip.train.param testclip.train.cv \
+	testclip.test.perf testclip.test.correlation
 endif
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # test various stuff
-test: test_data_full_A.fa test_data_full_A.pred.fa \
-	test_data_full_A.perf test_data_full_A.correlation \
-	test_data_full_A.cstats test_data_full_A.param
+test: test_data_full_A.train.param test_data_full_A.train.cv \
+	test_data_full_A.test.perf test_data_full_A.test.correlation
 endif
 
 ## insert additional rules into this file
