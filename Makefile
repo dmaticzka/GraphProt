@@ -33,13 +33,13 @@ LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
 COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
 SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
 FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
-#FASTAPL:=/home/maticzkd/repositories/RNAtools/fastapl
+#FASTAPL:=/home/maticzkd/co/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
-#FASTA2GSPAN:=/home/maticzkd/repositories/RNAtools/fasta2shrep_gspan.pl
-SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_dir_nspdkvp/svmsgdnspdk
+#FASTA2GSPAN:=/home/maticzkd/co/RNAtools/fasta2shrep_gspan.pl
+SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_120925/svmsgdnspdk
 CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
-CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
+CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 
 
@@ -109,7 +109,7 @@ CV_FILES:=$(patsubst %,%.cv,$(BASENAMES))
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy | %.param
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*
+	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 
@@ -183,7 +183,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 	# write out shrep membership
 	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
 	# compute features
-	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $*_singleshreps -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -pfx $*_singleshreps
+	$(SVMSGDNSPDK) -a FEATUREGENERATION -d $*_singleshreps -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -pfx $*_singleshreps
 	# compute probability-weighted features
 	$(COMBINEFEATURES) R$(RADIUS)D$(DISTANCE)$*_singleshrepsoutput.vec $*_probs $*_groups > $*
 	# add affinities to features
@@ -211,7 +211,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 %.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
 %.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan %.affy | %.param
-	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -ll 1 $(RADIUS) $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
+	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATUREGENERATION -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW) -pfx $*
 	cat R$(RADIUS)D$(DISTANCE)$*output.vec | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f R$(RADIUS)D$(DISTANCE)$*output.vec
 endif
@@ -280,7 +280,7 @@ ifeq ($(SVM),SGD)
 %.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv_sgd : %.gspan %.class | %.param
-	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a CROSSVALIDATION -cv $(CV_FOLD) -d $*.gspan -t $*.class -ll 1 $(RADIUS) $(DISTANCE) -pfx $*
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -pfx $*
 	cat $*output.cv_predictions |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
 	-rm -f $*output.cv_predictions $*model_*
 
@@ -293,12 +293,12 @@ ifeq ($(SVM),SGD)
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.model : %.gspan %.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 # this version of SGD reads all parameters from model
 %.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.output.predictions : %.model %.pred.gspan %.pred.class
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode $(NSPDK_MODE) -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -a TEST -m $< -d $*.pred.gspan -t $*.pred.class -pfx $*.
 
 # affinities and predictions: default format
 %.pred : %.output.predictions %.pred.affy
@@ -325,7 +325,7 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.sgd_model : %.gspan %.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -mode $(NSPDK_MODE) -a TRAIN -d $*.gspan -t $*.class -m $@ -ll 1 $(RADIUS) $(DISTANCE)
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 %.pred.filter : %.filter
 	ln -s $< $@
@@ -358,11 +358,6 @@ endif
 ## evaluations specific to RNAcompete analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
-# test various stuff
-test: test_data_full_A.fa test_data_full_A.pred.fa \
-	test_data_full_A.perf test_data_full_A.correlation \
-	test_data_full_A.cstats test_data_full_A.param
-
 # helper receipes for test
 test_data_full_A.fa :
 	cp -f $(FA_DIR)/$@ $@
@@ -415,11 +410,6 @@ endif
 ## evaluations specific to CLIP analysis
 ################################################################################
 ifeq ($(EVAL_TYPE),CLIP)
-# test various stuff
-test: testclip.train.fa testclip.train.gspan testclip.train.affy \
-	testclip.train.class testclip.train.cv \
-	testclip.test.pred testclip.test.perf
-
 # link parameter file for simpler handling
 %.test.param : %.train.param
 	ln -sf $< $@
@@ -427,7 +417,7 @@ test: testclip.train.fa testclip.train.gspan testclip.train.affy \
 # this version of SGD reads all parameters from model
 %.test.output.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
 %.test.output.predictions : %.train.model %.test.gspan %.test.class | %.test.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -mode $(NSPDK_MODE) -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -a TEST -m $< -d $*.test.gspan -t $*.test.class -pfx $*.test.
 
 %.test.pred : %.test.output.predictions %.test.affy
 	cat $< | awk '{print $$2}' | paste $*.test.affy - > $@
@@ -511,6 +501,19 @@ distclean: clean
 	-rm -rf *.param *.fa *.perf *.pred *.svrout *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.output.predictions *.correlation *.cv *.cv_sgd \
 	*.cv_svr
+
+ifeq ($(EVAL_TYPE),CLIP)
+# test various stuff
+test: testclip.train.fa testclip.train.gspan testclip.train.affy \
+	testclip.train.class testclip.train.cv \
+	testclip.test.pred testclip.test.perf
+endif
+ifeq ($(EVAL_TYPE),RNACOMPETE)
+# test various stuff
+test: test_data_full_A.fa test_data_full_A.pred.fa \
+	test_data_full_A.perf test_data_full_A.correlation \
+	test_data_full_A.cstats test_data_full_A.param
+endif
 
 ## insert additional rules into this file
 ################################################################################

@@ -42,7 +42,7 @@ SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+DO_LINESEARCH=NO
 
 # how many sequences to sample for parameter line search
 LINESEARCH_INPUT_SIZE:=1000
@@ -52,10 +52,6 @@ CV_FOLD:=5
 
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
-
-# how to handle recomputing features: FILE/MEMORY
-NSPDK_MODE=FILE
-
 
 ## RNAcompete specific parameters ##############################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
