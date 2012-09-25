@@ -514,7 +514,4 @@ distclean: clean
 
 ## insert additional rules into this file
 ################################################################################
-EXPERIMENT_SPECIFIC_RULES :
-	touch EXPERIMENT_SPECIFIC_RULES
-
 include EXPERIMENT_SPECIFIC_RULES
