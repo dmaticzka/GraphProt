@@ -346,6 +346,26 @@ ifeq ($(SVM),SGD)
 # affinities and predictions: default format
 %.predictions : %.sgd_out %.affy
 	cat $< | awk '{print $$2}' | paste $*.affy - > $@
+
+# compute margins of graph vertices
+# vertex_margins format: seqid verticeid margin
+%.test.vertex_margins : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
+%.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
+%.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
+%.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
+%.test.vertex_margins : %.test.gspan %.test.class %.train.model | %.test.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST_PART -m $*.train.model -d $*.test.gspan -t $*.test.class
+	mv $<.prediction_part $*.test.vertex_margins
+
+# dictionary of all graph vertices
+# dict file format: seqid v verticeid nt pos
+%.vertex_dict : %.gspan
+	cat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid-1, vertex_id++, $$3, $$4}/^V/{print seqid-1, vertex_id++, $$3, $$4}' > $@
+
+# compute nucleotide-wise margins from vertice margins
+%.nt_margins : %.vertex_margins %.vertex_dict
+	cat $< | $(PERL) ./vertex2ntmargins.pl -dict $*.vertex_dict > $@
+
 endif
 
 

@@ -25,3 +25,6 @@ test_*
 *.model_*
 output.cv_predictions.*
 *.output_predictions
+*.nt_margins
+*.vertex_margins
+*.vertex_dict
