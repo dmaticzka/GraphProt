@@ -249,13 +249,17 @@ ifeq ($(SVM),SVR)
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
-%.test.svr_out : %.train.model %.test.feature
+%.test.predictions_svr : %.train.model %.test.feature
 	time $(SVRPREDICT) $*.test.feature $< $@
 
-# affinities and predictions: default format
-%.predictions : %.svr_out %.affy
-	# combine affinities and predictions
+# affinities and predictions default format
+%.predictions_affy : %.predictions_svr %.affy
 	paste $*.affy $< > $@
+
+# class membership and predictions default format
+%.predictions_class : %.predictions_svr %.class
+	paste $*.class $< > $@
+
 endif
 
 
@@ -298,19 +302,28 @@ ifeq ($(SVM),TOPSVR)
 	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
-%.test.svr_out : %.train.model %.test.feature_filtered
+%.test.predictions_svr : %.train.model %.test.feature_filtered
 	time $(SVRPREDICT) $*.test.feature_filtered $< $@
 
-# affinities and predictions: default format
-%.predictions : %.svr_out %.affy
+# affinities and predictions default format
+%.predictions_affy : %.predictions_svr %.affy
 	# combine affinities and predictions
 	paste $*.affy $< > $@
+
+# class membership and predictions default format
+%.predictions_class : %.predictions_svr %.class
+	# combine affinities and predictions
+	paste $*.class $< > $@
 endif
 
 
 ## stochastic gradient descent
 ################################################################################
 ifeq ($(SVM),SGD)
+# extract single performance measure, used for linesearch decisions
+%.cv : %.cv.perf
+	cat $< | grep 'APR' | awk '{print $$NF}' > $@
+
 # train model; this one directly works on gspans
 %.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -320,29 +333,33 @@ ifeq ($(SVM),SGD)
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 # evaluate model
-%.test.sgd_out : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
-%.test.sgd_out : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
-%.test.sgd_out : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
-%.test.sgd_out : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
-%.test.sgd_out : %.train.model %.test.gspan %.test.class | %.test.param
+%.test.predictions_sgd : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
+%.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
+%.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
+%.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
+%.test.predictions_sgd : %.train.model %.test.gspan %.test.class | %.test.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
-	mv $*.test.gspan.prediction $*.test.sgd_out
+	mv $*.test.gspan.prediction $*.test.predictions_sgd
 
-# affinities and predictions: default format
-%.predictions : %.sgd_out %.affy
+# affinities and predictions default format
+%.predictions_affy : %.predictions_sgd %.affy
 	cat $< | awk '{print $$2}' | paste $*.affy - > $@
 
+# class membership and predictions default format
+%.predictions_class : %.predictions_sgd %.class
+	cat $< | awk '{print $$2}' | paste $*.class - > $@
+
 # results from crossvalidation cast into default format
-%.cv.predictions : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv.predictions : %.gspan %.class | %.param
+%.cv.predictions_class : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.cv.predictions_class : %.gspan %.class | %.train.param
 	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
 	cat output.cv_predictions$* | awk '{print $$2==1?1:0, $$4}' > $@
-	-rm output.cv_predictions$* -f$*.model_*
+	-rm  -f output.cv_predictions$* $*.model_*
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
@@ -377,20 +394,6 @@ ifeq ($(EVAL_TYPE),RNACOMPETE)
 %.class : %.affy
 	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
 
-# compute performance measures
-# .perf is tab separated: affinity \t prediction
-%.perf : BASENAME=$(firstword $(subst _, ,$<))
-%.perf : $(shell echo $(BASENAME))
-%.perf : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.perf : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
-%.perf : %.predictions
-	# select by threshold
-	( cat $< | awk '$$1 > $(HT)' | cut -f 2 | awk '{print 1 "\t" $$1 }'; \
-	cat $< | awk '$$1 < $(LT)' | cut -f 2 | awk '{print 0 "\t" $$1}' ) > $@.threshold
-	# compute performance measures
-	$(PERF) -confusion < $@.threshold > $@
-	rm -rf $@.threshold*
-
 # some statistics about class distribution
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
 %.cstats : TYPE=$(word 3,$(subst _, ,$<))
@@ -423,20 +426,12 @@ ifeq ($(EVAL_TYPE),CLIP)
 	echo "doing supervised training only"
 	touch $@
 
-# compute performance measures
-%.perf : %.predictions
-	cat $< | sed 's/^-1/0/g' | $(PERF) -confusion > $@
-
 # plot precision-recall
-%.prplot : %.predictions
+%.prplot : %.predictions_class
 	cat $< | sed 's/^-1/0/g' | $(PERF) -plot pr | awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
 
 %.prplot.svg : %.prplot
 	cat $< | gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
-
-# extract single performance measure, used for linesearch decisions
-%.cv : %.cv.perf
-	cat $< | grep 'APR' | awk '{print $$NF}' > $@
 
 # for clip data, affinities are actually the class
 %.class : %.affy
@@ -450,9 +445,9 @@ endif
 # %.gspan.gz : %.gspan
 # 	gzip -f $<;
 
-# if available, create gspan from precomputed files
-%.gspan : %.gspan.gz
-	zcat $< > $@
+# # if available, create gspan from precomputed files
+# %.gspan : %.gspan.gz
+# 	zcat $< > $@
 
 # link parameter file for simpler handling
 %.test.param : %.train.param
@@ -477,8 +472,12 @@ endif
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
 
-# final results summary
-%.correlation : %.predictions
+# compute performance measures
+%.perf : %.predictions_class
+	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion > $@
+
+# compute correlation: correlation \t pvalue
+%.correlation : %.predictions_affy
 	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
@@ -511,9 +510,10 @@ clean:
 
 # delete all files
 distclean: clean
-	-rm -rf *.param *.perf *.predictions *.svr_out *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.sgd_out *.correlation *.cv *.cv.predictions \
-	*.cv_svr *.model_*
+	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
+	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
+	*.sgeout *.class *.correlation *.cv *.cv.predictions \
+	*.cv_svr *.model_* *.prplot *.prplot.svg
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
