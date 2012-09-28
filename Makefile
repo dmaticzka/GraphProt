@@ -426,13 +426,6 @@ ifeq ($(EVAL_TYPE),CLIP)
 	echo "doing supervised training only"
 	touch $@
 
-# plot precision-recall
-%.prplot : %.predictions_class
-	cat $< | sed 's/^-1/0/g' | $(PERF) -plot pr | awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
-
-%.prplot.svg : %.prplot
-	cat $< | gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
-
 # for clip data, affinities are actually the class
 %.class : %.affy
 	ln -sf $< $@
@@ -476,6 +469,13 @@ endif
 %.perf : %.predictions_class
 	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion > $@
 
+# plot precision-recall
+%.prplot : %.predictions_class
+	cat $< | sed 's/^-1/0/g' | $(PERF) -plot pr | awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
+
+%.prplot.svg : %.prplot
+	cat $< | gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+
 # compute correlation: correlation \t pvalue
 %.correlation : %.predictions_affy
 	cat $< | $(RBIN) --slave -e 'data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
@@ -518,12 +518,14 @@ distclean: clean
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
 test: testclip.train.param testclip.train.cv \
-	testclip.test.perf testclip.test.correlation
+	testclip.test.perf testclip.test.correlation \
+	testclip.test.prplot.svg
 endif
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # test various stuff
 test: test_data_full_A.train.param test_data_full_A.train.cv \
-	test_data_full_A.test.perf test_data_full_A.test.correlation
+	test_data_full_A.test.perf test_data_full_A.test.correlation \
+	test_data_full_A.test.prplot.svg
 endif
 
 ## insert additional rules into this file
