@@ -311,21 +311,6 @@ endif
 ## stochastic gradient descent
 ################################################################################
 ifeq ($(SVM),SGD)
-# results from crossvalidation
-%.cv_sgd : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv_sgd : %.gspan %.class | %.param
-	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
-	cat output.cv_predictions$* |awk '{print $$2==1?1:0, $$4}' | $(PERF) -confusion > $@
-	-rm -f output.cv_predictions$* $*.model_*
-
-%.cv : %.cv_sgd
-	cat $< | grep 'APR' | awk '{print $$NF}' > $@
-
 # train model; this one directly works on gspans
 %.model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -346,6 +331,18 @@ ifeq ($(SVM),SGD)
 # affinities and predictions: default format
 %.predictions : %.sgd_out %.affy
 	cat $< | awk '{print $$2}' | paste $*.affy - > $@
+
+# results from crossvalidation cast into default format
+%.cv.predictions : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.cv.predictions : %.gspan %.class | %.param
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
+	cat output.cv_predictions$* | awk '{print $$2==1?1:0, $$4}' > $@
+	-rm output.cv_predictions$* -f$*.model_*
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
@@ -421,12 +418,25 @@ ifeq ($(EVAL_TYPE),CLIP)
 	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
 	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
 
+# "invent" empty set of unknowns
 %.unknowns.fa :
 	echo "doing supervised training only"
 	touch $@
 
+# compute performance measures
 %.perf : %.predictions
 	cat $< | sed 's/^-1/0/g' | $(PERF) -confusion > $@
+
+# plot precision-recall
+%.prplot : %.predictions
+	cat $< | sed 's/^-1/0/g' | $(PERF) -plot pr | awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
+
+%.prplot.svg : %.prplot
+	cat $< | gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+
+# extract single performance measure, used for linesearch decisions
+%.cv : %.cv.perf
+	cat $< | grep 'APR' | awk '{print $$NF}' > $@
 
 # for clip data, affinities are actually the class
 %.class : %.affy
@@ -502,7 +512,7 @@ clean:
 # delete all files
 distclean: clean
 	-rm -rf *.param *.perf *.predictions *.svr_out *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.sgd_out *.correlation *.cv *.cv_sgd \
+	*.sgeout *.class *.sgd_out *.correlation *.cv *.cv.predictions \
 	*.cv_svr *.model_*
 
 ifeq ($(EVAL_TYPE),CLIP)
