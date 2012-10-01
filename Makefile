@@ -126,7 +126,7 @@ ifeq ($(GRAPH_TYPE),ONLYSEQ)
 LSPAR:=./ls.$(METHOD_ID).onlyseq.parameters
 
 %.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) --nostruct -fa $< > $@
+	$(FASTA2GSPAN) --seq-graph-t -nostr -stdout -fasta $< > $@
 endif
 
 ################################################################################
