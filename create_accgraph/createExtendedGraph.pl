@@ -15,11 +15,11 @@ use StructureLibrary::Structure;
 
 =head1 NAME
 
-createGraph.pl
+createExtendedGraph.pl
 
 =head1 SYNOPSIS
 
-createGraph.pl -fasta=FASTA
+createExtendedGraph.pl -fasta=FASTA
 
 takes sequences of fasta file and generates graph output for
 fabrizio. context accessibilities are computed using a modified version
@@ -163,8 +163,9 @@ foreach my $id (@{$order_aref}) {
 
 	# create sequence edges and vertices
 	my @seq = split(//, $seq);
+	my $pos = 1; # position in sequence, 1-based
 	foreach my $nt (@seq) {
-		say join(' ', 'v', $graph_id, $nt, '1');
+		say join(' ', 'v', $graph_id, $nt, $pos++);
 		if ($graph_id > 0) {
 			say join(' ', 'e', $graph_id-1, $graph_id, 'b'); # b like backbone
 		}
