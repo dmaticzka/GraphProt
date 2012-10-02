@@ -423,7 +423,11 @@ ifeq ($(EVAL_TYPE),CLIP)
 
 # "invent" empty set of unknowns
 %.unknowns.fa :
-	echo "doing supervised training only"
+	echo "using empty set of unknowns!"
+	touch $@
+
+%.negatives.fa :
+	echo "using empty set of negatives!"
 	touch $@
 
 # for clip data, affinities are actually the class

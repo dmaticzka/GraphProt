@@ -25,7 +25,7 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=STRUCTACC
+GRAPH_TYPE=MEGA
 
 # folding parameters:
 # The primary window sizes are used for both shreps and accessibilities.
@@ -46,7 +46,7 @@ DO_LINESEARCH=NO
 LINESEARCH_INPUT_SIZE:=1000
 
 # number of crossvalidation sets to use
-CV_FOLD:=10
+CV_FOLD:=5
 
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
