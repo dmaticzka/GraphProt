@@ -33,29 +33,6 @@ Options:
 =cut
 
 ###############################################################################
-# create temporary directory
-# adds an error handler that deletes the directory in case of error
-# SIGUSR{1/2} are sent by the sge prior to the uncatchable SIGKILL if the
-# option -notify was set
-###############################################################################
-#my $tmp_template = 'template-XXXXXX';
-#my $tmp_prefix = '/var/tmp/';
-#my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
-#$SIG{'INT'} = 'end_handler';
-#$SIG{'TERM'} = 'end_handler';
-#$SIG{'ABRT'} = 'end_handler';
-#$SIG{'USR1'} = 'end_handler';
-#$SIG{'USR2'} = 'end_handler';
-#sub end_handler {
-#	print STDERR "signal '", $_[0], "' caught, cleaning up temporary files\n";
-#	# change into home directory. deletion of the temporary directory will
-#	# fail if it is the current working directory
-#	chdir();
-#	File::Temp::cleanup();
-#	die();
-#}
-
-###############################################################################
 # parse command line options
 ###############################################################################
 my $winsize;
@@ -77,8 +54,103 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 # functions
 ###############################################################################
 
+###############################################################################
+# meanArray
+# compute mean of values in array, ignore NA values
+###############################################################################
+sub meanArray {
+    my ($aref) = @_;
+    my $mean = 0;
+    my $nvals = 0;
+    foreach my $val (@$aref) {
+        if ($val ne "NA") {
+            $mean += $val;
+            $nvals++;
+        }
+    }
+    if ($nvals > 0) {
+        $mean = $mean/$nvals;
+    } else {
+        $mean = "NA";
+    }
+    return $mean;
+}
+
+###############################################################################
+# medianArray
+# compute median of values in array
+###############################################################################
+sub medianArray {
+  my ($aref) = @_;
+  my @values = @$aref;
+
+  my $median;
+  my $mid = int @values/2;
+  my @sorted_values = sort {$a <=> $b} @values;
+  if (@values % 2) {
+      $median = $sorted_values[ $mid ];
+  } else {
+      $median = ($sorted_values[$mid-1] + $sorted_values[$mid])/2;
+  }
+
+  return $median;
+}
+
+###############################################################################
+# sumArray
+# compute sum of values in array, ignore NA values
+###############################################################################
+sub sumArray {
+    my ($aref) = @_;
+    my $sum = 0;
+    foreach my $val (@$aref) {
+        if ($val ne "NA") {
+            $sum += $val;
+        }
+    }
+    return $sum;
+}
+
+###############################################################################
+# minArray
+# compute min of values in array, ignore NA values
+###############################################################################
+sub minArray {
+    my ($aref) = @_;
+    my @vals = ();
+    foreach my $val (@$aref) {
+        if ($val ne "NA") {
+            push @vals, $val;
+        }
+    }
+    return min @vals;
+}
+
+###############################################################################
+# maxArray
+# compute min of values in array, ignore NA values
+###############################################################################
+sub maxArray {
+    my ($aref) = @_;
+    my @vals = ();
+    foreach my $val (@$aref) {
+        if ($val ne "NA") {
+            push @vals, $val;
+        }
+    }
+    return max @vals;
+}
+
 sub summarize {
-  return 'dummyvalue';
+  my ($aref) = @_;
+
+  my $min       = minArray($aref);
+  my $max       = maxArray($aref);
+  my $mean      = meanArray($aref);
+  my $median    = medianArray($aref);
+  my $sum       = sumArray($aref);
+
+  return join("\t", $min, $max, $mean, $median, $sum);
 }
 
 sub cmp_wins {
