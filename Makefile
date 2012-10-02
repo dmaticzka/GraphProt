@@ -380,7 +380,7 @@ ifeq ($(SVM),SGD)
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
-	cat $< | $(PERL) ./vertex2ntmargins.pl -dict $*.vertex_dict > $@
+	cat $< | $(PERL) ./vertex2ntmargins.pl -dict $*.vertex_dict | awk '$$2!=0' > $@
 
 endif
 
