@@ -58,7 +58,7 @@ Options:
 ###############################################################################
 # parse command line options
 ###############################################################################
-my $W;
+my $winsize;
 my $help;
 my $man;
 my $debug;
@@ -73,8 +73,37 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 (defined $winsize) or pod2usage("error: parameter W mandatory");
 ($winsize>0) or pod2usage("error: window size must be larger 0");
 
+###############################################################################
+# functions
+###############################################################################
+
+sub cmp_wins {
+  my ($linestack_aref) = @_;
+  my @lines = @{$linestack_aref};
+  print STDERR $lines[0];
+}
 
 ###############################################################################
 # main
 ###############################################################################
 
+# parse input; data for each sequence is forwarded to the windowing function
+my $current_seqid = 0; # fist sequence id is expected to be 0
+my @linestack;
+while (my $line = <>) {
+  chomp $line;
+  my ($seqid) = split("\t", $line);
+  if ($seqid == $current_seqid) {
+    # if sequence id not changed, just record line
+    push @linestack, $line;
+  } else {
+    # push lines to windowing function
+    cmp_wins(\@linestack);
+    # start new linestack using current line
+    @linestack = ($line);
+    # update current_seqid
+    $current_seqid = $seqid;
+  }
+}
+# push lines to windowing function
+cmp_wins(\@linestack)
