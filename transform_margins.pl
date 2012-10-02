@@ -77,10 +77,47 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 # functions
 ###############################################################################
 
+sub summarize {
+  return 'dummyvalue';
+}
+
 sub cmp_wins {
+  # array of lines to summarize
   my ($linestack_aref) = @_;
   my @lines = @{$linestack_aref};
-  print STDERR $lines[0];
+  # array of lines containing summarized values
+  my @summaries;
+  # queue of margins to summarize (the window)
+  my @winqueue;
+
+  # handle left border and full windows
+  foreach my $line (@lines) {
+    # push margin into queue
+    my (undef, undef, $margin) = split("\t", $line);
+    push @winqueue, $margin;
+    # if window size reached, remove oldest item from queue
+    shift @winqueue if (@winqueue > $winsize);
+    # compute summaries if at least ceil(W/2) items in queue
+    if (@winqueue >= ceil($winsize/2)) {
+        # summarize window values
+        push @summaries, summarize(\@winqueue);
+    }
+  }
+
+  # handle remaining windows on right border
+  while (shift @winqueue) {
+    push @summaries, summarize(\@winqueue) if (@winqueue >= floor($winsize/2)+1)
+  }
+
+  # print output
+  my $nlines = @lines;
+  my $nsummaries = @summaries;
+  say STDERR "found $nsummaries summaries for $nlines lines";
+  foreach my $line (@lines) {
+    my $summary = shift @summaries;
+    say join("\t", $line, $summary);
+  }
+
 }
 
 ###############################################################################
