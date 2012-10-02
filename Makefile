@@ -421,13 +421,15 @@ ifeq ($(EVAL_TYPE),CLIP)
 	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
 	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
 
-# "invent" empty set of unknowns
+%.positives.fa :
+	@echo "error: require file $@" && exit 255
+
 %.unknowns.fa :
-	echo "using empty set of unknowns!"
+	@echo "using empty set of unknowns!"
 	touch $@
 
 %.negatives.fa :
-	echo "using empty set of negatives!"
+	@echo "using empty set of negatives!"
 	touch $@
 
 # for clip data, affinities are actually the class
