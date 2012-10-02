@@ -100,6 +100,8 @@ PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 PARAM_FILES:=$(patsubst %,%.train.param,$(BASENAMES))
 # results of crossvalidations
 CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
+# nucleotide-wise margins
+TESTPART_FILES:=$(patsubst %,%.test.nt_margins,$(BASENAMES))
 
 
 ## general feature and affinity creation (overridden where apropriate)
@@ -505,6 +507,9 @@ ls : $(PARAM_FILES)
 
 # do crossvalidation
 cv : $(CV_FILES)
+
+# compute nucleotide-wise margins
+testpart : $(TESTPART_FILES)
 
 # generate staticstics on positive/negative composition
 classstats : summary.cstats $(CSTAT_FILES)
