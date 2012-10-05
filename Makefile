@@ -99,7 +99,7 @@ CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
 # models
 MODEL_FILES:=$(patsubst %,%.train.model,$(BASENAMES))
 # final results spearman correlation
-CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
+CORRELATION_FILES:=$(patsubst %,%.test.correlation,$(BASENAMES))
 # final results from perf
 PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # nucleotide-wise margins
