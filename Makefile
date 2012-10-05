@@ -41,6 +41,7 @@ CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph
 MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
+SUMMARIZE_MARGINS:=$(PERL) summarize_margins.pl
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -103,7 +104,7 @@ CORRELATION_FILES:=$(patsubst %,%.test.correlation,$(BASENAMES))
 # final results from perf
 PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # nucleotide-wise margins
-TESTPART_FILES:=$(patsubst %,%.test.nt_margins,$(BASENAMES))
+TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 
 
 ## general feature and affinity creation (overridden where apropriate)
@@ -383,6 +384,14 @@ ifeq ($(SVM),SGD)
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
 	cat $< | $(PERL) ./vertex2ntmargins.pl -dict $*.vertex_dict | awk '$$2!=0' > $@
+
+# format (tab separated): sequence id, sequence position, margin,
+#                         min, max, mean, median, sum
+
+%.nt_margins.summarized : %.nt_margins
+	@echo ""
+	@echo "summarizing nucleotide-wise margins:"
+	$(SUMMARIZE_MARGINS) -W 30 < $< > $@
 
 endif
 
