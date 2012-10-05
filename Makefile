@@ -92,14 +92,16 @@ endif
 
 ## set targets common to all evaluations
 ################################################################################
-# final results spearman correlation
-CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
-# final results from perf
-PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # parameter files (from linesearch or default values)
 PARAM_FILES:=$(patsubst %,%.train.param,$(BASENAMES))
 # results of crossvalidations
 CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
+# models
+MODEL_FILES:=$(patsubst %,%.train.model,$(BASENAMES))
+# final results spearman correlation
+CORRELATION_FILES:=$(patsubst %,%.correlation,$(BASENAMES))
+# final results from perf
+PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # nucleotide-wise margins
 TESTPART_FILES:=$(patsubst %,%.test.nt_margins,$(BASENAMES))
 
@@ -499,7 +501,7 @@ results_correlation.csv : $(CORRELATION_FILES)
 ################################################################################
 .PHONY: all ls cv classstats test clean distclean
 
-# do predictions for all PROTEINS
+# do predictions and tests for all PROTEINS, summarize results
 all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
 
 # do parameter line search for all PROTEINS
@@ -507,6 +509,12 @@ ls : $(PARAM_FILES)
 
 # do crossvalidation
 cv : $(CV_FILES)
+
+# train target
+train : $(MODEL_FILES)
+
+# test target
+test : $(PERF_FILES) $(CORRELATION_FILES)
 
 # compute nucleotide-wise margins
 testpart : $(TESTPART_FILES)
@@ -528,13 +536,13 @@ distclean: clean
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
-test: testclip.train.param testclip.train.cv \
+runtests: testclip.train.param testclip.train.cv \
 	testclip.test.perf testclip.test.correlation \
 	testclip.test.prplot.svg
 endif
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # test various stuff
-test: test_data_full_A.train.param test_data_full_A.train.cv \
+runtests: test_data_full_A.train.param test_data_full_A.train.cv \
 	test_data_full_A.test.perf test_data_full_A.test.correlation \
 	test_data_full_A.test.prplot.svg
 endif
