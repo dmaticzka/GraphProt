@@ -42,7 +42,8 @@ MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 SUMMARIZE_MARGINS:=$(PERL) summarize_margins.pl
-
+MARGINS2BG:=$(PERL) margins2bg.pl
+BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
@@ -105,7 +106,8 @@ CORRELATION_FILES:=$(patsubst %,%.test.correlation,$(BASENAMES))
 PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 # nucleotide-wise margins
 TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
-
+# nucleotide-wise margins as bigWig
+TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 
 ## general feature and affinity creation (overridden where apropriate)
 ################################################################################
@@ -387,11 +389,15 @@ ifeq ($(SVM),SGD)
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum
-
 %.nt_margins.summarized : %.nt_margins
 	@echo ""
 	@echo "summarizing nucleotide-wise margins:"
-	$(SUMMARIZE_MARGINS) -W 30 < $< > $@
+	$(SUMMARIZE_MARGINS) -W 25 < $< > $@
+
+%.nt_margins.summarized.bg : %.nt_margins.summarized %.bed
+	@echo ""
+	@echo "converting margins to bedGraph"
+	$(MARGINS2BG) -bed $*.bed < $< > $@
 
 endif
 
@@ -434,14 +440,34 @@ ifeq ($(EVAL_TYPE),CLIP)
 	  $(FASTAPL) -p -1 -e '$$head .= " -1";' < $*.negatives.fa; \
 	  $(FASTAPL) -p -1 -e '$$head .= " 0";' < $*.unknowns.fa ) > $@
 
+%.bed : %.positives.bed %.negatives.bed %.unknowns.bed
+	cat $^ > $@
+
+%.positives.bed :
+	@echo ""
+	@echo "error: require file $@" && exit 255
+
+%.unknowns.bed :
+	@echo ""
+	@echo "using empty set of unknowns!"
+	touch $@
+
+%.negatives.bed :
+	@echo ""
+	@echo "using empty set of negatives!"
+	touch $@
+
 %.positives.fa :
+	@echo ""
 	@echo "error: require file $@" && exit 255
 
 %.unknowns.fa :
+	@echo ""
 	@echo "using empty set of unknowns!"
 	touch $@
 
 %.negatives.fa :
+	@echo ""
 	@echo "using empty set of negatives!"
 	touch $@
 
@@ -505,6 +531,14 @@ results_aucpr.csv : $(PERF_FILES)
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
+# convert bedGraph to bigWig
+%.bw : %.bg $(GENOME_BOUNDS)
+	$(BEDGRAPH2BIGWIG) $*.bg $(GENOME_BOUNDS) $@
+
+# do need genome bounds
+$(GENOME_BOUNDS) :
+	@echo ""
+	@echo "error: require genome boundaries $@" && exit 255
 
 ## phony target section
 ################################################################################
@@ -527,6 +561,9 @@ test : $(PERF_FILES) $(CORRELATION_FILES)
 
 # compute nucleotide-wise margins
 testpart : $(TESTPART_FILES)
+
+# compute nucleotide-wise margins for genome-browser
+testpart_coords : $(TESTPART_BIGWIG)
 
 # generate staticstics on positive/negative composition
 classstats : summary.cstats $(CSTAT_FILES)

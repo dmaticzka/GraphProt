@@ -54,6 +54,11 @@ SVR_CACHE:=10000
 # whether to keep intermediate files
 SECONDARY=YES
 
+# genome sequence
+GENOME=genome.fa
+# genome boundaries
+GENOME_BOUNDS=genome.tab
+
 ## RNAcompete specific parameters ##############################################
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # sets for training: FULL/WEAK/ALL
