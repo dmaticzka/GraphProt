@@ -25,7 +25,7 @@ BINDIR:=$(shell pwd)
 ## binaries
 ################################################################################
 PERL:=/usr/local/perl/bin/perl
-RBIN:=/usr/local/R/2.12.1-lx/bin/R
+RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
 SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
 PERF:=/home/maticzkd/src/stat/perf
