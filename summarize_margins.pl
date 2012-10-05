@@ -11,10 +11,10 @@ use File::Basename;
 
 =head1 NAME
 
-transform_margins.pl -W WINDOW_SIZE
+summarize_margins.pl -W WINDOW_SIZE
 
 reads nucleotide-wise margins from stdin or file,
-computes min, max, mean, median, sum per window of size WINDOW_SIZE
+computes min, max, mean, median, sum for centered window of size WINDOW_SIZE
 
 input format (tab separated): sequence id, sequence position, margin
 output is input plus: min, max, mean, median, sum
