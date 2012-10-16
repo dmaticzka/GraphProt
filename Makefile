@@ -352,11 +352,11 @@ ifeq ($(SVM),SGD)
 %.predictions_affy : %.predictions_sgd %.affy
 	cat $< | awk '{print $$2}' | paste $*.affy - > $@
 
-# class membership and predictions default format
+# class membership and predictions default format: class{-1,1}, prediction
 %.predictions_class : %.predictions_sgd %.class
 	cat $< | awk '{print $$2}' | paste $*.class - > $@
 
-# results from crossvalidation cast into default format
+# results from crossvalidation cast into default format: class{-1,1}, prediction
 %.cv.predictions_class : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
@@ -365,7 +365,7 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : %.gspan %.class | %.train.param
 	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
-	cat output.cv_predictions$* | awk '{print $$2==1?1:0, $$4}' > $@
+	cat output.cv_predictions$* | awk '{print $$2==1?1:-1, $$4}' > $@
 	-rm  -f output.cv_predictions$* $*.model_*
 
 # compute margins of graph vertices
@@ -511,6 +511,7 @@ endif
 	$@
 
 # compute performance measures
+# remove unknowns, set negative class to 0 for perf
 %.perf : %.predictions_class
 	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion > $@
 
