@@ -2,7 +2,7 @@
 # prefix of train/test data
 # RNAcompete proteins
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
-PROTEINS:=mle
+PROTEINS:=testclip
 
 # select evaluation type: RNACOMPETE / CLIP
 # RNACOMPETE:
@@ -25,7 +25,7 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=MEGA
+GRAPH_TYPE=ONLYSEQ
 
 # folding parameters:
 # The primary window sizes are used for both shreps and accessibilities.
@@ -40,7 +40,7 @@ SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=NO
+DO_LINESEARCH=YES
 
 # how many sequences to sample for parameter line search
 LINESEARCH_INPUT_SIZE:=1000
