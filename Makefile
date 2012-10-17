@@ -95,7 +95,7 @@ endif
 ## set targets common to all evaluations
 ################################################################################
 # parameter files (from linesearch or default values)
-PARAM_FILES:=$(patsubst %,%.train.param,$(BASENAMES))
+PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 # results of crossvalidations
 CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
 # models
@@ -340,11 +340,11 @@ ifeq ($(SVM),SGD)
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 # evaluate model
-%.test.predictions_sgd : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
-%.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
-%.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
-%.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
-%.test.predictions_sgd : %.train.model %.test.gspan %.test.class | %.test.param
+%.test.predictions_sgd : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.test.predictions_sgd : %.train.model %.test.gspan %.test.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
 	mv $*.test.gspan.prediction $*.test.predictions_sgd
 
@@ -363,18 +363,18 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv.predictions_class : %.gspan %.class | %.train.param
+%.cv.predictions_class : %.gspan %.class | %.param
 	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
 	cat output.cv_predictions$* | awk '{print $$2==1?1:-1, $$4}' > $@
 	-rm  -f output.cv_predictions$* $*.model_*
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
-%.test.vertex_margins : RADIUS=$(shell grep '^R ' $*.test.param | cut -f 2 -d' ')
-%.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.test.param | cut -f 2 -d' ')
-%.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.test.param | cut -f 2 -d' ')
-%.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.test.param | cut -f 2 -d' ')
-%.test.vertex_margins : %.test.gspan %.test.class %.train.model | %.test.param
+%.test.vertex_margins : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.test.vertex_margins : %.test.gspan %.test.class %.train.model | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST_PART -m $*.train.model -d $*.test.gspan -t $*.test.class
 	mv $<.prediction_part $*.test.vertex_margins
 
@@ -487,10 +487,6 @@ endif
 # %.gspan : %.gspan.gz
 # 	zcat $< > $@
 
-# link parameter file for simpler handling
-%.test.param : %.train.param
-	ln -sf $< $@
-
 ifeq ($(DO_LINESEARCH),NO)
 # just use defaults instead of doing line search
 %.param : $(LSPAR)
@@ -502,13 +498,21 @@ else
 endif
 
 # subset fastas prior to line search
-%.ls.fa : %.fa
+%.ls.fa : %.train.fa
 	cat $< | \
 	$(FASTAPL) -e 'print ">", $$head, "\t", $$seq, "\n"' | \
 	$(SHUF) -n $(LINESEARCH_INPUT_SIZE) | \
 	$(PERL) -ane \
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
+
+# link parameter files
+%.train.param : %.param
+	ln -sf $< $@
+
+%.test.param : %.param
+	ln -sf $< $@
+
 
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
@@ -583,13 +587,13 @@ distclean: clean
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
-runtests: testclip.train.param testclip.train.cv \
+runtests: testclip.param testclip.train.cv \
 	testclip.test.perf testclip.test.correlation \
 	testclip.test.prplot.svg
 endif
 ifeq ($(EVAL_TYPE),RNACOMPETE)
 # test various stuff
-runtests: test_data_full_A.train.param test_data_full_A.train.cv \
+runtests: test_data_full_A.param test_data_full_A.train.cv \
 	test_data_full_A.test.perf test_data_full_A.test.correlation \
 	test_data_full_A.test.prplot.svg
 endif
