@@ -115,7 +115,7 @@ TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy | %.param
+%.feature : %.gspan.gz %.affy | %.param
 	$(SVMSGDNSPDK) -a FEATURE -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED)
 	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f $<.feature
@@ -132,8 +132,8 @@ ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
 LSPAR:=./ls.$(METHOD_ID).onlyseq.parameters
 
-%.gspan : %.fa
-	$(FASTA2GSPAN) --seq-graph-t -nostr -stdout -fasta $< > $@
+%.gspan.gz : %.fa
+	$(FASTA2GSPAN) --seq-graph-t -nostr -stdout -fasta $< | gzip > $@
 endif
 
 ################################################################################
@@ -141,8 +141,8 @@ ifeq ($(GRAPH_TYPE),STRUCTACC)
 # line search parameters
 LSPAR:=./ls.$(METHOD_ID).structacc.parameters
 
-%.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) > $@
+%.gspan.gz : %.fa
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) | gzip > $@
 endif
 
 ################################################################################
@@ -150,11 +150,11 @@ ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
 LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 
-%.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
+%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : %.fa | %.param
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 endif
 
 ################################################################################
@@ -162,17 +162,17 @@ ifeq ($(GRAPH_TYPE),PROBSHREP)
 # line search parameters
 LSPAR:=./ls.$(METHOD_ID).shrep.parameters
 
-%.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
+%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : %.fa | %.param
+	$(FASTA2GSPAN) $(STACK) $(CUE) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy | %.param
+%.feature : %.gspan.gz %.affy | %.param
 	# remove t and w, convert s to t
 	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
 	# write out probabilities
@@ -193,11 +193,11 @@ ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
 LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 
-%.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
+%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : %.fa | %.param
+	$(FASTA2GSPAN) $(STACK) $(CUE) -abstr -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -207,7 +207,7 @@ LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
 %.feature : RR=$(shell grep '^RR ' $*.param | cut -f 2 -d' ')
 %.feature : RD=$(shell grep '^RD ' $*.param | cut -f 2 -d' ')
 %.feature : RW=$(shell grep '^RW ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan %.affy | %.param
+%.feature : %.gspan.gz %.affy | %.param
 	$(SVMSGDNSPDK) -kt ABSTRACT -a FEATURE -d $< -R $(RADIUS) -D $(DISTANCE) -gt $(DIRECTED) -anhf $(NHF) -rR $(RR) -rD $(RD) -rW $(RW)
 	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f $<.feature
@@ -219,19 +219,19 @@ ifeq ($(GRAPH_TYPE),MEGA)
 LSPAR:=./ls.$(METHOD_ID).mega.parameters
 
 # accessibility graphs
-%.acc.gspan : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) > $@
+%.acc.gspan.gz : %.fa
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) | gzip > $@
 
 # shrep graphs
-%.shrep.gspan : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.shrep.gspan : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< > $@
+%.shrep.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.shrep.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.shrep.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.shrep.gspan.gz : %.fa | %.param
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 
 # merge gspans
-%.gspan : %.shrep.gspan %.acc.gspan
-	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan > $@
+%.gspan.gz : %.shrep.gspan %.acc.gspan
+	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan | gzip > $@
 endif
 
 
@@ -288,8 +288,8 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.sgd_model : %.gspan %.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
+%.sgd_model : %.gspan.gz %.class | %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan.gz -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 %.test.filter : %.train.filter
 	ln -s $< $@
@@ -336,16 +336,16 @@ ifeq ($(SVM),SGD)
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.model : %.gspan %.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
+%.model : %.gspan.gz %.class | %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a TRAIN -d $*.gspan.gz -t $*.class -m $@ -R $(RADIUS) -D $(DISTANCE)
 
 # evaluate model
 %.test.predictions_sgd : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.predictions_sgd : %.train.model %.test.gspan %.test.class | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan -t $*.test.class
+%.test.predictions_sgd : %.train.model %.test.gspan.gz %.test.class | %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan.gz -t $*.test.class
 	mv $*.test.gspan.prediction $*.test.predictions_sgd
 
 # affinities and predictions default format
@@ -363,8 +363,8 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv.predictions_class : %.gspan %.class | %.param
-	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
+%.cv.predictions_class : %.gspan.gz %.class | %.param
+	time $(SVMSGDNSPDK) -gt $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -cv $(CV_FOLD) -m $*.model -d $*.gspan.gz -t $*.class -R $(RADIUS) -D $(DISTANCE) -sfx $*
 	cat output.cv_predictions$* | awk '{print $$2==1?1:-1, $$4}' > $@
 	-rm  -f output.cv_predictions$* $*.model_*
 
@@ -374,13 +374,13 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.vertex_margins : %.test.gspan %.test.class %.train.model | %.param
-	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST_PART -m $*.train.model -d $*.test.gspan -t $*.test.class
+%.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
+	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST_PART -m $*.train.model -d $*.test.gspan.gz -t $*.test.class
 	mv $<.prediction_part $*.test.vertex_margins
 
 # dictionary of all graph vertices
 # dict file format: seqid v verticeid nt pos
-%.vertex_dict : %.gspan
+%.vertex_dict : %.gspan.gz
 	cat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid-1, vertex_id++, $$3, $$4}/^V/{print seqid-1, vertex_id++, $$3, $$4}' > $@
 
 # compute nucleotide-wise margins from vertice margins
@@ -479,13 +479,10 @@ endif
 
 ## misc helper receipes
 ################################################################################
-# we can save some disk space here
-# %.gspan.gz : %.gspan
-# 	gzip -f $<;
 
-# # if available, create gspan from precomputed files
-# %.gspan : %.gspan.gz
-# 	zcat $< > $@
+# if needed, unzip gspans (for svr)
+%.gspan : %.gspan.gz
+	zcat $< > $@
 
 ifeq ($(DO_LINESEARCH),NO)
 # just use defaults instead of doing line search
@@ -575,7 +572,7 @@ classstats : summary.cstats $(CSTAT_FILES)
 
 # keep fasta, predictions and results
 clean:
-	-rm -rf log *.gspan *.threshold* *.feature *.affy *.feature_filtered \
+	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
 	*.filter *.class
 
 # delete all files
