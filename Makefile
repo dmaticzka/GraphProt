@@ -82,6 +82,10 @@ endif
 
 # general class statistics
 CSTAT_FILES:=$(patsubst %,%.cstats,$(FULL_BASENAMES))
+
+# generate staticstics on positive/negative composition
+classstats : summary.cstats $(CSTAT_FILES)
+
 endif
 
 
@@ -566,9 +570,6 @@ testpart : $(TESTPART_FILES)
 
 # compute nucleotide-wise margins for genome-browser
 testpart_coords : $(TESTPART_BIGWIG)
-
-# generate staticstics on positive/negative composition
-classstats : summary.cstats $(CSTAT_FILES)
 
 # keep fasta, predictions and results
 clean:
