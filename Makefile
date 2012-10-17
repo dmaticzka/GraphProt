@@ -112,6 +112,8 @@ PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
 TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 # nucleotide-wise margins as bigWig
 TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
+# files for learningcurve
+LC_FILES:=$(patsubst %,%.lc.svg,$(BASENAMES))
 
 ## general feature and affinity creation (overridden where apropriate)
 ################################################################################
@@ -403,6 +405,38 @@ ifeq ($(SVM),SGD)
 	@echo "converting margins to bedGraph"
 	$(MARGINS2BG) -bed $*.bed < $< > $@
 
+# compute learningcurve
+# svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
+# format: id, class, prediction, margin
+# we evaluate each one and summarize the probabilities in the following format:
+# SPLIT train_performance test_performance
+%.lc.perf : %.train.class %.train.gspan.gz
+	-rm $@
+	for i in $$(seq 1 10); \
+	do \
+	$(SVMSGDNSPDK) -a LEARNING_CURVE -d $*.train.gspan.gz -t $*.train.class -lc $(LEARNINGCURVE_SPLITS) -rs $$RANDOM -sfx .$* | tee $*.lc.log; \
+	for SPLIT in $$(seq 1 $(LEARNINGCURVE_SPLITS)); \
+	do \
+	cat output.lc_predictions_test_fold$$SPLIT.$* | \
+	awk '{print $$2"\t"$$4}' | \
+	sed 's/^-1/0/g' | \
+	$(PERF) | \
+	grep 'APR' | \
+	awk '{print $$NF}' > $*.ts; \
+	cat output.lc_predictions_train_fold$$SPLIT.$* | \
+	awk '{print $$2"\t"$$4}' | \
+	sed 's/^-1/0/g' | \
+	$(PERF) | \
+	grep 'APR' | \
+	awk '{print $$NF}' > $*.tr; \
+	echo $$SPLIT | paste - $*.tr $*.ts >> $@; \
+	done \
+	done
+	-rm -f $*.ts $*.tr $*.lc.log output.lc_predictions_*_fold*;
+
+%.lc.svg : %.lc.perf
+	bash ./plotlc.sh $< $@
+
 endif
 
 
@@ -548,7 +582,7 @@ $(GENOME_BOUNDS) :
 
 ## phony target section
 ################################################################################
-.PHONY: all ls cv classstats test clean distclean
+.PHONY: all ls cv classstats test clean distclean learningcurve
 
 # do predictions and tests for all PROTEINS, summarize results
 all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
@@ -570,6 +604,9 @@ testpart : $(TESTPART_FILES)
 
 # compute nucleotide-wise margins for genome-browser
 testpart_coords : $(TESTPART_BIGWIG)
+
+# see if additional data will help improve classification
+learningcurve: $(LC_FILES)
 
 # keep fasta, predictions and results
 clean:

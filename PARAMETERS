@@ -48,6 +48,9 @@ LINESEARCH_INPUT_SIZE:=1000
 # number of crossvalidation sets to use
 CV_FOLD:=5
 
+# number of iterations for the learningcurve evaluation
+LEARNINGCURVE_SPLITS:=5
+
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
 
