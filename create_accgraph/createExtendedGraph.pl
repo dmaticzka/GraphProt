@@ -32,6 +32,7 @@ Options:
     -nocontext  only use accessibilities, no context probabilities
     -cutoff     do not use probabilities below or at this value (default: 0)
     -nostruct   do not compute structure part
+    -vp         enable special viewpoint handling of nucleotides (default: off)
     -fasta      fasta file including input sequences
     -debug      enable debug output
     -help       brief help message
@@ -49,6 +50,7 @@ my $man;
 my $fasta;
 my $path;
 my $nostruct;
+my $vp;
 my $cutoff;
 my $nocontext;
 my $W;
@@ -57,6 +59,7 @@ my $result = GetOptions (	"help"		=> \$help,
 							"man"		=> \$man,
 							"fasta=s"	=> \$fasta,
 							"nostruct"	=> \$nostruct,
+							"vp"        => \$vp,
 							"cutoff=f"	=> \$cutoff,
 							"nocontext"	=> \$nocontext,
 							"W=i"		=> \$W,
@@ -161,11 +164,20 @@ foreach my $id (@{$order_aref}) {
 	say join(' ', 't', '#', $id, $affinity);
 	my $graph_id = 0;
 
-	# create sequence edges and vertices
+	# create backbone edges and vertices
 	my @seq = split(//, $seq);
 	my $pos = 1; # position in sequence, 1-based
 	foreach my $nt (@seq) {
-		say join(' ', 'v', $graph_id, $nt, $pos++);
+        my $vertice_label;
+        if (defined $vp) {
+          # with viewpoint option enabled, set backbone vertices according to
+          # uppercase/lowercase nucleotide
+          $vertice_label = ( $nt =~ /[a-z]/ ) ? 'V' : 'v';
+        } else {
+          # otherwise just use the regular 'v'
+          $vertice_label = 'v';
+        }
+		say join(' ', $vertice_label, $graph_id, $nt, $pos++);
 		if ($graph_id > 0) {
 			say join(' ', 'e', $graph_id-1, $graph_id, 'b'); # b like backbone
 		}
