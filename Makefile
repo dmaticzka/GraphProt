@@ -15,35 +15,45 @@ endif
 
 ## paths
 ################################################################################
+# root for fastas and thresholds
 PROJDIR:=/home/maticzkd/projects/RBPaffinity
 FA_DIR:=$(PROJDIR)/data/fasta
 THR_DIR:=$(PROJDIR)/data/thresholds/
-# expect binaries to reside in pwd, otherwise this variable must be overwritten
-BINDIR:=$(shell pwd)
+# expect binaries to reside in pwd/bin, otherwise this variable must be overwritten
+PWD:=$(shell pwd)
+BINDIR:=$(PWD)/bin
+DATADIR:=$(PWD)/data
 
 
-## binaries
+## global binaries
 ################################################################################
 PERL:=/usr/local/perl/bin/perl
 RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
 SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
 PERF:=/home/maticzkd/src/stat/perf
-LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
-COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
 SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
 FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
 #FASTAPL:=/home/maticzkd/co/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 #FASTA2GSPAN:=/home/maticzkd/co/RNAtools/fasta2shrep_gspan.pl
 SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_120925/svmsgdnspdk
-CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/create_accgraph/createExtendedGraph.pl
-MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
-FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
-SUMMARIZE_MARGINS:=$(PERL) summarize_margins.pl
-MARGINS2BG:=$(PERL) margins2bg.pl
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
+BASH:=/bin/bash
+
+
+## project internal tools
+################################################################################
+LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
+COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
+CREATE_EXTENDED_ACC_GRAPH:=$(PERL) $(BINDIR)/createExtendedGraph.pl
+MERGE_GSPAN:=$(PERL) $(BINDIR)/merge_gspan.pl
+FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
+SUMMARIZE_MARGINS:=$(PERL) $(BINDIR)/summarize_margins.pl
+MARGINS2BG:=$(PERL) $(BINDIR)/margins2bg.pl
+VERTEX2NTMARGINS:=$(PERL) $(BINDIR)/vertex2ntmargins.pl
+PLOTLC:=$(BASH) ./plotlc.sh
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
@@ -136,7 +146,7 @@ LC_FILES:=$(patsubst %,%.lc.svg,$(BASENAMES))
 ################################################################################
 ifeq ($(GRAPH_TYPE),ONLYSEQ)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).onlyseq.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa
@@ -146,7 +156,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),STRUCTACC)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).structacc.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).structacc.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa
@@ -156,7 +166,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).shrep.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 
 %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -169,7 +179,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),PROBSHREP)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).shrep.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 
 %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -201,7 +211,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).shrep_context.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 
 %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
@@ -227,7 +237,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),MEGA)
 # line search parameters
-LSPAR:=./ls.$(METHOD_ID).mega.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).mega.parameters
 
 # accessibility graphs
 %.acc.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
@@ -398,7 +408,7 @@ ifeq ($(SVM),SGD)
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
-	cat $< | $(PERL) ./vertex2ntmargins.pl -dict $*.vertex_dict | awk '$$2!=0' > $@
+	cat $< | $(VERTEX2NTMARGINS) -dict $*.vertex_dict | awk '$$2!=0' > $@
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum
@@ -442,7 +452,7 @@ ifeq ($(SVM),SGD)
 	-rm -f $*.ts $*.tr $*.lc.log output.lc_predictions_*_fold*;
 
 %.lc.svg : %.lc.perf
-	bash ./plotlc.sh $< $@
+	$(PLOTLC) $< $@
 
 endif
 
@@ -536,7 +546,7 @@ ifeq ($(DO_LINESEARCH),NO)
 else
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(BINDIR) 2> >(tee $@.log >&2)
+	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(PWD) 2> >(tee $@.log >&2)
 endif
 
 # subset fastas prior to line search
@@ -555,6 +565,24 @@ endif
 %.test.param : %.param
 	ln -sf $< $@
 
+# get test data
+testclip.train.positives.fa : $(DATADIR)/testclip.train.positives.fa
+	cp -f $< $@
+
+testclip.train.negatives.fa : $(DATADIR)/testclip.train.negatives.fa
+	cp -f $< $@
+
+testclip.test.positives.fa : $(DATADIR)/testclip.test.positives.fa
+	cp -f $< $@
+
+testclip.test.negatives.fa : $(DATADIR)/testclip.test.negatives.fa
+	cp -f $< $@
+
+test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
+	cp -f $< $@
+
+test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
+	cp -f $< $@
 
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
