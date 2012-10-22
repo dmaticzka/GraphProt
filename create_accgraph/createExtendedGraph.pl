@@ -10,8 +10,6 @@ use List::Util qw/ min max /;
 use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
-use StructureLibrary::Sequence;
-use StructureLibrary::Structure;
 
 =head1 NAME
 
@@ -71,29 +69,56 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 (defined $W) or $W = 150;
 (defined $L) or $L = 100;
 
-###############################################################################
-# get filename parts of input files
-###############################################################################
-#my ( $prefix, $path, $suffix ) = fileparse( $infname, "\.[^.]*" );
 
-###############################################################################
-# create temporary directory
-###############################################################################
-#my $tmp_template = 'template-XXXXXX';
-#my $tmp_prefix = '/var/tmp/';
-#my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
+##################################################################################
+# This method parses a fasta file and is useful if the header ID is not-unique!!
+# It returns the header lines in an array and the sequence lines in the same
+# order. It is then up to the user to extract the parts from the header that is
+# necessary for the script.
+# Furthermore, the method deals with multiple lines, and returns a single sequence
+# without line breaks.
+# Input:
+#       file        The name of the fasta file
+# Output:
+#   (1) An array reference for each header line
+#   (2) An array reference for each sequence in same order as the headers
+##################################################################################
+sub read_fasta_with_nonunique_headers{
+    my($file) = @_;
+    my $FUNCTION = "read_fasta_file in Sequences.pm";
 
-###############################################################################
-# readAccessibilities [DEPRECATED]
-# in: id of acc file, path to files, suffix
-# out: reference to array of accessibilities
-###############################################################################
-sub readAccessibilities {
-    my ($id, $path, $suffix, $u) = @_;
-    # read accessibilities
-    my $fname = "$path${id}_RNAlfold.acc$suffix";
-	(-f $fname) or die ("error, file does not exist: '$fname');");
-	return parse_PUfile_get1u($fname, $u, 2);
+    my $header      = "";
+    my $seqstring   = "";
+    my @headers     = ();
+    my @sequences   = ();
+    open(IN_HANDLE, "<$file") || die "ERROR in $FUNCTION:\n".
+                                     "Couldn't open the following file in package Tool,".
+                                     " sub read_fasta_file: $file\n";
+
+    while(my $line = <IN_HANDLE>){
+        chomp($line);
+
+        # header (can contain one space after > symbol)
+        if($line =~ /^\>(.*)/){
+            if($header){
+                $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
+                push(@headers, $header);
+                push(@sequences, $seqstring);
+                $seqstring = "";
+            }
+            $header = $1;
+        } else {
+                $seqstring .= $line if ($header);
+        }
+    }
+
+    if($header){
+      $seqstring =~ s/\s*//g; ## do not allow spaces in sequence
+      push(@headers, $header);
+      push(@sequences, $seqstring);
+      $seqstring = "";
+    }
+    return (\@headers, \@sequences);
 }
 
 ###############################################################################
@@ -146,10 +171,12 @@ sub computeAccessibilities {
 ($fasta) or die "error: specify fasta file";
 (-f $fasta) or die "error: no such file '$fasta'";
 
-my ($fasta_ref, $order_aref, $header_ref) = read_fasta_file($fasta);
+# my ($fasta_ref, $order_aref, $header_ref) = read_fasta_file($fasta);
+my ($headers_aref, $seqs_aref) = read_fasta_with_nonunique_headers($fasta);
 my $n=0;
-foreach my $id (@{$order_aref}) {
-	my $seq = $fasta_ref->{$id};
+foreach my $header (@{$headers_aref}) {
+	my $seq = shift @{$seqs_aref};
+	my ($id, $affinity) = split(/\s/, $header);
 
 	# print out how many stuff we already computed
 	$n++;
@@ -160,7 +187,6 @@ foreach my $id (@{$order_aref}) {
 		}
 	}
 
-	my $affinity = $header_ref->{$id};
 	say join(' ', 't', '#', $id, $affinity);
 	my $graph_id = 0;
 
