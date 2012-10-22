@@ -359,7 +359,7 @@ ifeq ($(SVM),SGD)
 %.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : %.train.model %.test.gspan.gz %.test.class | %.param
 	$(SVMSGDNSPDK) -gt $(DIRECTED) -R $(RADIUS) -D $(DISTANCE) -b $(BITSIZE) -a TEST -m $< -d $*.test.gspan.gz -t $*.test.class
-	mv $*.test.gspan.prediction $*.test.predictions_sgd
+	mv $*.test.gspan.gz.prediction $*.test.predictions_sgd
 
 # affinities and predictions default format
 %.predictions_affy : %.predictions_sgd %.affy
