@@ -10,6 +10,7 @@ use File::Temp qw(tempdir);
 use File::Basename;
 use File::Copy;
 use Cwd;
+use Scalar::Util qw(looks_like_number);
 
 =head1 NAME
 
@@ -26,6 +27,11 @@ Options:
     -mf         makefile to use for crossvalidation
     -bindir     expect RBPaffinity-specific binaries to be in this directory
     -of         write optimal parameters to this file
+    -sgdopt     utilize sgd-internal optimization
+                this has several effects:
+                * current parameters are written to intermediate parameter files
+                * intermediate parameter files contain maximum values for
+                  parameters optimized by sgd: R, D, EPOCHS, LAMBDA
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -65,6 +71,7 @@ my $param;
 my $mf;
 my $bindir;
 my $of;
+my $sgdopt;
 my $help;
 my $man;
 my $debug;
@@ -73,6 +80,7 @@ my $result = GetOptions (	"fa=s"		=> \$fa,
 							"mf=s"		=> \$mf,
 							"bindir=s"	=> \$bindir,
 							"of=s"		=> \$of,
+							"sgdopt"       => \$sgdopt,
 							"help"	=> \$help,
 							"man"	=> \$man,
 							"debug" => \$debug);
@@ -97,6 +105,7 @@ my $n_rounds = 1;
 my $basename = $fa;
 $basename =~ s/.fa//;
 my %result_cache;
+my %sgd_internal_optimization = ('R' => 1, 'D' => 1, 'EPOCHS' => 1, 'LAMBDA' => 1);
 
 # binaries
 my $libsvm = '~/src/libsvm-3.0/svm-train';
@@ -114,6 +123,9 @@ while (<PARAM>) {
 	$parameters{$id}{default} = $default;
 	$parameters{$id}{current} = $default;
 	$parameters{$id}{values} = \@values;
+	if (looks_like_number($parameters{$id}{default})) {
+      $parameters{$id}{max} = max(@values);
+    }
 }
 
 # print important variables
@@ -132,7 +144,10 @@ my $optimization_finished = 0;
 do {
 	# optimize each parameter
 	for my $par (@parameters) {
-		next if (@{$parameters{$par}{values}}<=1); # some parameters don't vary
+        # some parameters don't vary
+		next if (@{$parameters{$par}{values}}<=1);
+		# some parameters are varied by sgd
+		next if (defined $sgdopt and defined $sgd_internal_optimization{$par});
 		say STDERR "\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
 		for my $try_this (@{$parameters{$par}{values}}) {
 			# set new parameter
@@ -143,7 +158,13 @@ do {
 
 			# get current parameter key for hash lookup
 			my $param_key = get_current_param_key();
-			my $cached_value_found = defined $result_cache{$param_key};
+			my $cached_value_found;
+			if ($sgdopt) {
+              # disable caching
+              $cached_value_found = 0;
+			} else {
+              $cached_value_found = defined $result_cache{$param_key};
+			}
 
 			# look for cached result
 			if ($cached_value_found) {
@@ -152,7 +173,14 @@ do {
 				$correlation = $result_cache{$param_key};
 			} else {
 				$tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
-				my $param_file = $basename . '.param';
+				my $param_file = $of;
+				# rewrite to fit to line search input fasta filename
+				if (defined $sgdopt) {
+                    $param_file =~ s/.param/.ls_sgdopt.param/;
+				} else {
+                  $param_file =~ s/.param/.ls.param/;
+                }
+                $debug and say STDERR "writing temporaray parameters to '$param_file'";
 				my $cv_file = $basename . '.cv';
 
 				# check if parameter combination is valid
@@ -169,15 +197,28 @@ do {
 				open PARS, '>', $param_file;
 				print STDERR 'parameters: ';
 				for my $par (@parameters) {
-					print STDERR $par, ' ', $parameters{$par}{current}, ";";
-					say PARS $par, ' ', $parameters{$par}{current};
+					my $parameter_value = '';
+					if (defined $sgdopt and defined $sgd_internal_optimization{$par}) {
+                      # use maximum value specified, sgd will handle this
+                      $parameter_value = $parameters{$par}{max};
+                    } else {
+                      # use the current value
+                      $parameter_value = $parameters{$par}{current};
+                    }
+                    print STDERR $par, ' ', $parameter_value, ";";
+					say PARS $par, ' ', $parameter_value;
 				}
 				print STDERR "\n";
 				close PARS;
+				# in a first step prepare parameter file
+				my $final_param_file = $of;
+				$final_param_file =~  s/.param/.ls.param/;
+				my $prepare_param = "make -f $bindir/$mf -e BINDIR=$bindir $final_param_file";
+				system("$prepare_param") == 0 or die "$prepare_param failed: $?";
 				# call Makefile for cv
 				my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
 				$debug and say STDERR $exec;
-				system("time $exec") == 0 or die "$exec failed: $?";
+				system("$exec") == 0 or die "$exec failed: $?";
 
 				# parse result
 				open RES, '<', $cv_file;
@@ -187,6 +228,17 @@ do {
 				# save result for later reference
 				$result_cache{get_current_param_key()} = $correlation;
 				say STDERR "correlation: $correlation";
+
+				# in case of sgdopt parameters should have changed, read from file
+				if (defined $sgdopt) {
+                  my $pfile = $of;
+                  $pfile =~ s/.param/.ls.param/;
+                  open PFILE, '<', $pfile or die "error opening file '$pfile'";
+                  while (<PFILE>) {
+                    my ($par, $val) = split(/\s/);
+                    $parameters{$par}{currentsgdopt}=$val;
+                  }
+                }
 
 				# exit temp directory
 				chdir($CURRDIR);
@@ -198,7 +250,11 @@ do {
 				# if the new result is better, save these parameters
 				$top_correlation = $correlation;
 				for my $par (@parameters) {
-					$parameters{$par}{currentbest}=$parameters{$par}{current};
+                    if (defined $sgdopt) {
+                    $parameters{$par}{currentbest}=$parameters{$par}{currentsgdopt};
+                    } else {
+                    $parameters{$par}{currentbest}=$parameters{$par}{current};
+                    }
 				}
 			}
 		}

@@ -41,6 +41,10 @@ SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
+# enable/disable sgd-internal optimization
+DO_SGDOPT=YES
+# try this many variations of each parameter
+SGDOPT_STEPS=5
 
 # how many sequences to sample for parameter line search
 LINESEARCH_INPUT_SIZE:=1000
