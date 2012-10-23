@@ -60,16 +60,16 @@ my $filter;
 my $help;
 my $man;
 my $debug;
-my $result = GetOptions (	"feature=s" => \$feature,
-							"filter=s" => \$filter,
-							"help"	=> \$help,
-							"man"	=> \$man,
-							"debug" => \$debug);
-pod2usage(-exitstatus => 1, -verbose => 1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-($result) or pod2usage(2);
-(-f $feature) or die "error: can't fild feature file '$feature'";
-(-f $filter) or die "error: can't fild filter file '$feature'";
+my $result = GetOptions( "feature=s" => \$feature,
+  "filter=s" => \$filter,
+  "help"     => \$help,
+  "man"      => \$man,
+  "debug"    => \$debug );
+pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+($result)       or pod2usage(2);
+( -f $feature ) or die "error: can't fild feature file '$feature'";
+( -f $filter )  or die "error: can't fild filter file '$feature'";
 
 ###############################################################################
 # main
@@ -80,27 +80,34 @@ my $i;
 my %filter;
 open FILTER, '<', $filter;
 while (<FILTER>) {
-	chomp $_;
-	$filter{$_}=1;
+  chomp $_;
+  $filter{$_} = 1;
 }
 
 # filter features
 open FEATURE, '<', $feature;
 while (<FEATURE>) {
-	# parse items
-	my @vals = split(/\s/, $_);
-	# special case: first item is affinity
-	my $affinity = shift @vals;
-	my @newvals = ($affinity);
-	# for all features in line
-	foreach (@vals) {
-		# ignore empty lines
-		next if (/^\s*$/);
-		# feature encoding: index:weight
-		my ($idx, undef) = split(':');
-		# add feature to print list if not filtered out
-		push @newvals, $_ if (defined $filter{$idx});
-	}
-	# print new features for line
-	say join(' ', @newvals);
+
+  # parse items
+  my @vals = split( /\s/, $_ );
+
+  # special case: first item is affinity
+  my $affinity = shift @vals;
+  my @newvals  = ($affinity);
+
+  # for all features in line
+  foreach (@vals) {
+
+    # ignore empty lines
+    next if (/^\s*$/);
+
+    # feature encoding: index:weight
+    my ( $idx, undef ) = split(':');
+
+    # add feature to print list if not filtered out
+    push @newvals, $_ if ( defined $filter{$idx} );
+  }
+
+  # print new features for line
+  say join( ' ', @newvals );
 }

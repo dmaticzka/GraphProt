@@ -50,35 +50,35 @@ Options:
 my $help;
 my $man;
 my $dir;
-my $result = GetOptions (	"target-dir=s"	=> \$dir,
-							"help"	=> \$help,
-							"man"	=> \$man);
-pod2usage(-exitstatus => 1, -verbose => 1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+my $result = GetOptions( "target-dir=s" => \$dir,
+  "help" => \$help,
+  "man"  => \$man );
+pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result) or pod2usage(2);
 
 ###############################################################################
 # main
 ###############################################################################
 
-while (my $fname = shift @ARGV) {
-	my ( $prefix, $path, $suffix ) = fileparse( $fname, "\.[^.]*" );
-	my $ofname = "$prefix.fa";
-	my $i = 1;
-	
-	open IN, $fname or die "error: $!";
-	open OUT, ">", "$dir/$ofname" or die "error: $!";
-	
-	while (my $line = <IN>) {
-		chomp $line;
-		my ($affinity, $sequence) = split(/\s/, $line);
-		say OUT ">${prefix}_$i $affinity";
-		say OUT "$sequence";
-		$i++;
-	}
-	
-	close IN;
-	close OUT;
+while ( my $fname = shift @ARGV ) {
+  my ( $prefix, $path, $suffix ) = fileparse( $fname, "\.[^.]*" );
+  my $ofname = "$prefix.fa";
+  my $i      = 1;
+
+  open IN, $fname or die "error: $!";
+  open OUT, ">", "$dir/$ofname" or die "error: $!";
+
+  while ( my $line = <IN> ) {
+    chomp $line;
+    my ( $affinity, $sequence ) = split( /\s/, $line );
+    say OUT ">${prefix}_$i $affinity";
+    say OUT "$sequence";
+    $i++;
+  }
+
+  close IN;
+  close OUT;
 }
 
 ###############################################################################
@@ -87,5 +87,5 @@ while (my $fname = shift @ARGV) {
 # out:
 ###############################################################################
 sub stub {
-    my ($val) = @_
+  my ($val) = @_
 }
