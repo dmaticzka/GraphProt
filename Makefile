@@ -150,7 +150,7 @@ ifeq ($(GRAPH_TYPE),ONLYSEQ)
 LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : %.fa
+%.gspan.gz : %.fa | %.param
 	$(FASTA2GSPAN) $(VIEWPOINT) --seq-graph-t -nostr -stdout -fasta $< | gzip > $@
 endif
 
@@ -160,7 +160,7 @@ ifeq ($(GRAPH_TYPE),STRUCTACC)
 LSPAR:=$(DATADIR)/ls.$(METHOD_ID).structacc.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : %.fa
+%.gspan.gz : %.fa | %.param
 	$(CREATE_EXTENDED_ACC_GRAPH) $(VIEWPOINT) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) | gzip > $@
 endif
 
