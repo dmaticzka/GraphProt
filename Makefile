@@ -53,7 +53,7 @@ FILTER_FEATURES:=$(PERL) $(BINDIR)/filter_features.pl
 SUMMARIZE_MARGINS:=$(PERL) $(BINDIR)/summarize_margins.pl
 MARGINS2BG:=$(PERL) $(BINDIR)/margins2bg.pl
 VERTEX2NTMARGINS:=$(PERL) $(BINDIR)/vertex2ntmargins.pl
-PLOTLC:=$(BASH) ./plotlc.sh
+PLOTLC:=$(BASH) $(BINDIR)/plotlc.sh
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -124,7 +124,7 @@ TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 # nucleotide-wise margins as bigWig
 TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 # files for learningcurve
-LC_FILES:=$(patsubst %,%.lc.svg,$(BASENAMES))
+LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
 
 ## general feature and affinity creation (overridden where apropriate)
 ################################################################################
@@ -436,31 +436,36 @@ ifeq ($(SVM),SGD)
 # format: id, class, prediction, margin
 # we evaluate each one and summarize the probabilities in the following format:
 # SPLIT train_performance test_performance
+# this is done using svmsgdnspdk default parameters
+%.lc.perf : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
+%.lc.perf : LAMBDA=$(shell grep '^LAMBDA ' $*.param | cut -f 2 -d' ')
+%.lc.perf : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.lc.perf : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.lc.perf : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.lc.perf : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.lc.perf : %.train.class %.train.gspan.gz
-	-rm $@
-	for i in $$(seq 1 10); \
+	-rm -f $*.train.dat_lc;
+	LC=10; \
+	NUM_REP=10; \
+	lcn=$$((LC+1)); \
+	for r in $$(seq 1 $$NUM_REP); \
+	do $(SVMSGDNSPDK) -a LEARNING_CURVE -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -i $*.train.gspan.gz -t $*.train.class -p $$lcn -R $$r > /dev/null; \
+	for i in $$(seq 1 $$LC); \
 	do \
-	$(SVMSGDNSPDK) -a LEARNING_CURVE -i $*.train.gspan.gz -t $*.train.class -p $(LEARNINGCURVE_SPLITS) -rs $$RANDOM -s .$* | tee $*.lc.log; \
-	for SPLIT in $$(seq 1 $(LEARNINGCURVE_SPLITS)); \
-	do \
-	cat output.lc_predictions_test_fold$$SPLIT.$* | \
-	awk '{print $$2"\t"$$4}' | \
-	sed 's/^-1/0/g' | \
-	$(PERF) | \
-	grep 'APR' | \
-	awk '{print $$NF}' > $*.ts; \
-	cat output.lc_predictions_train_fold$$SPLIT.$* | \
-	awk '{print $$2"\t"$$4}' | \
-	sed 's/^-1/0/g' | \
-	$(PERF) | \
-	grep 'APR' | \
-	awk '{print $$NF}' > $*.tr; \
-	echo $$SPLIT | paste - $*.tr $*.ts >> $@; \
-	done \
-	done
-	-rm -f $*.ts $*.tr $*.lc.log output.lc_predictions_*_fold*;
+	dim=$$(cat  $*.train.gspan.gz.lc_predictions_train_fold_$$i | wc -l); \
+	echo -n "$$dim " >> $*.train.dat_lc; \
+	cat $*.train.gspan.gz.lc_predictions_train_fold_$$i | \
+	awk '{print $$2,$$4}' | $(PERF) -APR -ROC -ACC -t 0 -PRF 2> /dev/null | \
+	awk '{printf("%s %s ",$$1,$$2)}END{printf("\n")}' >> $*.train.dat_lc; \
+	cat $*.train.gspan.gz.lc_predictions_test_fold_$$i | awk '{print $$2,$$4}' | \
+	$(PERF) -APR -ROC -ACC -t 0 -PRF 2> /dev/null | \
+	awk '{printf("%s %s ",$$1,$$2)}END{printf("\n")}' >> $*.train.dat_lc; \
+	done; \
+	done; \
+	cat $*.train.dat_lc | awk 'NR%2==1{printf("%s ",$$0)}NR%2==0{print $$0}' | column -t > $@
+	-rm -f $*.train.gspan.gz.lc_predictions_t*_fold_* $*.train.dat_lc
 
-%.lc.svg : %.lc.perf
+%.lc.png : %.lc.perf
 	$(PLOTLC) $< $@
 
 endif
@@ -673,7 +678,7 @@ distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
 	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
-	*.cv_svr *.model_* *.prplot *.prplot.svg
+	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES)
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
