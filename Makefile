@@ -593,6 +593,17 @@ test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
 test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	cp -f $< $@
 
+# create empty input
+%.unknowns.fa :
+	@echo ""
+	@echo "using empty set of unknowns!"
+	touch $@
+
+%.negatives.fa :
+	@echo ""
+	@echo "using empty set of negatives!"
+	touch $@
+
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
 %.perf : %.predictions_class
