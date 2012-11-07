@@ -137,7 +137,11 @@ if ($debug) {
   say STDERR 'keys in hash: ', join( ', ', keys %{ $parameters{'epsilon'} } );
   while ( my ( $param, $param_h ) = each %parameters ) {
     while ( my ( $key, $values ) = each %{$param_h} ) {
-      say STDERR join( '/', $param, $key ), ': ', $values;
+      if ($key eq 'values') {
+        say STDERR join( '/', $param, $key ), ': ', join(', ', @{$values});
+      } else {
+        say STDERR join( '/', $param, $key ), ': ', $values;
+      }
     }
   }
 }
@@ -145,15 +149,32 @@ if ($debug) {
 # main loop: do until finished
 my $optimization_finished = 0;
 do {
+  $debug and say STDERR '';
+  $debug and say STDERR 'starting round ' . $n_rounds;
+
+  # use this to track if we have to do an evaluation even though there
+  # is always only one choice per parameter
+  my $started_at_least_one_evaluation = 0;
 
   # optimize each parameter
   for my $par (@parameters) {
 
-    # some parameters don't vary
-    next if ( @{ $parameters{$par}{values} } <= 1 );
-
     # some parameters are varied by sgd
-    next if ( defined $sgdopt and defined $sgd_internal_optimization{$par} );
+    if ( defined $sgdopt and defined $sgd_internal_optimization{$par} ) {
+      $debug and say 'skipping parameter because of sgd-internal optimization: ' . $par;
+      next;
+    }
+
+    # some parameters don't vary
+    # anyway, we have to ensure that we get at least one result
+    # so in case of a non-varying parameter, do the analysis anyway
+    # if none has been done so far
+    if ( @{ $parameters{$par}{values} } <= 1 and $started_at_least_one_evaluation) {
+      $debug and say 'skipping parameter that does not vary: ' . $par;
+      next;
+    }
+    $started_at_least_one_evaluation = 1;
+
     say STDERR "\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
     for my $try_this ( @{ $parameters{$par}{values} } ) {
 
