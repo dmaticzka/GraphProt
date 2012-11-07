@@ -678,7 +678,7 @@ distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
 	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
-	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES)
+	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins.*
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
