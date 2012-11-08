@@ -413,7 +413,7 @@ ifeq ($(SVM),SGD)
 # dictionary of all graph vertices
 # dict file format: seqid v verticeid nt pos
 %.vertex_dict : %.gspan.gz
-	cat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid-1, vertex_id++, $$3, $$4}/^V/{print seqid-1, vertex_id++, $$3, $$4}' > $@
+	zcat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid-1, vertex_id++, $$3, $$4}/^V/{print seqid-1, vertex_id++, $$3, $$4}' > $@
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
