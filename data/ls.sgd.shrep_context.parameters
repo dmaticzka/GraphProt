@@ -1,6 +1,6 @@
 # [parameter] [default] [parameter list]
-EPOCHS 50 50
-LAMBDA 10e-4 10e-4 10e-12
+EPOCHS 5 50
+LAMBDA 10e-4 10e-12
 R 1 4 3 2 1
 D 4 6 5 4 3 2 1
 b 14 14

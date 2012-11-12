@@ -30,8 +30,8 @@ Options:
     -sgdopt     utilize sgd-internal optimization
                 this has several effects:
                 * current parameters are written to intermediate parameter files
-                * intermediate parameter files contain maximum values for
-                  parameters optimized by sgd: R, D, EPOCHS, LAMBDA
+                * intermediate parameter files contain default and extreme values
+                  for parameters optimized directly by sgd: R, D, EPOCHS, LAMBDA
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -77,7 +77,8 @@ my $sgdopt;
 my $help;
 my $man;
 my $debug;
-my $result = GetOptions( "fa=s" => \$fa,
+my $result = GetOptions(
+  "fa=s"     => \$fa,
   "param=s"  => \$param,
   "mf=s"     => \$mf,
   "bindir=s" => \$bindir,
@@ -85,7 +86,8 @@ my $result = GetOptions( "fa=s" => \$fa,
   "sgdopt"   => \$sgdopt,
   "help"     => \$help,
   "man"      => \$man,
-  "debug"    => \$debug );
+  "debug"    => \$debug
+);
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result)       or pod2usage(2);
@@ -107,7 +109,8 @@ my $n_rounds        = 1;
 my $basename        = $fa;
 $basename =~ s/.fa//;
 my %result_cache;
-my %sgd_internal_optimization = ( 'R' => 1, 'D' => 1, 'EPOCHS' => 1, 'LAMBDA' => 1 );
+my %sgd_internal_optimization =
+  ( 'R' => 1, 'D' => 1, 'EPOCHS' => 1, 'LAMBDA' => 1 );
 
 # binaries
 my $libsvm         = '~/src/libsvm-3.0/svm-train';
@@ -126,8 +129,12 @@ while (<PARAM>) {
   $parameters{$id}{default} = $default;
   $parameters{$id}{current} = $default;
   $parameters{$id}{values}  = \@values;
-  if ( looks_like_number( $parameters{$id}{default} ) ) {
-    $parameters{$id}{max} = max(@values);
+
+  # if doing the sge-internal optimization, we just use the rightmost value
+  # specified in the parameter file
+  if ( defined $sgdopt and defined $sgd_internal_optimization{$id} ) {
+    $parameters{$id}{default} = $values[-1];
+    $parameters{$id}{current} = $values[-1];
   }
 }
 
@@ -137,8 +144,8 @@ if ($debug) {
   say STDERR 'keys in hash: ', join( ', ', keys %{ $parameters{'epsilon'} } );
   while ( my ( $param, $param_h ) = each %parameters ) {
     while ( my ( $key, $values ) = each %{$param_h} ) {
-      if ($key eq 'values') {
-        say STDERR join( '/', $param, $key ), ': ', join(', ', @{$values});
+      if ( $key eq 'values' ) {
+        say STDERR join( '/', $param, $key ), ': ', join( ', ', @{$values} );
       } else {
         say STDERR join( '/', $param, $key ), ': ', $values;
       }
@@ -157,11 +164,82 @@ do {
   my $started_at_least_one_evaluation = 0;
 
   # optimize each parameter
+  # if doing sgd-internal optimization, do this first
+  if ( defined $sgdopt ) {
+
+    # do sgd-internal optimization and save optimal values under current key
+    $tmpdir = tempdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+    my $param_file = $of;
+
+    say STDERR "\n*** optimizing sgd-internal parameters";
+
+    # rewrite to fit to line search input fasta filename
+    $param_file =~ s/.param/.ls_sgdopt.param/;
+    $debug and say STDERR "writing temporaray parameters to '$param_file'";
+    my $cv_file = $basename . '.cv';
+
+    # copy relevant files to tmp
+    copy( $fa,                         $tmpdir );
+    copy( 'PARAMETERS',                $tmpdir );
+    copy( 'EXPERIMENT_SPECIFIC_RULES', $tmpdir );
+
+    # test parameter combination / get value from previous run
+    # create parameter file
+    chdir($tmpdir);
+    open PARS, '>', $param_file;
+    print STDERR 'parameters: ';
+
+    # distinguish parameter source by parameter
+    for my $par (@parameters) {
+      my $parameter_value;
+      if ( defined $sgd_internal_optimization{$par} ) {
+
+        # if the parameter is optimized by the sgd, always use value strored in
+        # default field
+        $parameter_value = $parameters{$par}{default};
+      } else {
+
+        # all other parameters should use the values that are currently best
+        $parameter_value = $parameters{$par}{current};
+      }
+      print STDERR $par, ' ', $parameter_value, ";";
+      say PARS $par, ' ', $parameter_value;
+    }
+    print STDERR "\n";
+    close PARS;
+
+    # in a first step prepare parameter file
+    # this will do the sgd-internal optimization
+    my $final_param_file = $of;
+    $final_param_file =~ s/.param/.ls.param/;
+    my $prepare_param =
+      "make -f $bindir/$mf -e BINDIR=$bindir $final_param_file";
+    system("$prepare_param") == 0 or die "$prepare_param failed: $?";
+
+    # look up new best parameters from file
+    my $pfile = $of;
+    $pfile =~ s/.param/.ls.param/;
+    open PFILE, '<', $pfile or die "error opening file '$pfile'";
+    while (<PFILE>) {
+      my ( $par, $val ) = split(/\s/);
+
+      # set new current parameters based on sgd-optimization
+      $parameters{$par}{current} = $val;
+    }
+
+    # exit temp directory
+    chdir($CURRDIR);
+    File::Temp::cleanup();
+  }
+
+  # optimize other parameters
   for my $par (@parameters) {
 
     # some parameters are varied by sgd
     if ( defined $sgdopt and defined $sgd_internal_optimization{$par} ) {
-      $debug and say 'skipping parameter because of sgd-internal optimization: ' . $par;
+      $debug
+        and say 'skipping parameter because of sgd-internal optimization: '
+        . $par;
       next;
     }
 
@@ -169,13 +247,16 @@ do {
     # anyway, we have to ensure that we get at least one result
     # so in case of a non-varying parameter, do the analysis anyway
     # if none has been done so far
-    if ( @{ $parameters{$par}{values} } <= 1 and $started_at_least_one_evaluation) {
+    if ( @{ $parameters{$par}{values} } <= 1
+      and $started_at_least_one_evaluation )
+    {
       $debug and say 'skipping parameter that does not vary: ' . $par;
       next;
     }
     $started_at_least_one_evaluation = 1;
 
-    say STDERR "\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
+    say STDERR
+"\n*** optimizing parameter $par, round: $n_rounds, current best: $top_correlation";
     for my $try_this ( @{ $parameters{$par}{values} } ) {
 
       # set new parameter
@@ -187,13 +268,6 @@ do {
       # get current parameter key for hash lookup
       my $param_key = get_current_param_key();
       my $cached_value_found;
-      if ($sgdopt) {
-
-        # disable caching
-        $cached_value_found = 0;
-      } else {
-        $cached_value_found = defined $result_cache{$param_key};
-      }
 
       # look for cached result
       if ($cached_value_found) {
@@ -206,16 +280,16 @@ do {
         my $param_file = $of;
 
         # rewrite to fit to line search input fasta filename
-        if ( defined $sgdopt ) {
-          $param_file =~ s/.param/.ls_sgdopt.param/;
-        } else {
-          $param_file =~ s/.param/.ls.param/;
-        }
+        $param_file =~ s/.param/.ls.param/;
         $debug and say STDERR "writing temporaray parameters to '$param_file'";
         my $cv_file = $basename . '.cv';
 
         # check if parameter combination is valid
-        next if ( $parameters{'R'}{current} > $parameters{'D'}{current} );
+        if ( not $sgdopt
+          and $parameters{'R'}{current} > $parameters{'D'}{current} )
+        {
+          next;
+        }
 
         # copy relevant files into tmp
         copy( $fa,                         $tmpdir );
@@ -228,30 +302,16 @@ do {
         open PARS, '>', $param_file;
         print STDERR 'parameters: ';
         for my $par (@parameters) {
-          my $parameter_value = '';
-          if ( defined $sgdopt and defined $sgd_internal_optimization{$par} ) {
-
-            # use maximum value specified, sgd will handle this
-            $parameter_value = $parameters{$par}{max};
-          } else {
-
-            # use the current value
-            $parameter_value = $parameters{$par}{current};
-          }
+          my $parameter_value = $parameters{$par}{current};
           print STDERR $par, ' ', $parameter_value, ";";
           say PARS $par, ' ', $parameter_value;
         }
         print STDERR "\n";
         close PARS;
 
-        # in a first step prepare parameter file
-        my $final_param_file = $of;
-        $final_param_file =~ s/.param/.ls.param/;
-        my $prepare_param = "make -f $bindir/$mf -e BINDIR=$bindir $final_param_file";
-        system("$prepare_param") == 0 or die "$prepare_param failed: $?";
-
         # call Makefile for cv
-        my $exec = "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
+        my $exec =
+          "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
         $debug and say STDERR $exec;
         system("$exec") == 0 or die "$exec failed: $?";
 
@@ -265,17 +325,6 @@ do {
         $result_cache{ get_current_param_key() } = $correlation;
         say STDERR "correlation: $correlation";
 
-        # in case of sgdopt parameters should have changed, read from file
-        if ( defined $sgdopt ) {
-          my $pfile = $of;
-          $pfile =~ s/.param/.ls.param/;
-          open PFILE, '<', $pfile or die "error opening file '$pfile'";
-          while (<PFILE>) {
-            my ( $par, $val ) = split(/\s/);
-            $parameters{$par}{currentsgdopt} = $val;
-          }
-        }
-
         # exit temp directory
         chdir($CURRDIR);
         File::Temp::cleanup();
@@ -287,11 +336,7 @@ do {
         # if the new result is better, save these parameters
         $top_correlation = $correlation;
         for my $par (@parameters) {
-          if ( defined $sgdopt ) {
-            $parameters{$par}{currentbest} = $parameters{$par}{currentsgdopt};
-          } else {
-            $parameters{$par}{currentbest} = $parameters{$par}{current};
-          }
+          $parameters{$par}{currentbest} = $parameters{$par}{current};
         }
       }
     }
@@ -303,10 +348,10 @@ do {
   }
 
   # do a maximum of 5 rounds
-  if ( $n_rounds++ > 5 ) {
+  if ( $n_rounds++ > 3 ) {
     say STDERR "\n";
-    say STDERR "maximum of 5 rounds reached, stopping";
-    $optimization_finished = 1
+    say STDERR "maximum of 3 rounds reached, stopping";
+    $optimization_finished = 1;
   }
 
   # stop if the last round improved correlation by less than 0.01
@@ -314,7 +359,7 @@ do {
   if ( $top_rounds[-1] - $top_rounds[-2] < 0.01 ) {
     say STDERR "\n";
     say STDERR "improvement to last round < 0.01, stopping";
-    $optimization_finished = 1
+    $optimization_finished = 1;
   }
 } while ( not $optimization_finished );
 
