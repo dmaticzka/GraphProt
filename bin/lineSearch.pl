@@ -213,7 +213,8 @@ do {
     my $final_param_file = $of;
     $final_param_file =~ s/.param/.ls.param/;
     my $prepare_param =
-      "make -f $bindir/$mf -e BINDIR=$bindir $final_param_file";
+      "make -f $bindir/$mf -e PWD=$bindir $final_param_file";
+    $debug and say STDERR "calling '$prepare_param'";
     system("$prepare_param") == 0 or die "$prepare_param failed: $?";
 
     # look up new best parameters from file
@@ -311,7 +312,7 @@ do {
 
         # call Makefile for cv
         my $exec =
-          "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e BINDIR=$bindir";
+          "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e PWD=$bindir";
         $debug and say STDERR $exec;
         system("$exec") == 0 or die "$exec failed: $?";
 
