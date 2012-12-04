@@ -46,6 +46,9 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ###############################################################################
 # main
 ###############################################################################
+
+# first step: read dictionary and fill %id2pos
+# this maps sequence and vertice ids to nucleotide positions
 my %id2pos;
 open DICT, $dict or die $!;
 while (<DICT>) {
@@ -55,9 +58,11 @@ while (<DICT>) {
 }
 close DICT;
 
+# second step: map vertice id to nucleotide positions using dictionary
 my %pos2margin;
 while (<>) {
   my ( $seq_id, $vertex_id, $margin ) = split(/\s/);
+  defined $id2pos{$seq_id} or die "error: nothing known about id '$seq_id' in id2pos";
   my $pos = $id2pos{$seq_id}{$vertex_id};
   $pos2margin{$seq_id}{$pos} += $margin;
 }

@@ -40,7 +40,7 @@ SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+DO_LINESEARCH=NO
 # enable/disable sgd-internal optimization
 DO_SGDOPT=YES
 # try this many variations of each parameter

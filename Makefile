@@ -413,7 +413,7 @@ ifeq ($(SVM),SGD)
 # dictionary of all graph vertices
 # dict file format: seqid v verticeid nt pos
 %.vertex_dict : %.gspan.gz
-	zcat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid-1, vertex_id++, $$3, $$4}/^V/{print seqid-1, vertex_id++, $$3, $$4}' > $@
+	zcat $< | awk '/^t/{seqid++; vertex_id=0}/^v/{print seqid, vertex_id++, $$3, $$4}/^V/{print seqid, vertex_id++, $$3, $$4}' > $@
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
@@ -678,7 +678,8 @@ distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
 	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
-	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins.*
+	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins* \
+	*.vertex_margins *.vertex_dict
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
