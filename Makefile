@@ -437,12 +437,12 @@ ifeq ($(SVM),SGD)
 # we evaluate each one and summarize the probabilities in the following format:
 # SPLIT train_performance test_performance
 # this is done using svmsgdnspdk default parameters
-%.lc.perf : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
-%.lc.perf : LAMBDA=$(shell grep '^LAMBDA ' $*.param | cut -f 2 -d' ')
-%.lc.perf : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.lc.perf : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.lc.perf : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.lc.perf : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.lc.perf : EPOCHS=$(shell grep '^EPOCHS ' $*.train.param | cut -f 2 -d' ')
+%.lc.perf : LAMBDA=$(shell grep '^LAMBDA ' $*.train.param | cut -f 2 -d' ')
+%.lc.perf : RADIUS=$(shell grep '^R ' $*.train.param | cut -f 2 -d' ')
+%.lc.perf : DISTANCE=$(shell grep '^D ' $*.train.param | cut -f 2 -d' ')
+%.lc.perf : BITSIZE=$(shell grep '^b ' $*.train.param | cut -f 2 -d' ')
+%.lc.perf : DIRECTED=$(shell grep '^DIRECTED ' $*.train.param | cut -f 2 -d' ')
 %.lc.perf : %.train.class %.train.gspan.gz
 	-rm -f $*.train.dat_lc;
 	LC=10; \
