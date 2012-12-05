@@ -3,7 +3,7 @@
 LC_PERF=$1
 PLOT_PS=$2
 
-gnuplot -p << EOF
+/home/maticzkd/local/gnuplot-4.6.1/bin/gnuplot -p << EOF
 set terminal png
 set grid
 set xlabel "Training set size"
