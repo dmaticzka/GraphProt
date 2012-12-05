@@ -54,6 +54,7 @@ SUMMARIZE_MARGINS:=$(PERL) $(BINDIR)/summarize_margins.pl
 MARGINS2BG:=$(PERL) $(BINDIR)/margins2bg.pl
 VERTEX2NTMARGINS:=$(PERL) $(BINDIR)/vertex2ntmargins.pl
 PLOTLC:=$(BASH) $(BINDIR)/plotlc.sh
+CHECK_SYNC_GSPAN_CLASS:=$(BASH) $(BINDIR)/check_sync_gspan_class.sh
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -133,6 +134,7 @@ LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan.gz %.affy | %.param
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy
 	$(SVMSGDNSPDK) -a FEATURE -i $< -r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
 	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f $<.feature
@@ -315,6 +317,7 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.sgd_model : %.gspan.gz %.class | %.param
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
 	$(SVMSGDNSPDK) -g $(DIRECTED) -b $(BITSIZE) -a TRAIN -i $*.gspan.gz -t $*.class -m $@ -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) -l $(LAMBDA)
 
 %.test.filter : %.train.filter
@@ -365,6 +368,7 @@ ifeq ($(SVM),SGD)
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.model : %.gspan.gz %.class | %.param
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
 	$(SVMSGDNSPDK) -g $(DIRECTED) -e $(EPOCHS) -l $(LAMBDA) -b $(BITSIZE) -a TRAIN -i $*.gspan.gz -t $*.class -m $@ -r $(RADIUS) -d $(DISTANCE)
 
 # evaluate model
@@ -394,6 +398,7 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : %.gspan.gz %.class | %.param
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
 	$(SVMSGDNSPDK) -g $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -c $(CV_FOLD) -m $*.model -i $< -t $*.class -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) -l $(LAMBDA)
 	cat $<.cv_predictions | awk '{print $$2==1?1:-1, $$4}' > $@
 	-rm  -f $<.cv_predictions$* $*.model_*
