@@ -614,6 +614,16 @@ test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	@echo "using empty set of negatives!"
 	touch $@
 
+%.unknowns.bed :
+	@echo ""
+	@echo "using empty set of unknowns!"
+	touch $@
+
+%.negatives.bed :
+	@echo ""
+	@echo "using empty set of negatives!"
+	touch $@
+
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
 %.perf : %.predictions_class
