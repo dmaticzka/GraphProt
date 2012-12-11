@@ -65,19 +65,28 @@ sub cmp_bedgraph {
 
   # parse bed entry
   my @bed = split( "\t", $bedline );
-  if ( @bed != 12 ) {
-    say STDERR "warning: skipping non bed12 entry: '$bedline'";
+  if ( @bed != 12 and @bed != 6 ) {
+    say STDERR "warning: skipping non bed6/12 entry: '$bedline'";
     return;
   }
   my ( $chrom, $chromStart, $chromEnd, undef, undef, $strand, undef, undef,
     undef, $blockCount, $blockSizes, $blockStarts ) = @bed;
 
-  # parse bed entry
-  my @blockSizes  = split ",", $blockSizes;
-  my @blockStarts = split ",", $blockStarts;
-  if ( $blockCount != @blockSizes or $blockCount != @blockStarts ) {
-    say STDERR "warning: skipping entrie because of invalid number of blockSizes or blockStarts: '$bedline'";
-    return;
+  my @blockSizes;
+  my @blockStarts;
+  # parse bed12 entry
+  if (@bed == 12) {
+    @blockSizes  = split ",", $blockSizes;
+    @blockStarts = split ",", $blockStarts;
+    # sanity check
+    if ( $blockCount != @blockSizes or $blockCount != @blockStarts ) {
+      say STDERR "warning: skipping entry because of invalid number of blockSizes or blockStarts: '$bedline'";
+      return;
+    }
+  } else {
+    @blockSizes = ($chromEnd-$chromStart);
+    @blockStarts = (0);
+    $blockCount = 1;
   }
 
   # compute sequence of genome coordinates
@@ -93,7 +102,7 @@ sub cmp_bedgraph {
 
     # save sequence
     push @genome_coords, @abs_coords;
-  }
+}
 
   # extract array of margins, default: use median
   my @margins;
@@ -110,9 +119,11 @@ sub cmp_bedgraph {
     @margins = reverse @margins;
   }
 
-  # print gedGraph lines
+  # print bedGraph lines
   if ( length(@margins) != length(@genome_coords) ) {
-    say STDERR "warning: skipping entry because somehow we ended up with a different number of coordinates and margins";
+    say STDERR "warning: skipping entry because somehow we ended up with a " .
+      "different number of coordinates and margins: " .
+      scalar @genome_coords . " != " . scalar @margins;
     return;
   }
   $debug and say STDERR "iterating over " . scalar @genome_coords . " coordinates:";
@@ -142,7 +153,7 @@ my $nbed = length(@bed);    # number of bed entries
 close BED;
 
 # parse margins; data for each sequence is forwarded to the conversion function
-my $current_seqid = 0;      # fist sequence id is expected to be 0
+my $current_seqid = 1;      # fist sequence id is expected to be 1
 my @linestack;
 while ( my $line = <> ) {
   chomp $line;
@@ -170,6 +181,6 @@ my $bedline = shift @bed;
 cmp_bedgraph( \@linestack, $bedline );
 
 # final sanity check
-if ( $nbed != $current_seqid + 1 ) {
-  die "error: read $nbed bed entries, but got " . $current_seqid + 1 . " sequences";
+if ( $nbed != $current_seqid ) {
+  die "error: read $nbed bed entries, but got " . $current_seqid . " sequences";
 }
