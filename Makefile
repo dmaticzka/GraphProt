@@ -429,12 +429,12 @@ ifeq ($(SVM),SGD)
 %.nt_margins.summarized : %.nt_margins
 	@echo ""
 	@echo "summarizing nucleotide-wise margins:"
-	$(SUMMARIZE_MARGINS) -W 25 < $< > $@
+	$(SUMMARIZE_MARGINS) -W $(MARGINS_WINDOW) < $< > $@
 
 %.nt_margins.summarized.bg : %.nt_margins.summarized %.bed
 	@echo ""
 	@echo "converting margins to bedGraph"
-	$(MARGINS2BG) -bed $*.bed < $< > $@
+	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) < $< > $@
 
 # compute learningcurve
 # svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}

@@ -53,7 +53,13 @@ LINESEARCH_INPUT_SIZE:=200
 CV_FOLD:=10
 
 # number of iterations for the learningcurve evaluation
-LEARNINGCURVE_SPLITS:=5
+LEARNINGCURVE_SPLITS:=10
+
+# profile generation parameters
+# window size
+MARGINS_WINDOW=6
+# one of: (min, max, mean, median, sum)
+MARGINS_MEASURE=mean
 
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000

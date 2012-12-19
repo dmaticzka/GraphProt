@@ -11,23 +11,26 @@ use File::Basename;
 
 =head1 NAME
 
+margins2bg.pl
+
+=head1 SYNOPSIS
+
 margins2bg.pl -bed COORDINATES.bed12 < margins
 
 converts nucleotide-wise margins to bedGraph format
 reads margins (or summarized margins) from stdtin or file, prints bedGraph
-coordinates are taken from a bed12 whose items should correspond to the
+coordinates are taken from a bed file that should correspond to the
 entries in the margins file
 
 margins (summarized):
 sequence id, sequence position, margin, (min, max, mean, median, sum)
 
-hardcoded default: use max
-
-=head1 SYNOPSIS
-
 Options:
 
     -bed        coordinates of margin entries
+    -aggregate  which aggregate measure to use. choose one of
+                (min, max, mean, median, sum)
+                (default: mean)
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -40,18 +43,28 @@ Options:
 # parse command line options
 ###############################################################################
 my $bed;
+my $aggregate;
 my $help;
 my $man;
 my $debug;
 my $result = GetOptions( "help" => \$help,
   "man"   => \$man,
   "debug" => \$debug,
-  "bed=s" => \$bed );
+  "bed=s" => \$bed,
+  "aggregate=s" => \$aggregate );
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result) or pod2usage(2);
 
 ( defined $bed ) or pod2usage("error: parameter bed mandatory");
+( defined $aggregate ) or $aggregate = "mean";
+
+# parse choice of aggregate measure
+my %aggregates = ("min" => 0, "max" => 1, "mean" => 2, "median" => 3, "sum" => 4);
+my $aggregate_choice = $aggregates{$aggregate};
+if (not defined $aggregate_choice) {
+	die("error: don't know about aggregate '$aggregate'. choose one of: min, max, mean, median, sum");
+}
 
 ###############################################################################
 # functions
@@ -104,14 +117,16 @@ sub cmp_bedgraph {
     push @genome_coords, @abs_coords;
 }
 
-  # extract array of margins, default: use median
+  # extract array of margins, use as chosen by user
   my @margins;
   foreach my $marginline (@$margins_aref) {
 
     # parse margins entry
     my ( $sequence_id, $sequence_position, $margin,
-      $min, $max, $mean, $median, $sum ) = split "\t", $marginline;
-    $margins[ $sequence_position - 1 ] = $max;
+      @aggregates ) = split "\t", $marginline;
+    
+    # save value of chosen aggregate measure
+    $margins[ $sequence_position - 1 ] = $aggregates[$aggregate_choice];
   }
 
   # reverse order of margins if on negative strand
