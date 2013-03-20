@@ -609,20 +609,20 @@ test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	@echo "using empty set of unknowns!"
 	touch $@
 
-%.negatives.fa :
-	@echo ""
-	@echo "using empty set of negatives!"
-	touch $@
+# %.negatives.fa :
+# 	@echo ""
+# 	@echo "using empty set of negatives!"
+# 	touch $@
 
 %.unknowns.bed :
 	@echo ""
 	@echo "using empty set of unknowns!"
 	touch $@
 
-%.negatives.bed :
-	@echo ""
-	@echo "using empty set of negatives!"
-	touch $@
+# %.negatives.bed :
+# 	@echo ""
+# 	@echo "using empty set of negatives!"
+# 	touch $@
 
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
@@ -650,10 +650,10 @@ results_correlation.csv : $(CORRELATION_FILES)
 %.bw : %.bg $(GENOME_BOUNDS)
 	$(BEDGRAPH2BIGWIG) $*.bg $(GENOME_BOUNDS) $@
 
-# do need genome bounds
-$(GENOME_BOUNDS) :
-	@echo ""
-	@echo "error: require genome boundaries $@" && exit 255
+# # do need genome bounds
+# $(GENOME_BOUNDS) :
+# 	@echo ""
+# 	@echo "error: require genome boundaries $@" && exit 255
 
 ## phony target section
 ################################################################################
@@ -708,6 +708,29 @@ runtests: test_data_full_A.param test_data_full_A.train.cv \
 	test_data_full_A.test.perf test_data_full_A.test.correlation \
 	test_data_full_A.test.prplot.svg
 endif
+
+## miscellaneous rules
+################################################################################
+
+# load genome sizes from ucsc
+%.tab :
+	mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \
+	"select chrom, size from $*.chromInfo" | grep -v size > $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.positives.fa : %.positives.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.negatives.fa : %.negatives.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.unknowns.fa : %.unknowns.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
 
 ## insert additional rules into this file
 ################################################################################
