@@ -41,6 +41,7 @@ SVMSGDNSPDK:=LD_LIBRARY_PATH=/usr/local/openbabel/2.3.1/lib /home/maticzkd/local
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 BASH:=/bin/bash
+BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
 
 
 ## project internal tools
@@ -431,10 +432,11 @@ ifeq ($(SVM),SGD)
 	@echo "summarizing nucleotide-wise margins:"
 	$(SUMMARIZE_MARGINS) -W $(MARGINS_WINDOW) < $< > $@
 
-%.nt_margins.summarized.bg : %.nt_margins.summarized %.bed
+%.nt_margins.summarized.bedGraph : %.nt_margins.summarized %.bed
 	@echo ""
 	@echo "converting margins to bedGraph"
-	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) < $< > $@
+	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) < $< | \
+	$(BEDTOOLS) sort > $@
 
 # compute learningcurve
 # svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
@@ -647,8 +649,8 @@ results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
 # convert bedGraph to bigWig
-%.bw : %.bg $(GENOME_BOUNDS)
-	$(BEDGRAPH2BIGWIG) $*.bg $(GENOME_BOUNDS) $@
+%.bw : %.bedGraph $(GENOME_BOUNDS)
+	$(BEDGRAPH2BIGWIG) $*.bedGraph $(GENOME_BOUNDS) $@
 
 # # do need genome bounds
 # $(GENOME_BOUNDS) :
