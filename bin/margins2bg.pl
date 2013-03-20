@@ -164,7 +164,7 @@ while ( my $bedline = <BED> ) {
   chomp $bedline;
   push @bed, $bedline;
 }
-my $nbed = length(@bed);    # number of bed entries
+my $nbed = scalar @bed;    # number of bed entries
 close BED;
 
 # parse margins; data for each sequence is forwarded to the conversion function
