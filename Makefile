@@ -37,7 +37,7 @@ FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
 #FASTAPL:=/home/maticzkd/co/RNAtools/fastapl
 FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
 #FASTA2GSPAN:=/home/maticzkd/co/RNAtools/fasta2shrep_gspan.pl
-SVMSGDNSPDK:=LD_LIBRARY_PATH=/usr/local/openbabel/2.3.1/lib /home/maticzkd/local/svmsgdnspdk_121204/EDeN
+SVMSGDNSPDK:=LD_LIBRARY_PATH=/usr/local/openbabel/2.3.1/lib /home/maticzkd/local/svmsgdnspdk_130606/EDeN
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 BASH:=/bin/bash
