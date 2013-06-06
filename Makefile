@@ -41,6 +41,7 @@ SVMSGDNSPDK:=LD_LIBRARY_PATH=/usr/local/openbabel/2.3.1/lib /home/maticzkd/local
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 BASH:=/bin/bash
+BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
 
 
 ## project internal tools
@@ -429,12 +430,13 @@ ifeq ($(SVM),SGD)
 %.nt_margins.summarized : %.nt_margins
 	@echo ""
 	@echo "summarizing nucleotide-wise margins:"
-	$(SUMMARIZE_MARGINS) -W 25 < $< > $@
+	$(SUMMARIZE_MARGINS) -W $(MARGINS_WINDOW) < $< > $@
 
-%.nt_margins.summarized.bg : %.nt_margins.summarized %.bed
+%.nt_margins.summarized.bedGraph : %.nt_margins.summarized %.bed
 	@echo ""
 	@echo "converting margins to bedGraph"
-	$(MARGINS2BG) -bed $*.bed < $< > $@
+	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) < $< | \
+	$(BEDTOOLS) sort > $@
 
 # compute learningcurve
 # svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
@@ -609,10 +611,20 @@ test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	@echo "using empty set of unknowns!"
 	touch $@
 
-%.negatives.fa :
+# %.negatives.fa :
+# 	@echo ""
+# 	@echo "using empty set of negatives!"
+# 	touch $@
+
+%.unknowns.bed :
 	@echo ""
-	@echo "using empty set of negatives!"
+	@echo "using empty set of unknowns!"
 	touch $@
+
+# %.negatives.bed :
+# 	@echo ""
+# 	@echo "using empty set of negatives!"
+# 	touch $@
 
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
@@ -637,13 +649,13 @@ results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@
 
 # convert bedGraph to bigWig
-%.bw : %.bg $(GENOME_BOUNDS)
-	$(BEDGRAPH2BIGWIG) $*.bg $(GENOME_BOUNDS) $@
+%.bw : %.bedGraph $(GENOME_BOUNDS)
+	$(BEDGRAPH2BIGWIG) $*.bedGraph $(GENOME_BOUNDS) $@
 
-# do need genome bounds
-$(GENOME_BOUNDS) :
-	@echo ""
-	@echo "error: require genome boundaries $@" && exit 255
+# # do need genome bounds
+# $(GENOME_BOUNDS) :
+# 	@echo ""
+# 	@echo "error: require genome boundaries $@" && exit 255
 
 ## phony target section
 ################################################################################
@@ -698,6 +710,29 @@ runtests: test_data_full_A.param test_data_full_A.train.cv \
 	test_data_full_A.test.perf test_data_full_A.test.correlation \
 	test_data_full_A.test.prplot.svg
 endif
+
+## miscellaneous rules
+################################################################################
+
+# load genome sizes from ucsc
+%.tab :
+	mysql --user=genome --host=genome-mysql.cse.ucsc.edu -A -e \
+	"select chrom, size from $*.chromInfo" | grep -v size > $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.positives.fa : %.positives.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.negatives.fa : %.negatives.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
+
+# get sequence from bed using twoBitToFa
+TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+%.unknowns.fa : %.unknowns.bed
+	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
 
 ## insert additional rules into this file
 ################################################################################

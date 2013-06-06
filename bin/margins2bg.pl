@@ -11,23 +11,26 @@ use File::Basename;
 
 =head1 NAME
 
+margins2bg.pl
+
+=head1 SYNOPSIS
+
 margins2bg.pl -bed COORDINATES.bed12 < margins
 
 converts nucleotide-wise margins to bedGraph format
 reads margins (or summarized margins) from stdtin or file, prints bedGraph
-coordinates are taken from a bed12 whose items should correspond to the
+coordinates are taken from a bed file that should correspond to the
 entries in the margins file
 
 margins (summarized):
 sequence id, sequence position, margin, (min, max, mean, median, sum)
 
-hardcoded default: use max
-
-=head1 SYNOPSIS
-
 Options:
 
     -bed        coordinates of margin entries
+    -aggregate  which aggregate measure to use. choose one of
+                (min, max, mean, median, sum)
+                (default: mean)
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -40,18 +43,28 @@ Options:
 # parse command line options
 ###############################################################################
 my $bed;
+my $aggregate;
 my $help;
 my $man;
 my $debug;
 my $result = GetOptions( "help" => \$help,
   "man"   => \$man,
   "debug" => \$debug,
-  "bed=s" => \$bed );
+  "bed=s" => \$bed,
+  "aggregate=s" => \$aggregate );
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result) or pod2usage(2);
 
 ( defined $bed ) or pod2usage("error: parameter bed mandatory");
+( defined $aggregate ) or $aggregate = "mean";
+
+# parse choice of aggregate measure
+my %aggregates = ("min" => 0, "max" => 1, "mean" => 2, "median" => 3, "sum" => 4);
+my $aggregate_choice = $aggregates{$aggregate};
+if (not defined $aggregate_choice) {
+	die("error: don't know about aggregate '$aggregate'. choose one of: min, max, mean, median, sum");
+}
 
 ###############################################################################
 # functions
@@ -65,19 +78,28 @@ sub cmp_bedgraph {
 
   # parse bed entry
   my @bed = split( "\t", $bedline );
-  if ( @bed != 12 ) {
-    say STDERR "warning: skipping non bed12 entry: '$bedline'";
+  if ( @bed != 12 and @bed != 6 ) {
+    say STDERR "warning: skipping non bed6/12 entry: '$bedline'";
     return;
   }
   my ( $chrom, $chromStart, $chromEnd, undef, undef, $strand, undef, undef,
     undef, $blockCount, $blockSizes, $blockStarts ) = @bed;
 
-  # parse bed entry
-  my @blockSizes  = split ",", $blockSizes;
-  my @blockStarts = split ",", $blockStarts;
-  if ( $blockCount != @blockSizes or $blockCount != @blockStarts ) {
-    say STDERR "warning: skipping entrie because of invalid number of blockSizes or blockStarts: '$bedline'";
-    return;
+  my @blockSizes;
+  my @blockStarts;
+  # parse bed12 entry
+  if (@bed == 12) {
+    @blockSizes  = split ",", $blockSizes;
+    @blockStarts = split ",", $blockStarts;
+    # sanity check
+    if ( $blockCount != @blockSizes or $blockCount != @blockStarts ) {
+      say STDERR "warning: skipping entry because of invalid number of blockSizes or blockStarts: '$bedline'";
+      return;
+    }
+  } else {
+    @blockSizes = ($chromEnd-$chromStart);
+    @blockStarts = (0);
+    $blockCount = 1;
   }
 
   # compute sequence of genome coordinates
@@ -93,16 +115,18 @@ sub cmp_bedgraph {
 
     # save sequence
     push @genome_coords, @abs_coords;
-  }
+}
 
-  # extract array of margins, default: use median
+  # extract array of margins, use as chosen by user
   my @margins;
   foreach my $marginline (@$margins_aref) {
 
     # parse margins entry
     my ( $sequence_id, $sequence_position, $margin,
-      $min, $max, $mean, $median, $sum ) = split "\t", $marginline;
-    $margins[ $sequence_position - 1 ] = $max;
+      @aggregates ) = split "\t", $marginline;
+    
+    # save value of chosen aggregate measure
+    $margins[ $sequence_position - 1 ] = $aggregates[$aggregate_choice];
   }
 
   # reverse order of margins if on negative strand
@@ -110,9 +134,11 @@ sub cmp_bedgraph {
     @margins = reverse @margins;
   }
 
-  # print gedGraph lines
+  # print bedGraph lines
   if ( length(@margins) != length(@genome_coords) ) {
-    say STDERR "warning: skipping entry because somehow we ended up with a different number of coordinates and margins";
+    say STDERR "warning: skipping entry because somehow we ended up with a " .
+      "different number of coordinates and margins: " .
+      scalar @genome_coords . " != " . scalar @margins;
     return;
   }
   $debug and say STDERR "iterating over " . scalar @genome_coords . " coordinates:";
@@ -138,11 +164,11 @@ while ( my $bedline = <BED> ) {
   chomp $bedline;
   push @bed, $bedline;
 }
-my $nbed = length(@bed);    # number of bed entries
+my $nbed = scalar @bed;    # number of bed entries
 close BED;
 
 # parse margins; data for each sequence is forwarded to the conversion function
-my $current_seqid = 0;      # fist sequence id is expected to be 0
+my $current_seqid = 1;      # fist sequence id is expected to be 1
 my @linestack;
 while ( my $line = <> ) {
   chomp $line;
@@ -170,6 +196,6 @@ my $bedline = shift @bed;
 cmp_bedgraph( \@linestack, $bedline );
 
 # final sanity check
-if ( $nbed != $current_seqid + 1 ) {
-  die "error: read $nbed bed entries, but got " . $current_seqid + 1 . " sequences";
+if ( $nbed != $current_seqid ) {
+  die "error: read $nbed bed entries, but got " . $current_seqid . " sequences";
 }
