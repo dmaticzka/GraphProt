@@ -204,7 +204,7 @@ sub cmp_wins {
 ###############################################################################
 
 # parse input; data for each sequence is forwarded to the windowing function
-my $current_seqid = 1;    # fist sequence id is expected to be 1
+my $current_seqid = 0;    # fist sequence id is expected to be 0
 my @linestack;
 while ( my $line = <> ) {
   chomp $line;
