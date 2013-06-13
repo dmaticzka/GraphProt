@@ -15,7 +15,7 @@ THR_DIR:=$(ROOT)/data/thresholds/
 
 # progs
 RNAPLFOLD=bin/RNAplfold_context_stdout
-PLFOLD_WL=-W 50 -L 50
+PLFOLD_WL=-W 150 -L 100
 PL2CONTEXT=./bin/pl2context.pl
 RNACONTEXT=~/src/RNAcontext/bin/rnacontext
 PERF:=~/src/stat/perf
