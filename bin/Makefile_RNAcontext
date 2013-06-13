@@ -1,6 +1,6 @@
 # secondary structure profiles can be computed using
 # PLFOLD or SFOLD
-PROFILE_COMP:=SFOLD
+PROFILE_COMP:=PLFOLD
 
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
@@ -10,10 +10,13 @@ SHELL:=/bin/bash
 
 # paths
 ROOT:=~/projects/RBPaffinity
-FA_DIR:=$(ROOT)/data/fasta
+FA_DIR:=$(ROOT)/data/fasta/old_naming_scheme/
 THR_DIR:=$(ROOT)/data/thresholds/
 
 # progs
+RNAPLFOLD=bin/RNAplfold_context_stdout
+PLFOLD_WL=-W 50 -L 50
+PL2CONTEXT=./bin/pl2context.pl
 RNACONTEXT=~/src/RNAcontext/bin/rnacontext
 PERF:=~/src/stat/perf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
@@ -88,7 +91,7 @@ else
 ifeq ($(PROFILE_COMP),PLFOLD)
 
 %.profile : %.fa
-	cat $< | ./RNAplfold_context_stdout -W 50 -L 50 -u 1 | perl ./pl2context.pl > $@
+	cat $< | $(RNAPLFOLD) $(PLFOLD_WL) -u 1 | perl $(PL2CONTEXT) > $@
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
 	$(RNACONTEXT) -s 3 -w 4-12 -a ACGT -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
