@@ -1,5 +1,7 @@
 # secondary structure profiles can be computed using
 # PLFOLD or SFOLD
+# to be called from main directory as
+# make -f bin/Makefile_RNAcontext
 PROFILE_COMP:=PLFOLD
 
 SHELL:=/bin/bash
@@ -23,7 +25,8 @@ FASTAPL:=/usr/local/user/RNAtools/fastapl
 # this includes the modifications from RNAcontext for computing structure accs
 SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
 CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
-RBIN:=/usr/local/R/2.12.1-lx/bin/R
+RBIN:=/usr/local/R/2.15.1-lx/bin/R
+PLOTRESULTS=bin/RNAcontext_Auswertung.R
 
 # proteins to use
 # PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -73,7 +76,7 @@ profile: $(PROFILES)
 perf: results_aucpr.csv results_correlation.csv best.csv.dummy
 
 %.sequence : %.fa
-	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
+	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals; $$seq =~ tr/Uu/Tt/; print $$affy, "\t", $$seq, "\n";' > $@
 
 ifeq ($(PROFILE_COMP),SFOLD)
 
@@ -122,4 +125,4 @@ results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.correlation//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$8,$$9}' > $@
 
 best.csv.dummy : results_aucpr.csv
-	R --slave < RNAcontext_Auswertung.R && touch $@
+	R --slave < $(PLOTRESULTS) && touch $@
