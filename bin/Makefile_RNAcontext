@@ -76,7 +76,13 @@ profile: $(PROFILES)
 perf: results_aucpr.csv results_correlation.csv best.csv.dummy
 
 %.sequence : %.fa
-	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals; $$seq =~ tr/Uu/Tt/; print $$affy, "\t", $$seq, "\n";' > $@
+	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals; $$seq =~ tr/AaCcGgUuTt/AACCGGUUUU/; print $$affy, "\t", $$seq, "\n";' > $@
+	cut -f 2 $@ | grep -qv -E '^[ACGU]+$$'; \
+	if [ $$? -eq 0 ]; \
+	then \
+		echo "warning: sequences in file $@ contain illegal characters (not in ACGU); RNAcontext will segfault..."; \
+		return 1; \
+	fi
 
 ifeq ($(PROFILE_COMP),SFOLD)
 
@@ -98,7 +104,7 @@ ifeq ($(PROFILE_COMP),PLFOLD)
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
 	mkdir -p outputs
-	$(RNACONTEXT) -s 3 -w 4-12 -a ACGT -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
+	$(RNACONTEXT) -s 3 -w 4-12 -a ACGU -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
 
 endif
 endif
