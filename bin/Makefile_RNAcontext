@@ -1,6 +1,8 @@
 # secondary structure profiles can be computed using
 # PLFOLD or SFOLD
-PROFILE_COMP:=SFOLD
+# to be called from main directory as
+# make -f bin/Makefile_RNAcontext
+PROFILE_COMP:=PLFOLD
 
 SHELL:=/bin/bash
 .DELETE_ON_ERROR:
@@ -10,17 +12,21 @@ SHELL:=/bin/bash
 
 # paths
 ROOT:=~/projects/RBPaffinity
-FA_DIR:=$(ROOT)/data/fasta
+FA_DIR:=$(ROOT)/data/fasta/old_naming_scheme/
 THR_DIR:=$(ROOT)/data/thresholds/
 
 # progs
+RNAPLFOLD=bin/RNAplfold_context_stdout
+PLFOLD_WL=-W 150 -L 100
+PL2CONTEXT=./bin/pl2context.pl
 RNACONTEXT=~/src/RNAcontext/bin/rnacontext
 PERF:=~/src/stat/perf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 # this includes the modifications from RNAcontext for computing structure accs
 SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
-CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
-RBIN:=/usr/local/R/2.12.1-lx/bin/R
+CAT_TABLES:=$(PERL) /home/maticzkd/co/RNAtools/catTables.pl
+RBIN:=/usr/local/R/2.15.1-lx/bin/R
+PLOTRESULTS=bin/RNAcontext_Auswertung.R
 
 # proteins to use
 # PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -70,7 +76,13 @@ profile: $(PROFILES)
 perf: results_aucpr.csv results_correlation.csv best.csv.dummy
 
 %.sequence : %.fa
-	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals ;print $$affy, "\t", $$seq, "\n";' > $@
+	cat $< | /usr/local/perl/bin/perl $(FASTAPL) -e 'my @vals = split(/\s/, $$head); my $$affy=pop @vals; $$seq =~ tr/AaCcGgUuTt/AACCGGUUUU/; print $$affy, "\t", $$seq, "\n";' > $@
+	cut -f 2 $@ | grep -qv -E '^[ACGU]+$$'; \
+	if [ $$? -eq 0 ]; \
+	then \
+		echo "warning: sequences in file $@ contain illegal characters (not in ACGU); RNAcontext will segfault..."; \
+		return 1; \
+	fi
 
 ifeq ($(PROFILE_COMP),SFOLD)
 
@@ -88,10 +100,11 @@ else
 ifeq ($(PROFILE_COMP),PLFOLD)
 
 %.profile : %.fa
-	cat $< | ./RNAplfold_context_stdout -W 50 -L 50 -u 1 | perl ./pl2context.pl > $@
+	cat $< | $(RNAPLFOLD) $(PLFOLD_WL) -u 1 | perl $(PL2CONTEXT) > $@
 
 %.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
-	$(RNACONTEXT) -s 3 -w 4-12 -a ACGT -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
+	mkdir -p outputs
+	$(RNACONTEXT) -s 3 -w 4-12 -a ACGU -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
 
 endif
 endif
@@ -118,4 +131,4 @@ results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) | tr '/_' '  ' | sed 's/bruijn/weak/g' | sed 's/.correlation//g' | tr "\t" ' ' | awk '{print $$2,$$3,$$5,$$6,$$7,$$8,$$9}' > $@
 
 best.csv.dummy : results_aucpr.csv
-	R --slave < RNAcontext_Auswertung.R && touch $@
+	R --slave < $(PLOTRESULTS) && touch $@
