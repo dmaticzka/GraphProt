@@ -24,7 +24,7 @@ PERF:=~/src/stat/perf
 FASTAPL:=/usr/local/user/RNAtools/fastapl
 # this includes the modifications from RNAcontext for computing structure accs
 SFOLD_DIR:=/home/maticzkd/src/sfold-2.2
-CAT_TABLES:=$(PERL) /home/maticzkd/repositories/MiscScripts/catTables.pl
+CAT_TABLES:=$(PERL) /home/maticzkd/co/RNAtools/catTables.pl
 RBIN:=/usr/local/R/2.15.1-lx/bin/R
 PLOTRESULTS=bin/RNAcontext_Auswertung.R
 
