@@ -223,7 +223,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) -abstr -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 endif
 
 ################################################################################

@@ -25,7 +25,7 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=ONLYSEQ
+GRAPH_TYPE=CONTEXTSHREP
 
 # folding parameters:
 # The primary window sizes are used for both shreps and accessibilities.
@@ -47,7 +47,7 @@ DO_SGDOPT=YES
 SGDOPT_STEPS=5
 
 # how many sequences to sample for parameter line search
-LINESEARCH_INPUT_SIZE:=200
+LINESEARCH_INPUT_SIZE:=5000
 
 # number of crossvalidation sets to use
 CV_FOLD:=10
