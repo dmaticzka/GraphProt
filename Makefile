@@ -178,7 +178,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 endif
 
 ################################################################################
@@ -191,7 +191,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
@@ -223,7 +223,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
+	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 endif
 
 ################################################################################
@@ -242,7 +242,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).mega.parameters
 %.shrep.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 5 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
+	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@
 
 # merge gspans
 %.gspan.gz : %.shrep.gspan %.acc.gspan
