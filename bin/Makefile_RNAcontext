@@ -1,5 +1,5 @@
 # secondary structure profiles can be computed using
-# PLFOLD or SFOLD
+# PLFOLD or SFOLD or NONE
 # to be called from main directory as
 # make -f bin/Makefile_RNAcontext
 PROFILE_COMP:=PLFOLD
@@ -106,6 +106,21 @@ ifeq ($(PROFILE_COMP),PLFOLD)
 	mkdir -p outputs
 	$(RNACONTEXT) -s 3 -w 4-12 -a ACGU -e PHIME -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
 
+else
+ifeq ($(PROFILE_COMP),NONE)
+
+#assign 1 to each profile position
+%.profile : %.fa
+	cat $< | \
+	$(FASTAPL) -e \
+	'print $$head,"\n"; print join("\t", split("", "1" x length($$seq))), "\n";' > $@
+
+# profile annotation D is for dummy
+%.dummy : %.sequence %.profile %.pred.sequence %.pred.profile
+	mkdir -p outputs
+	$(RNACONTEXT) -s 3 -w 4-12 -a ACGU -e D -c $*.sequence -h $*.profile -d $*.pred.sequence -n $*.pred.profile -o $* && touch $@
+
+endif
 endif
 endif
 
