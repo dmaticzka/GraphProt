@@ -448,6 +448,7 @@ ifeq ($(SVM),SGD)
 	for i in $$(seq 1 $$LC); \
 	do \
 	dim=$$(cat  $*.train.gspan.gz.lc_predictions_train_fold_$$i | wc -l); \
+	echo -n "calculating learningcurve iteration $$i"; \
 	echo -n "$$dim " >> $*.train.dat_lc; \
 	cat $*.train.gspan.gz.lc_predictions_train_fold_$$i | \
 	awk '{print $$2,$$4}' | $(PERF) -APR -ROC -ACC -t 0 -PRF 2> /dev/null | \
@@ -462,6 +463,11 @@ ifeq ($(SVM),SGD)
 
 %.lc.png : %.lc.perf
 	$(PLOTLC) $< $@
+	cat $@.fit_log | \
+	grep 'ats' | \
+	grep '=' | \
+	tail -n 1 | \
+	awk '{print $$3}' > $@.train_limit
 
 endif
 
