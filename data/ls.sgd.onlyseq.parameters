@@ -1,8 +1,8 @@
 # [parameter] [default] [parameter list]
-EPOCHS 5 5 10 25 50
-LAMBDA 10e-4 10e-2 10e-4 10e-6 10e-8 10e-10 10e-12
+EPOCHS 10 10 25 50
+LAMBDA 10e-6 10e-4 10e-6 10e-8
 R 1 4 3 2 1
 D 4 6 5 4 3 2 1
-b 14 12 14 16 18
+b 14 14 16
 DIRECTED DIRECTED DIRECTED
-VIEWPOINT nil nil
+VIEWPOINT --vp --vp
