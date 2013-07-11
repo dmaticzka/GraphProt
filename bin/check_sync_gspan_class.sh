@@ -14,6 +14,6 @@ N_GRAPHS=`zcat ${GSPAN_FILE} | grep -c '^t'`
 #echo $N_GRAPHS;
 #echo $N_CLASS;
 
-[ $N_GRAPHS -ne $N_CLASS ] && "error: gspan and class not in sync [${N_GRAPHS} graphs vs. ${N_CLASS} class entries]" && exit 255
+[ $N_GRAPHS -ne $N_CLASS ] && echo "error: gspan and class not in sync [${N_GRAPHS} graphs vs. ${N_CLASS} class entries]" && exit 1
 
 echo "OK: gspan and class in sync" && exit 0
