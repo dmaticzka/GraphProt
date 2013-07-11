@@ -42,7 +42,7 @@ SHAPES_SHIFT=25
 # enable/disable line search: YES/NO
 DO_LINESEARCH=NO
 # enable/disable sgd-internal optimization
-DO_SGDOPT=YES
+DO_SGDOPT=NO
 # try this many variations of each parameter
 SGDOPT_STEPS=5
 
