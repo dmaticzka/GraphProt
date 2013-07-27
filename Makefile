@@ -229,7 +229,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
 %.top_wins : %.nt_margins selectTopWinShreps.R
-	R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 
 %.sequence_top_wins : %.sequence %.top_wins
 	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
