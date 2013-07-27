@@ -231,6 +231,19 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.top_wins : %.nt_margins selectTopWinShreps.R
 	R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 
+%.sequence_top_wins : %.sequence %.top_wins
+	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+
+%.struct_annot_top_wins : %.struct_annot %.top_wins
+	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+
+# %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+# %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+# %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+# %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
+# %.gspan.gz : %.fa | %.param
+# 	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+
 endif
 
 ################################################################################
