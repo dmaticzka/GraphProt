@@ -412,11 +412,9 @@ ifeq ($(SVM),SGD)
 	mv $<.prediction_part $*.test.vertex_margins
 
 # dictionary of all graph vertices
-# dict file format: seqid v verticeid nt pos
+# dict file format: seqid verticeid nt pos
 %.vertex_dict : %.gspan.gz
-	zcat $< | awk 'BEGIN{seqid=-1}/^t/{seqid++; vertex_id=0}/^v/&&!/\^/&&!/#/{print seqid, vertex_id++, $$3, $$4}' > $@
-
-# /^V/{print seqid, vertex_id++, $$3, $$4}
+	zcat $< | awk 'BEGIN{seqid=-1}/^t/{seqid++; vertex_id=0; nt_pos=0}/^v/&&!/\^/&&!/#/{print seqid, vertex_id++, $$3, nt_pos++}/^V/&&!/\^/&&!/#/{nt_pos++}' > $@
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
