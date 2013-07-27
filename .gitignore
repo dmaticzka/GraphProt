@@ -28,3 +28,6 @@ output.cv_predictions.*
 *.nt_margins
 *.vertex_margins
 *.vertex_dict
+*sgeout
+*annot
+*.top_wins
