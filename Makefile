@@ -237,6 +237,12 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.struct_annot_top_wins : %.struct_annot %.top_wins
 	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
 
+%.truncated : %
+	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
+
+%.pup : %
+	cat $< | tr 'HBIEM' 'UUUUU' | tr 'S' 'P' > $@
+
 # %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 # %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 # %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
