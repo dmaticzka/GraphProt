@@ -241,7 +241,11 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
 
 %.pup : %
-	cat $< | tr 'HBIEM' 'UUUUU' | tr 'S' 'P' > $@
+	cat $< | tr 'HBIEM' 'E' | tr 'S' 'S' > $@
+
+%.logo.png : %
+	cat $< | awk '{print ">"i++"\n"$$0}' | \
+	~/src/weblogo-3.3/weblogo -F png_print -o $@
 
 # %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 # %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
