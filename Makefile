@@ -224,6 +224,13 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
 	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+
+%.sequence : %.gspan.gz
+	zcat $< | awk '/^t/{print $$NF}' > $@
+
+%.top_wins : %.nt_margins selectTopWinShreps.R
+	R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
+
 endif
 
 ################################################################################

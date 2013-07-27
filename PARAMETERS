@@ -61,6 +61,9 @@ MARGINS_WINDOW=6
 # one of: (min, max, mean, median, sum)
 MARGINS_MEASURE=mean
 
+# motif elicitation: select the best TOP_WINDOWS for further processing
+TOP_WINDOWS=100
+
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
 
