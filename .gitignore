@@ -31,3 +31,11 @@ output.cv_predictions.*
 *sgeout
 *annot
 *.top_wins
+*.pup
+*top_wins
+*summarized
+*meme
+*subset
+*png
+*class
+*predictions

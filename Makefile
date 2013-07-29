@@ -228,6 +228,13 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.sequence : %.gspan.gz
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
+	
+%.sequence.nt_subset : %.sequence %.nt_margins
+	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > thresh') | tr 'ACGU' '_' > $@
+
+%.struct_annot.nt_subset : %.struct_annot %.nt_margins
+	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > 10') | tr 'EHSIMB' '_' > $@
+
 %.top_wins : %.nt_margins.summarized selectTopWinShreps.R
 	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 
@@ -767,7 +774,7 @@ include EXPERIMENT_SPECIFIC_RULES
 ################################################################################
 # # binaries
 # MEME_GETMARKOV:=/home/maticzkd/src/meme_4.7.0/local/bin/fasta-get-markov
-# MEME:=/home/maticzkd/src/meme_4.7.0/local/bin/meme
+MEME:=/home/maticzkd/src/meme_4.7.0/local/bin/meme
 # FASTAUID:=/usr/local/user/RNAtools/fastaUID.pl
 # # perform meme oops (only one per sequence) search
 # meme_oops: positives_unique.fa negatives_markov0.txt
