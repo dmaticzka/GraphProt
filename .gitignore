@@ -39,3 +39,4 @@ output.cv_predictions.*
 *png
 *class
 *predictions
+*truncated
