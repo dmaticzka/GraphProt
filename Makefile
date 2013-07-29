@@ -248,11 +248,19 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
 
 %.pup : %
-	cat $< | tr 'HBIEM' 'E' | tr 'S' 'S' > $@
+	cat $< | tr 'HBIEM' 'U' | tr 'S' 'P' > $@
 
-%.logo.png : %
+%.sequence_top_wins.truncated.logo.png : %.sequence_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.3/weblogo -F png_print -o $@
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
+
+%.struct_annot_top_wins.truncated.logo.png : %.struct_annot_top_wins.truncated
+	cat $< | awk '{print ">"i++"\n"$$0}' | \
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ --alphabet 'BEHIMS' --errorbars NO --fineprint '' --units probability --color 'red' 'S' 'Stacking' --color blue E External --color green M Multiloop --color black H Hairpin --color 'dark orange' I InternalLoop --color purple B Bulge --show-yaxis NO --show-xaxis NO
+
+%.struct_annot_top_wins.truncated.pup.logo.png : %.struct_annot_top_wins.truncated.pup
+	cat $< | awk '{print ">"i++"\n"$$0}' | \
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --alphabet 'UP' --color red P 'Paired' --color black U 'Unpaired' --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
 # %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 # %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))

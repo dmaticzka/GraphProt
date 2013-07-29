@@ -57,7 +57,7 @@ LEARNINGCURVE_SPLITS:=10
 
 # profile generation parameters
 # window size
-MARGINS_WINDOW=6
+MARGINS_WINDOW=12
 # one of: (min, max, mean, median, sum)
 MARGINS_MEASURE=mean
 
