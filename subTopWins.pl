@@ -72,6 +72,6 @@ while (my $loc = <LOC>) {
 #	say STDERR $seq;
 #	say STDERR $pos;
 #	say STDERR length($seq) - ($pos-2);
-	my $subseq = substr($seq, min(0, $pos), min($win_size, length($seq) - $pos));
+	my $subseq = substr($seq, $pos, min($win_size, length($seq) - $pos));
 	say $subseq;
 }
