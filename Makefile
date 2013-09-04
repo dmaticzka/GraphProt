@@ -128,8 +128,16 @@ TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 # files for learningcurve
 LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
+
+## motif stuff
+SEQMOTIFS_PRELIMINARIES:=\
+	$(BASENAMES:%=%.test.sequence) \
+	$(BASENAMES:%=%.test.top_wins) \
+	$(BASENAMES:%=%.test.sequence_top_wins) \
+	$(BASENAMES:%=%.test.sequence_top_wins.truncated)
 # sequence motifs
 SEQMOTIFS:=$(BASENAMES:%=%.test.sequence_top_wins.truncated.logo.png)
+SEQMOTIFS_BIT:=$(BASENAMES:%=%.test.sequence_top_wins.truncated.logo_bit.png)
 # structural context motifs
 STRUCTMOTIFS:=$(BASENAMES:%=%.test.struct_annot_top_wins.truncated.logo.png)
 # simplified accessibility motifs
@@ -588,6 +596,10 @@ endif
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
 	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
+%.sequence_top_wins.truncated.logo_bit.png : %.sequence_top_wins.truncated
+	cat $< | awk '{print ">"i++"\n"$$0}' | \
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --fineprint ''
+
 ## misc helper receipes
 ################################################################################
 
@@ -758,7 +770,7 @@ clean:
 motif: seqmotifs structmotifs accmotifs
 
 # calculate sequence motifs
-seqmotif: testpart $(SEQMOTIFS)
+seqmotif: testpart $(SEQMOTIFS_PRELIMINARIES) $(SEQMOTIFS) $(SEQMOTIFS_BIT)
 
 # calculate structural context motifs
 structmotif: testpart $(STRUCTMOTIFS)
