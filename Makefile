@@ -128,6 +128,13 @@ TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 # files for learningcurve
 LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
+# sequence motifs
+SEQMOTIFS:=$(BASENAMES:%=%.test.sequence_top_wins.truncated.logo.png)
+# structural context motifs
+STRUCTMOTIFS:=$(BASENAMES:%=%.test.struct_annot_top_wins.truncated.logo.png)
+# simplified accessibility motifs
+ACCMOTIFS:=$(BASENAMES:%=%.test.struct_annot_top_wins.truncated.pup.logo.png)
+
 
 ## general feature and affinity creation (overridden where apropriate)
 ################################################################################
@@ -156,6 +163,10 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
 	$(FASTA2GSPAN) $(VIEWPOINT) --seq-graph-t -nostr -stdout -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+
+%.sequence : %.gspan.gz
+	zcat $< | awk '/^u/{print $$NF}' | tr 'tT' 'uU' > $@
+
 endif
 
 ################################################################################
@@ -228,31 +239,14 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.sequence : %.gspan.gz
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
-	
-%.sequence.nt_subset : %.sequence %.nt_margins
-	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > thresh') | tr 'ACGU' '_' > $@
-
 %.struct_annot.nt_subset : %.struct_annot %.nt_margins
 	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > 10') | tr 'EHSIMB' '_' > $@
 
-%.top_wins : %.nt_margins.summarized selectTopWinShreps.R
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
-
-%.sequence_top_wins : %.sequence %.top_wins
-	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
-
 %.struct_annot_top_wins : %.struct_annot %.top_wins
 	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
-
-%.truncated : %
-	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
-
+	
 %.pup : %
 	cat $< | tr 'HBIEM' 'U' | tr 'S' 'P' > $@
-
-%.sequence_top_wins.truncated.logo.png : %.sequence_top_wins.truncated
-	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
 %.struct_annot_top_wins.truncated.logo.png : %.struct_annot_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
@@ -449,6 +443,18 @@ ifeq ($(SVM),SGD)
 	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.test.gspan.gz -t $*.test.class
 	mv $<.prediction_part $*.test.vertex_margins
 
+# compute margins of graph vertices
+# vertex_margins format: seqid verticeid margin
+%.train.vertex_margins : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : LAMBDA=$(shell grep '^LAMBDA ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.train.vertex_margins : %.train.gspan.gz %.train.class %.train.model | %.param
+	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.train.gspan.gz -t $*.train.class
+	mv $<.prediction_part $*.train.vertex_margins
+
 # dictionary of all graph vertices
 # dict file format: seqid verticeid nt pos
 %.vertex_dict : %.gspan.gz
@@ -563,6 +569,24 @@ ifeq ($(EVAL_TYPE),CLIP)
 	ln -sf $< $@
 endif
 
+## general motif generation
+################################################################################
+
+%.sequence.nt_subset : %.sequence %.nt_margins
+	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > thresh') | tr 'ACGU' '_' > $@
+
+%.top_wins : %.nt_margins.summarized selectTopWinShreps.R
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
+
+%.sequence_top_wins : %.sequence %.top_wins
+	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+
+%.truncated : %
+	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
+
+%.sequence_top_wins.truncated.logo.png : %.sequence_top_wins.truncated
+	cat $< | awk '{print ">"i++"\n"$$0}' | \
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
 ## misc helper receipes
 ################################################################################
@@ -698,7 +722,8 @@ results_correlation.csv : $(CORRELATION_FILES)
 
 ## phony target section
 ################################################################################
-.PHONY: all ls cv classstats test clean distclean learningcurve
+.PHONY: all ls cv classstats test clean distclean learningcurve \
+	motifs seqmotifs structmotifs accmotifs
 
 # do predictions and tests for all PROTEINS, summarize results
 all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
@@ -728,6 +753,18 @@ learningcurve: $(LC_FILES)
 clean:
 	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
 	*.filter *.class
+
+# calculate all motifs
+motif: seqmotifs structmotifs accmotifs
+
+# calculate sequence motifs
+seqmotif: testpart $(SEQMOTIFS)
+
+# calculate structural context motifs
+structmotif: testpart $(STRUCTMOTIFS)
+
+# calculate simplified accessibility motifs
+accmotif: testpart $(ACCMOTIFS)
 
 # delete all files
 distclean: clean
