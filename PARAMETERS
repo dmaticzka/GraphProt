@@ -47,7 +47,7 @@ DO_SGDOPT=NO
 SGDOPT_STEPS=5
 
 # how many sequences to sample for parameter line search
-LINESEARCH_INPUT_SIZE:=5000
+LINESEARCH_INPUT_SIZE:=1000
 
 # number of crossvalidation sets to use
 CV_FOLD:=10
