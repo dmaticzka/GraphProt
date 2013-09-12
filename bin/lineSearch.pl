@@ -48,7 +48,6 @@ Options:
 ###############################################################################
 my $tmp_template = 'lineSearch-XXXXXX';
 my $tmp_prefix   = '/var/tmp/';
-my $tmpdir       = tempdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
 $SIG{'INT'}  = 'end_handler';
 $SIG{'TERM'} = 'end_handler';
 $SIG{'ABRT'} = 'end_handler';
@@ -64,6 +63,7 @@ sub end_handler {
   File::Temp::cleanup();
   die();
 }
+
 
 ###############################################################################
 # parse command line options
@@ -138,6 +138,13 @@ while (<PARAM>) {
   }
 }
 
+# gspan creation depends on these parameters
+my %gspan_params;
+$gspan_params{"ABSTRACTION"} = 1;
+$gspan_params{"STACK"} = 1;
+$gspan_params{"CUE"} = 1;
+$gspan_params{"VIEWPOINT"} = 1;
+
 # print important variables
 if ($debug) {
   say STDERR 'parameters to optimize: ', join( ', ', @parameters );
@@ -152,6 +159,29 @@ if ($debug) {
     }
   }
 }
+
+################################################################################
+# given the current parameters,
+# determine the filename to be used for caching purposes.
+# the filename should encode all neccessary parameters
+sub get_cached_gspan_filename {
+  my ($basename, @parameters) = @_;
+  my $parameter_string;
+
+  for my $par (@parameters) {
+    # use parameter if gspan depends on it
+    if ( defined $gspan_params{$par}) {
+      $parameter_string .= $par . $parameters{$par}{current};
+    }
+  }
+  
+  return $basename . '.' . $parameter_string;
+}
+
+# create temporary directory to cache gspan files
+my $gspan_cache_dir_obj = File::Temp->newdir( "GspanCache_" . $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+my $gspan_cache_dir = $gspan_cache_dir_obj->dirname;
+say STDERR "CACHE DIRECTORY: $gspan_cache_dir";
 
 # main loop: do until finished
 my $optimization_finished = 0;
@@ -168,7 +198,8 @@ do {
   if ( defined $sgdopt ) {
 
     # do sgd-internal optimization and save optimal values under current key
-    $tmpdir = tempdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+    my $tmpdir_obj = File::Temp->newdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+    my $tmpdir = $tmpdir_obj->dirname;
     my $param_file = $of;
 
     say STDERR "\n*** optimizing sgd-internal parameters";
@@ -180,6 +211,14 @@ do {
 
     # copy relevant files to tmp
     copy( $fa,                         $tmpdir );
+    # get cached gspan filename
+    my $cached_gspan_fname = get_cached_gspan_filename($basename, @parameters);
+    my $cached_gspan_fname_full = "$gspan_cache_dir/$cached_gspan_fname";
+    # if exists, copy to temp dir
+    if (-f $cached_gspan_fname_full) {
+      $debug and say STDERR "reusing cached gspan $cached_gspan_fname";
+      copy($cached_gspan_fname_full, "$tmpdir/$basename.gspan.gz");
+    }
     copy( 'PARAMETERS',                $tmpdir );
     copy( 'EXPERIMENT_SPECIFIC_RULES', $tmpdir );
 
@@ -213,7 +252,7 @@ do {
     my $final_param_file = $of;
     $final_param_file =~ s/.param/.ls.param/;
     my $prepare_param =
-      "make -f $bindir/$mf -e PWD=$bindir $final_param_file";
+      "time make -f $bindir/$mf -e PWD=$bindir $final_param_file";
     $debug and say STDERR "calling '$prepare_param'";
     system("$prepare_param") == 0 or die "$prepare_param failed: $?";
 
@@ -227,10 +266,15 @@ do {
       # set new current parameters based on sgd-optimization
       $parameters{$par}{current} = $val;
     }
+    
+    # if cached gspan filename not exists, copy to cache
+    if (not -f $cached_gspan_fname_full) {
+      $debug and say STDERR "caching gspan $cached_gspan_fname";
+      copy("$tmpdir/$basename.gspan.gz", $cached_gspan_fname_full);
+    }
 
     # exit temp directory
     chdir($CURRDIR);
-    File::Temp::cleanup();
   }
 
   # optimize other parameters
@@ -277,7 +321,9 @@ do {
         # retrieve cached result and be done
         $correlation = $result_cache{$param_key};
       } else {
-        $tmpdir = tempdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+        my $tmpdir_obj = File::Temp->newdir( $tmp_template, DIR => $tmp_prefix, CLEANUP => 1 );
+        my $tmpdir = $tmpdir_obj->dirname;
+        
         my $param_file = $of;
 
         # rewrite to fit to line search input fasta filename
@@ -294,6 +340,14 @@ do {
 
         # copy relevant files into tmp
         copy( $fa,                         $tmpdir );
+        # get cached gspan filename
+        my $cached_gspan_fname = get_cached_gspan_filename($basename, @parameters);
+        my $cached_gspan_fname_full = "$gspan_cache_dir/$cached_gspan_fname";
+        # if exists, copy to temp dir
+        if (-f $cached_gspan_fname_full) {
+          $debug and say STDERR "reusing cached gspan $cached_gspan_fname";
+          copy($cached_gspan_fname_full, "$tmpdir/$basename.gspan.gz");
+        }
         copy( 'PARAMETERS',                $tmpdir );
         copy( 'EXPERIMENT_SPECIFIC_RULES', $tmpdir );
 
@@ -312,7 +366,7 @@ do {
 
         # call Makefile for cv
         my $exec =
-          "make cv -f $bindir/$mf -e CV_FILES=$cv_file -e PWD=$bindir";
+          "time make cv -f $bindir/$mf -e CV_FILES=$cv_file -e PWD=$bindir";
         $debug and say STDERR $exec;
         system("$exec") == 0 or die "$exec failed: $?";
 
@@ -326,9 +380,15 @@ do {
         $result_cache{ get_current_param_key() } = $correlation;
         say STDERR "correlation: $correlation";
 
+        # if cached gspan filename not exists, copy to cache
+        if (not -f $cached_gspan_fname_full) {
+          $debug and say STDERR "caching gspan $cached_gspan_fname";
+          copy("$tmpdir/$basename.gspan.gz", $cached_gspan_fname_full);
+        }
+    
         # exit temp directory
         chdir($CURRDIR);
-        File::Temp::cleanup();
+#         File::Temp::cleanup();
       }
 
       # save state info
@@ -348,7 +408,7 @@ do {
     }
   }
 
-  # do a maximum of 5 rounds
+  # do a maximum of 3 rounds
   if ( $n_rounds++ > 3 ) {
     say STDERR "\n";
     say STDERR "maximum of 3 rounds reached, stopping";
