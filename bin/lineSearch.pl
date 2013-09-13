@@ -327,13 +327,6 @@ do {
         $debug and say STDERR "writing temporaray parameters to '$param_file'";
         my $cv_file = $basename . '.cv';
 
-        # check if parameter combination is valid
-        if ( not $sgdopt
-          and $parameters{'R'}{current} > $parameters{'D'}{current} )
-        {
-          next;
-        }
-
         # copy relevant files into tmp
         copy( $fa,                         $tmpdir );
         # get cached gspan filename
