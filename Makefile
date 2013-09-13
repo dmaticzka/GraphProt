@@ -610,7 +610,7 @@ test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
 %.perf : %.predictions_class
-	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion 2> $*.perf_log > $@
+	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion 2> $@.log > $@
 
 # plot precision-recall
 %.prplot : %.predictions_class
