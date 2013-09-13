@@ -45,7 +45,7 @@ BASH:=/bin/bash
 BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
 
 
-## project internal tools
+## project-internal tools
 ################################################################################
 LINESEARCH:=$(PERL) $(BINDIR)/lineSearch.pl
 COMBINEFEATURES:=$(PERL) $(BINDIR)/combineFeatures.pl
@@ -179,40 +179,6 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
 	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
-endif
-
-################################################################################
-ifeq ($(GRAPH_TYPE),PROBSHREP)
-# line search parameters
-LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
-
-%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan.gz %.affy | %.param
-	# remove t and w, convert s to t
-	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
-	# write out probabilities
-	cat $< | grep '^s' | $(PERL) -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
-	# write out shrep membership
-	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
-	# compute features
-	$(SVMSGDNSPDK) -a FEATURE \
-	-i $*_singleshreps \
-	-r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
-	# compute probability-weighted features
-	$(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
-	# add affinities to features
-	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f $*_singleshreps.feature
 endif
 
 ################################################################################

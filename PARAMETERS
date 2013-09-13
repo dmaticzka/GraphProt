@@ -22,7 +22,6 @@ SVM=SGD
 # ONLYSEQ: plain sequence
 # STRUCTACC: sequence annotated with structural context
 # SHREP: plain shrep graphs
-# PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
 GRAPH_TYPE=ONLYSEQ
