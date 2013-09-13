@@ -109,8 +109,11 @@ my $n_rounds        = 1;
 my $basename        = $fa;
 $basename =~ s/.fa//;
 my %result_cache;
+# these parameters can be optimized internally by eden
 my %sgd_internal_optimization =
   ( 'R' => 1, 'D' => 1, 'EPOCHS' => 1, 'LAMBDA' => 1 );
+# gspan creation depends on these parameters
+my %gspan_params = ('ABSTRACTION' => 1, 'STACK' => 1, 'CUE' => 1, 'VIEWPOINT' => 1)
 
 # binaries
 my $libsvm         = '~/src/libsvm-3.0/svm-train';
@@ -137,13 +140,6 @@ while (<PARAM>) {
     $parameters{$id}{current} = $values[-1];
   }
 }
-
-# gspan creation depends on these parameters
-my %gspan_params;
-$gspan_params{"ABSTRACTION"} = 1;
-$gspan_params{"STACK"} = 1;
-$gspan_params{"CUE"} = 1;
-$gspan_params{"VIEWPOINT"} = 1;
 
 # print important variables
 if ($debug) {
