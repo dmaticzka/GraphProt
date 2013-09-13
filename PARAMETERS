@@ -25,7 +25,7 @@ SVM=SGD
 # PROBSHREP: plain shrep graphs, features weighted by shape probability
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=CONTEXTSHREP
+GRAPH_TYPE=ONLYSEQ
 
 # folding parameters:
 # The primary window sizes are used for both shreps and accessibilities.
@@ -40,9 +40,9 @@ SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=NO
+DO_LINESEARCH=YES
 # enable/disable sgd-internal optimization
-DO_SGDOPT=NO
+DO_SGDOPT=YES
 # try this many variations of each parameter
 SGDOPT_STEPS=5
 

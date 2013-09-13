@@ -205,7 +205,9 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 	# write out shrep membership
 	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
 	# compute features
-	$(SVMSGDNSPDK) -a FEATURE -i $*_singleshreps -r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
+	$(SVMSGDNSPDK) -a FEATURE \
+	-i $*_singleshreps \
+	-r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
 	# compute probability-weighted features
 	$(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
 	# add affinities to features
@@ -306,8 +308,11 @@ ifeq ($(SVM),TOPSVR)
 %.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.sgd_model : %.gspan.gz %.class | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
-	$(SVMSGDNSPDK) -g $(DIRECTED) -b $(BITSIZE) -a TRAIN -i $*.gspan.gz -t $*.class -m $@ -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) -l $(LAMBDA)
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
+	$(SVMSGDNSPDK) -a TRAIN \
+	-i $*.gspan.gz -t $*.class -m $@ \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA)
 
 %.test.filter : %.train.filter
 	ln -s $< $@
@@ -357,8 +362,11 @@ ifeq ($(SVM),SGD)
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.model : %.gspan.gz %.class | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
-	$(SVMSGDNSPDK) -g $(DIRECTED) -e $(EPOCHS) -l $(LAMBDA) -b $(BITSIZE) -a TRAIN -i $*.gspan.gz -t $*.class -m $@ -r $(RADIUS) -d $(DISTANCE)
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
+	$(SVMSGDNSPDK) -a TRAIN \
+	-i $*.gspan.gz -t $*.class -m $@ \
+	-r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED) -b $(BITSIZE) \
+	-e $(EPOCHS) -l $(LAMBDA)
 
 # evaluate model
 %.test.predictions_sgd : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
@@ -368,7 +376,11 @@ ifeq ($(SVM),SGD)
 %.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : %.train.model %.test.gspan.gz %.test.class | %.param
-	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) -l $(LAMBDA) -b $(BITSIZE) -a TEST -m $< -i $*.test.gspan.gz -t $*.test.class
+	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
+	$(SVMSGDNSPDK) -a TEST \
+	-m $< -i $*.test.gspan.gz -t $*.test.class \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA)
 	mv $*.test.gspan.gz.prediction $*.test.predictions_sgd
 
 # affinities and predictions default format
@@ -387,8 +399,11 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : %.gspan.gz %.class | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class
-	$(SVMSGDNSPDK) -g $(DIRECTED) -b $(BITSIZE) -a CROSS_VALIDATION -c $(CV_FOLD) -m $*.model -i $< -t $*.class -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) -l $(LAMBDA)
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
+	$(SVMSGDNSPDK) -a CROSS_VALIDATION -c $(CV_FOLD) \
+	-m $*.model -i $< -t $*.class \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	cat $<.cv_predictions | awk '{print $$2==1?1:-1, $$4}' > $@
 	-rm  -f $<.cv_predictions$* $*.model_*
 
@@ -401,7 +416,11 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
-	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.test.gspan.gz -t $*.test.class
+	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
+	$(SVMSGDNSPDK) -a TEST_PART \
+	-m $*.train.model -i $*.test.gspan.gz -t $*.test.class \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	mv $<.prediction_part $*.test.vertex_margins
 
 # dictionary of all graph vertices
@@ -535,8 +554,8 @@ ifeq ($(DO_SGDOPT),YES)
 # do parameter optimization by line search but also use sgd-internal optimization
 %.param : %.ls.fa $(LSPAR)
 	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(PWD) -sgdopt 2> >(tee $@.log >&2)
-# call sgdsvmnspdk optimization and write file containing optimized parameters
 
+# call sgdsvmnspdk optimization and write file containing optimized parameters
 %.ls.param : EPOCHS=$(shell grep '^EPOCHS ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : LAMBDA=$(shell grep '^LAMBDA ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : RADIUS=$(shell grep '^R ' $*.ls_sgdopt.param | cut -f 2 -d' ')
@@ -544,9 +563,11 @@ ifeq ($(DO_SGDOPT),YES)
 %.ls.param : BITSIZE=$(shell grep '^b ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : DIRECTED=$(shell grep '^DIRECTED ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : %.ls_sgdopt.param %.ls_sgdopt.gspan.gz %.ls_sgdopt.class
-	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -e $(EPOCHS) \
-	-l $(LAMBDA) -b $(BITSIZE) -a PARAMETERS_OPTIMIZATION \
-	-i $*.ls_sgdopt.gspan.gz -t $*.ls_sgdopt.class -m $@ -p $(SGDOPT_STEPS) > /dev/null
+	$(SVMSGDNSPDK) -a PARAMETERS_OPTIMIZATION -p $(SGDOPT_STEPS) \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA) \
+	-i $*.ls_sgdopt.gspan.gz -t $*.ls_sgdopt.class -m $@ \
+	&> $@.log
 	( cat $< | grep -v -e '^D ' -e '^R ' -e '^EPOCHS ' -e '^LAMBDA '; \
 	cat $*.ls_sgdopt.gspan.gz.opt_param | awk '{print "R",$$2,"\nD",$$4,"\nEPOCHS",$$6,"\nLAMBDA",$$8}' \
 	) > $@

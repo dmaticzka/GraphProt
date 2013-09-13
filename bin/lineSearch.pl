@@ -213,7 +213,7 @@ do {
     my $cached_gspan_fname_full = "$gspan_cache_dir/$cached_gspan_fname";
     # if exists, copy to temp dir
     if (-f $cached_gspan_fname_full) {
-      $debug and say STDERR "reusing cached gspan $cached_gspan_fname";
+      $debug and say STDERR "reusing cached gspan $cached_gspan_fname -> $tmpdir/${basename}_sgdopt.gspan.gz";
       copy($cached_gspan_fname_full, "$tmpdir/$basename.gspan.gz");
     }
     copy( 'PARAMETERS',                $tmpdir );
