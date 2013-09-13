@@ -675,7 +675,7 @@ clean:
 distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
 	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
-	*.sgeout *.class *.correlation *.cv *.cv.predictions \
+	*.sgeout *.class *.correlation *.cv *.cv.predictions *.cv_predictions \
 	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins* \
 	*.vertex_margins *.vertex_dict
 
