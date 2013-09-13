@@ -113,7 +113,8 @@ my %result_cache;
 my %sgd_internal_optimization =
   ( 'R' => 1, 'D' => 1, 'EPOCHS' => 1, 'LAMBDA' => 1 );
 # gspan creation depends on these parameters
-my %gspan_params = ('ABSTRACTION' => 1, 'STACK' => 1, 'CUE' => 1, 'VIEWPOINT' => 1)
+my %gspan_params = 
+  ('ABSTRACTION' => 1, 'STACK' => 1, 'CUE' => 1, 'VIEWPOINT' => 1);
 
 # binaries
 my $libsvm         = '~/src/libsvm-3.0/svm-train';
