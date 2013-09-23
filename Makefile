@@ -57,6 +57,10 @@ MARGINS2BG:=$(PERL) $(BINDIR)/margins2bg.pl
 VERTEX2NTMARGINS:=$(PERL) $(BINDIR)/vertex2ntmargins.pl
 PLOTLC:=$(BASH) $(BINDIR)/plotlc.sh
 CHECK_SYNC_GSPAN_CLASS:=$(BASH) $(BINDIR)/check_sync_gspan_class.sh
+SELECT_TOP_WIN_SHREPS:=$(BINDIR)/selectTopWinShreps.R
+SUBSET_NT_BY_THRESHOLD:=$(BINDIR)/subsetNTsbythreshold.pl
+SUBSET_TOP_WINS:=$(BINDIR)/subTopWins.pl
+MEDIAN_AWK:=$(BINDIR)/median.awk
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -248,10 +252,10 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
 %.struct_annot.nt_subset : %.struct_annot %.nt_margins
-	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > 10') | tr 'EHSIMB' '_' > $@
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > 10') | tr 'EHSIMB' '_' > $@
 
 %.struct_annot_top_wins : %.struct_annot %.top_wins
-	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+	$(PERL) $(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
 	
 %.pup : %
 	cat $< | tr 'HBIEM' 'U' | tr 'S' 'P' > $@
@@ -581,13 +585,13 @@ endif
 ################################################################################
 
 %.sequence.nt_subset : %.sequence %.nt_margins
-	$(PERL) subsetNTsbythreshold.pl -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f median.awk` '$$3 > thresh') | tr 'ACGU' '_' > $@
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > thresh') | tr 'ACGU' '_' > $@
 
-%.top_wins : %.nt_margins.summarized selectTopWinShreps.R
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < selectTopWinShreps.R | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
+%.top_wins : %.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 
 %.sequence_top_wins : %.sequence %.top_wins
-	$(PERL) subTopWins.pl --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+	$(PERL) $(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
 
 %.truncated : %
 	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@
