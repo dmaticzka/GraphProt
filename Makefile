@@ -61,6 +61,7 @@ SELECT_TOP_WIN_SHREPS:=$(BINDIR)/selectTopWinShreps.R
 SUBSET_NT_BY_THRESHOLD:=$(BINDIR)/subsetNTsbythreshold.pl
 SUBSET_TOP_WINS:=$(BINDIR)/subTopWins.pl
 MEDIAN_AWK:=$(BINDIR)/median.awk
+GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -133,12 +134,7 @@ TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
 # files for learningcurve
 LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
 
-## motif stuff
-SEQMOTIFS_PRELIMINARIES:=\
-	$(BASENAMES:%=%.test.sequence) \
-	$(BASENAMES:%=%.test.top_wins) \
-	$(BASENAMES:%=%.test.sequence_top_wins) \
-	$(BASENAMES:%=%.test.sequence_top_wins.truncated)
+### motif stuff
 # sequence motifs
 SEQMOTIFS:=$(BASENAMES:%=%.test.sequence_top_wins.truncated.logo.png)
 SEQMOTIFS_BIT:=$(BASENAMES:%=%.test.sequence_top_wins.truncated.logo_bit.png)
@@ -179,6 +175,11 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 %.sequence : %.gspan.gz
 	zcat $< | awk '/^u/{print $$NF}' | tr 'tT' 'uU' > $@
 
+%.sequence.nt_subset : %.sequence %.nt_margins
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > thresh') | tr 'ACGU' '_' > $@
+
+%.top_wins : %.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 endif
 
 ################################################################################
@@ -248,10 +249,49 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.gspan.gz : %.fa | %.param
 	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
 
-%.sequence : %.gspan.gz
+# for motif creation with contextshreps we evaluate each shrep as a single graph
+%.motif.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.motif.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.motif.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.motif.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
+%.motif.gspan.gz : %.test.fa | %.param
+	$(PERL) ~/projects/RBPplus/scratch/130726_motif_elicitation/RNAtools_annotate_structure/fasta2shrep_gspan.pl $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< 2> $*.struct_annot | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
+
+# different filenames for motif creation
+# compute margins of graph vertices
+# vertex_margins format: seqid verticeid margin
+%.motif.vertex_margins : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : LAMBDA=$(shell grep '^LAMBDA ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.motif.vertex_margins : %.motif.gspan.gz %.test.class %.train.model | %.param
+	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.motif.gspan.gz -t $*.test.class
+	mv $<.prediction_part $@
+
+%.test.sequence : %.motif.gspan.gz
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
-%.struct_annot.nt_subset : %.struct_annot %.nt_margins
+# compute nucleotide-wise margins from vertice margins
+%.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict
+	cat $< | $(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict | awk '$$2!=0' > $@
+
+%.sequence.nt_subset : %.sequence %.motif.nt_margins
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.motif.nt_margins | \
+	awk -v thresh=`cat $*.nt_margins | \
+	cut -f 3 | \
+	sort -nr | \
+	awk -f $(MEDIAN_AWK)` '$$3 > thresh') | \
+	tr 'ACGU' '_' > $@
+
+%.test.top_wins : %.motif.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
+	sort -k3,3nr | \
+	head -n $(TOP_WINDOWS) | \
+	sort -k1,1n > $@
+
+%.struct_annot.nt_subset : %.struct_annot %.motif.nt_margins
 	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > 10') | tr 'EHSIMB' '_' > $@
 
 %.struct_annot_top_wins : %.struct_annot %.top_wins
@@ -268,12 +308,6 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
 	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --alphabet 'UP' --color red P 'Paired' --color black U 'Unpaired' --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
-# %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-# %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-# %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-# %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-# %.gspan.gz : %.fa | %.param
-# 	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
 
 endif
 
@@ -453,7 +487,7 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
 	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.test.gspan.gz -t $*.test.class
-	mv $<.prediction_part $*.test.vertex_margins
+	mv $<.prediction_part $<
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
@@ -465,7 +499,7 @@ ifeq ($(SVM),SGD)
 %.train.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : %.train.gspan.gz %.train.class %.train.model | %.param
 	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.train.gspan.gz -t $*.train.class
-	mv $<.prediction_part $*.train.vertex_margins
+	mv $<.prediction_part $<
 
 # dictionary of all graph vertices
 # dict file format: seqid verticeid nt pos
@@ -583,12 +617,6 @@ endif
 
 ## general motif generation
 ################################################################################
-
-%.sequence.nt_subset : %.sequence %.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > thresh') | tr 'ACGU' '_' > $@
-
-%.top_wins : %.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
 
 %.sequence_top_wins : %.sequence %.top_wins
 	$(PERL) $(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
@@ -739,7 +767,7 @@ results_correlation.csv : $(CORRELATION_FILES)
 ## phony target section
 ################################################################################
 .PHONY: all ls cv classstats test clean distclean learningcurve \
-	motifs seqmotifs structmotifs accmotifs
+	motif seqmotif structmotif accmotif
 
 # do predictions and tests for all PROTEINS, summarize results
 all: $(PERF_FILES) $(CORRELATION_FILES) results_aucpr.csv results_correlation.csv
@@ -768,19 +796,19 @@ learningcurve: $(LC_FILES)
 # keep fasta, predictions and results
 clean:
 	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
-	*.filter *.class
+	*.filter *.class *top_wins *.sequence *.truncated *.prediction_part *_annot
 
 # calculate all motifs
-motif: seqmotifs structmotifs accmotifs
+motif: seqmotif structmotif accmotif
 
 # calculate sequence motifs
-seqmotif: testpart $(SEQMOTIFS_PRELIMINARIES) $(SEQMOTIFS) $(SEQMOTIFS_BIT)
+seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
 
 # calculate structural context motifs
-structmotif: testpart $(STRUCTMOTIFS)
+structmotif: $(STRUCTMOTIFS)
 
 # calculate simplified accessibility motifs
-accmotif: testpart $(ACCMOTIFS)
+accmotif: $(ACCMOTIFS)
 
 # delete all files
 distclean: clean
