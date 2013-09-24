@@ -487,7 +487,7 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
 	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.test.gspan.gz -t $*.test.class
-	mv $<.prediction_part $<
+	mv $<.prediction_part $@
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
@@ -816,7 +816,7 @@ distclean: clean
 	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
 	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins* \
-	*.vertex_margins *.vertex_dict
+	*.vertex_margins *.vertex_dict *.logo.png *.logo_bit.png
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
