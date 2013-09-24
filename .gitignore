@@ -40,3 +40,4 @@ output.cv_predictions.*
 *class
 *predictions
 *truncated
+*.prediction_part
