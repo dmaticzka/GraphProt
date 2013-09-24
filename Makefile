@@ -255,7 +255,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.motif.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : %.test.fa | %.param
-	$(PERL) ~/projects/RBPplus/scratch/130726_motif_elicitation/RNAtools_annotate_structure/fasta2shrep_gspan.pl $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< 2> $*.struct_annot | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
+	$(PERL) ~/projects/RBPplus/scratch/130726_motif_elicitation/RNAtools_annotate_structure/fasta2shrep_gspan.pl $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< 2> $*.test.struct_annot | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
 
 # different filenames for motif creation
 # compute margins of graph vertices
@@ -308,7 +308,16 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
 	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --alphabet 'UP' --color red P 'Paired' --color black U 'Unpaired' --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
 
+# these only work with contextshreps
 
+# calculate all motifs
+motif: seqmotif structmotif accmotif
+
+# calculate structural context motifs
+structmotif: $(STRUCTMOTIFS)
+
+# calculate simplified accessibility motifs
+accmotif: $(ACCMOTIFS)
 endif
 
 ################################################################################
@@ -798,17 +807,8 @@ clean:
 	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
 	*.filter *.class *top_wins *.sequence *.truncated *.prediction_part *_annot
 
-# calculate all motifs
-motif: seqmotif structmotif accmotif
-
 # calculate sequence motifs
 seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
-
-# calculate structural context motifs
-structmotif: $(STRUCTMOTIFS)
-
-# calculate simplified accessibility motifs
-accmotif: $(ACCMOTIFS)
 
 # delete all files
 distclean: clean
