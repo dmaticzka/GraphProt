@@ -805,7 +805,7 @@ learningcurve: $(LC_FILES)
 # keep fasta, predictions and results
 clean:
 	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
-	*.filter *.class *top_wins *.sequence *.truncated *.prediction_part *_annot
+	*.filter *.class *top_wins *.sequence *.truncated *.prediction_part *_annot *.pup
 
 # calculate sequence motifs
 seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
