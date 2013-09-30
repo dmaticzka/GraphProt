@@ -170,16 +170,24 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(VIEWPOINT) --seq-graph-t -nostr -stdout -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+	$(FASTA2GSPAN) $(VIEWPOINT) --seq-graph-t -nostr -stdout -fasta $< | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 
 %.sequence : %.gspan.gz
 	zcat $< | awk '/^u/{print $$NF}' | tr 'tT' 'uU' > $@
 
 %.sequence.nt_subset : %.sequence %.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > thresh') | tr 'ACGU' '_' > $@
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | \
+	awk -v thresh=`cat $*.nt_margins | \
+	cut -f 3 | sort -nr | \
+	awk -f $(MEDIAN_AWK)` '$$3 > thresh') | \
+	tr 'ACGU' '_' > $@
 
 %.top_wins : %.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | sort -k3,3nr | head -n $(TOP_WINDOWS) | sort -k1,1n > $@
+	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
+	sort -k3,3nr | \
+	head -n $(TOP_WINDOWS) | \
+	sort -k1,1n > $@
 endif
 
 ################################################################################
@@ -189,7 +197,11 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).structacc.parameters
 
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(CREATE_EXTENDED_ACC_GRAPH) $(VIEWPOINT) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) | gzip > $@; exit $${PIPESTATUS[0]}
+	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< \
+	$(VIEWPOINT) \
+	-W $(W_PRIMARY) \
+	-L $(L_PRIMARY) | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 endif
 
 ################################################################################
@@ -202,39 +214,14 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
-endif
-
-################################################################################
-ifeq ($(GRAPH_TYPE),PROBSHREP)
-# line search parameters
-LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
-
-%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) -stdout -q -Tp 0.05 -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
-
-%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.feature : %.gspan.gz %.affy | %.param
-	# remove t and w, convert s to t
-	cat $< | grep -v -e '^t' -e '^w' | sed 's/^s/t/' > $*_singleshreps
-	# write out probabilities
-	cat $< | grep '^s' | $(PERL) -ne '($$prob) = /SHAPEPROB ([0-9.]+)/; print $$prob, "\n"' > $*_probs
-	# write out shrep membership
-	cat $< | awk '/^t/{i++}/^s/{print i}' > $*_groups
-	# compute features
-	$(SVMSGDNSPDK) -a FEATURE -i $*_singleshreps -r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
-	# compute probability-weighted features
-	$(COMBINEFEATURES) $*_singleshreps.feature $*_probs $*_groups > $*
-	# add affinities to features
-	cat $* | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f $*_singleshreps.feature
+	$(FASTA2GSPAN) -fasta $< -stdout \
+	--seq-graph-t --seq-graph-alph \
+	$(STACK) $(CUE) $(VIEWPOINT) \
+	-t $(ABSTRACTION) \
+	-M $(SHREPS_MAX) \
+	-wins '$(SHAPES_WINS)' \
+	-shift '$(SHAPES_SHIFT)' | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 endif
 
 ################################################################################
@@ -247,7 +234,14 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+	$(FASTA2GSPAN) -fasta $< -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	$(STACK) $(CUE) $(VIEWPOINT) \
+	-t $(ABSTRACTION) \
+	-M $(SHREPS_MAX) \
+	-wins '$(SHAPES_WINS)' \
+	-shift '$(SHAPES_SHIFT)' | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 
 # for motif creation with contextshreps we evaluate each shrep as a single graph
 %.motif.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
@@ -255,7 +249,16 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.motif.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : %.test.fa | %.param
-	$(PERL) $(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr --abstr-out $*.test.struct_annot -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
+	$(PERL) $(FASTA2GSPAN) -fasta $< -stdout \
+	$(STACK) $(CUE) $(VIEWPOINT) \
+	--seq-graph-t --seq-graph-alph -abstr \
+	--abstr-out $*.test.struct_annot \
+	-t $(ABSTRACTION) \
+	-M $(SHREPS_MAX) \
+	-wins '$(SHAPES_WINS)' \
+	-shift '$(SHAPES_SHIFT)' \
+	awk -f $(GSPAN_SPLIT_GRAPHS) | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 
 # different filenames for motif creation
 # compute margins of graph vertices
@@ -267,7 +270,17 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.motif.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.motif.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.motif.vertex_margins : %.motif.gspan.gz %.test.class %.train.model | %.param
-	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.motif.gspan.gz -t $*.test.class
+	$(SVMSGDNSPDK) \
+	-a TEST_PART \
+	-m $*.train.model \
+	-i $*.motif.gspan.gz \
+	-t $*.test.class \
+	-g $(DIRECTED) \
+	-r $(RADIUS) \
+	-d $(DISTANCE) \
+	-b $(BITSIZE) \
+	-e $(EPOCHS) \
+	-l $(LAMBDA)
 	mv $<.prediction_part $@
 
 %.test.sequence : %.motif.gspan.gz
@@ -275,10 +288,13 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 
 # compute nucleotide-wise margins from vertice margins
 %.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict
-	cat $< | $(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict | awk '$$2!=0' > $@
+	cat $< | \
+	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict | \
+	awk '$$2!=0' > $@
 
 %.sequence.nt_subset : %.sequence %.motif.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.motif.nt_margins | \
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) \
+	-input $< -locations <(cat $*.motif.nt_margins | \
 	awk -v thresh=`cat $*.nt_margins | \
 	cut -f 3 | \
 	sort -nr | \
@@ -292,21 +308,48 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	sort -k1,1n > $@
 
 %.struct_annot.nt_subset : %.struct_annot %.motif.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > 10') | tr 'EHSIMB' '_' > $@
+	$(PERL) $(SUBSET_NT_BY_THRESHOLD) \
+	-input $< \
+	-locations <(cat $*.nt_margins | \
+	awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > 10') | \
+	tr 'EHSIMB' '_' > $@
 
 %.struct_annot_top_wins : %.struct_annot %.top_wins
-	$(PERL) $(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+	$(PERL) $(SUBSET_TOP_WINS) \
+	--input $< \
+	--locations $*.top_wins \
+	--win_size $(MARGINS_WINDOW) > $@
 	
 %.pup : %
 	cat $< | tr 'HBIEM' 'U' | tr 'S' 'P' > $@
 
 %.struct_annot_top_wins.truncated.logo.png : %.struct_annot_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ --alphabet 'BEHIMS' --errorbars NO --fineprint '' --units probability --color 'red' 'S' 'Stacking' --color blue E External --color green M Multiloop --color black H Hairpin --color 'dark orange' I InternalLoop --color purple B Bulge --show-yaxis NO --show-xaxis NO
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	--alphabet 'BEHIMS' \
+	--errorbars NO \
+	--fineprint '' \
+	--units probability \
+	--color 'red' 'S' 'Stacking' \
+	--color blue E External \
+	--color green M Multiloop \
+	--color black H Hairpin \
+	--color 'dark orange' I InternalLoop \
+	--color purple B Bulge \
+	--show-yaxis NO \
+	--show-xaxis NO
 
 %.struct_annot_top_wins.truncated.pup.logo.png : %.struct_annot_top_wins.truncated.pup
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --alphabet 'UP' --color red P 'Paired' --color black U 'Unpaired' --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	--color-scheme classic \
+	--alphabet 'UP' \
+	--color red P 'Paired' \
+	--color black U 'Unpaired' \
+	--errorbars NO --fineprint '' \
+	--units probability \
+	--show-yaxis NO \
+	--show-xaxis NO
 
 # these only work with contextshreps
 
@@ -328,7 +371,11 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).mega.parameters
 # accessibility graphs
 %.acc.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.acc.gspan.gz : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) $(VIEWPOINT) -fa $< -W $(W_PRIMARY) -L $(L_PRIMARY) | gzip > $@; exit $${PIPESTATUS[0]}
+	$(CREATE_EXTENDED_ACC_GRAPH) \
+	-fa $< \
+	$(VIEWPOINT) \
+	-W $(W_PRIMARY) \
+	-L $(L_PRIMARY) | gzip > $@; exit $${PIPESTATUS[0]}
 
 # shrep graphs
 %.shrep.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
@@ -336,11 +383,22 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).mega.parameters
 %.shrep.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.shrep.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) --seq-graph-t --seq-graph-alph $(STACK) $(CUE) $(VIEWPOINT) -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | gzip > $@; exit $${PIPESTATUS[0]}
+	$(FASTA2GSPAN) -stdout \
+	-fasta $< \
+	--seq-graph-t --seq-graph-alph \
+	$(STACK) \
+	$(CUE) \
+	$(VIEWPOINT) \
+	-t $(ABSTRACTION) \
+	-M $(SHREPS_MAX) \
+	-wins '$(SHAPES_WINS)' \
+	-shift '$(SHAPES_SHIFT) | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 
 # merge gspans
 %.gspan.gz : %.shrep.gspan %.acc.gspan
-	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan | gzip > $@; exit $${PIPESTATUS[0]}
+	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan | \
+	gzip > $@; exit $${PIPESTATUS[0]}
 endif
 
 
@@ -356,7 +414,9 @@ ifeq ($(SVM),SVR)
 
 # final result of cross validation: squared correlation coefficient
 %.cv : %.cv_svr
-	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
+	cat $< | \
+	grep 'Cross Validation Squared correlation coefficient' | \
+	perl -ne 'print /(\d+.\d+)/' > $@
 
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
@@ -377,67 +437,6 @@ ifeq ($(SVM),SVR)
 	paste $*.class $< > $@
 
 endif
-
-
-## support vector regression using sgd-derived subset of top features
-################################################################################
-ifeq ($(SVM),TOPSVR)
-# results from cross validation
-%.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
-%.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
-%.cv_svr : %.feature | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
-
-# final result of cross validation: squared correlation coefficient
-%.cv : %.cv_svr
-	cat $< | grep 'Cross Validation Squared correlation coefficient' | perl -ne 'print /(\d+.\d+)/' > $@
-
-# train model; this one directly works on gspans
-%.sgd_model : EPOCHS=$(shell grep '^EPOCHS ' $*.param | cut -f 2 -d' ')
-%.sgd_model : LAMBDA=$(shell grep '^LAMBDA ' $*.param | cut -f 2 -d' ')
-%.sgd_model : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
-%.sgd_model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
-%.sgd_model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
-%.sgd_model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.sgd_model : %.gspan.gz %.class | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
-	$(SVMSGDNSPDK) -a TRAIN \
-	-i $*.gspan.gz -t $*.class -m $@ \
-	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
-	-e $(EPOCHS) -l $(LAMBDA)
-
-%.test.filter : %.train.filter
-	ln -s $< $@
-
-%.filter : NFEAT=$(shell cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | wc -l)
-%.filter : TENP=$(shell echo "$(NFEAT) / 5" | bc)
-%.filter : %.sgd_model
-	cat $< | grep '^w ' | sed 's/^w //' | tr ' :' "\n\t" | sort -k2,2gr | head -n $(TENP) | cut -f 1 | sort -n > $@
-
-%.feature_filtered : %.feature %.filter
-	$(FILTER_FEATURES) --feature $< --filter $*.filter > $@
-
-# SVR model
-%.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
-%.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
-%.model : %.feature_filtered | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
-
-# SVR predictions
-%.test.predictions_svr : %.train.model %.test.feature_filtered
-	time $(SVRPREDICT) $*.test.feature_filtered $< $@
-
-# affinities and predictions default format
-%.predictions_affy : %.predictions_svr %.affy
-	# combine affinities and predictions
-	paste $*.affy $< > $@
-
-# class membership and predictions default format
-%.predictions_class : %.predictions_svr %.class
-	# combine affinities and predictions
-	paste $*.class $< > $@
-endif
-
 
 ## stochastic gradient descent
 ################################################################################
@@ -513,7 +512,7 @@ ifeq ($(SVM),SGD)
 	-m $*.train.model -i $*.test.gspan.gz -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
-	mv $<.prediction_part $*.test.vertex_margins
+	mv $<.prediction_part $@
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
@@ -524,13 +523,18 @@ ifeq ($(SVM),SGD)
 %.train.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : %.train.gspan.gz %.train.class %.train.model | %.param
-	$(SVMSGDNSPDK) -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -a TEST_PART -m $*.train.model -i $*.train.gspan.gz -t $*.train.class
-	mv $<.prediction_part $<
+	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
+	$(SVMSGDNSPDK) -a TEST_PART \
+	-m $*.train.model -i $*.train.gspan.gz -t $*.train.class \
+	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
+	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
+	mv $<.prediction_part $@
 
 # dictionary of all graph vertices
 # dict file format: seqid verticeid nt pos
 %.vertex_dict : %.gspan.gz
-	zcat $< | awk 'BEGIN{seqid=-1}/^t/{seqid++; vertex_id=0; nt_pos=0}/^v/&&!/\^/&&!/#/{print seqid, vertex_id++, $$3, nt_pos++}/^V/&&!/\^/&&!/#/{nt_pos++}' > $@
+	zcat $< | \
+	awk 'BEGIN{seqid=-1}/^t/{seqid++; vertex_id=0; nt_pos=0}/^v/&&!/\^/&&!/#/{print seqid, vertex_id++, $$3, nt_pos++}/^V/&&!/\^/&&!/#/{nt_pos++}' > $@
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
@@ -550,7 +554,8 @@ ifeq ($(SVM),SGD)
 	$(BEDTOOLS) sort > $@
 
 # compute learningcurve
-# svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
+# svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format 
+# output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
 # format: id, class, prediction, margin
 # we evaluate each one and summarize the probabilities in the following format:
 # SPLIT train_performance test_performance
@@ -604,7 +609,8 @@ ifeq ($(EVAL_TYPE),RNACOMPETE)
 %.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
 %.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
 %.class : %.affy
-	cat $< | awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
+	cat $< | \
+	awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
 
 # some statistics about class distribution
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
@@ -652,11 +658,21 @@ endif
 
 %.sequence_top_wins.truncated.logo.png : %.sequence_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --errorbars NO --fineprint '' --units probability --show-yaxis NO --show-xaxis NO
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	--color-scheme classic \
+	--sequence-type rna \
+	--errorbars NO \
+	--fineprint '' \
+	--units probability \
+	--show-yaxis NO \
+	--show-xaxis NO
 
 %.sequence_top_wins.truncated.logo_bit.png : %.sequence_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ --color-scheme classic --sequence-type rna --fineprint ''
+	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	--color-scheme classic \
+	--sequence-type rna \
+	--fineprint ''
 
 ## misc helper receipes
 ################################################################################
@@ -673,7 +689,13 @@ else
 ifeq ($(DO_SGDOPT),YES)
 # do parameter optimization by line search but also use sgd-internal optimization
 %.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(PWD) -sgdopt 2> >(tee $@.log >&2)
+	$(LINESEARCH) \
+	-fa $< \
+	-param $(LSPAR) \
+	-mf Makefile \
+	-of $@ \
+	-bindir $(PWD) \
+	-sgdopt 2> >(tee $@.log >&2)
 
 # call sgdsvmnspdk optimization and write file containing optimized parameters
 %.ls.param : EPOCHS=$(shell grep '^EPOCHS ' $*.ls_sgdopt.param | cut -f 2 -d' ')
@@ -683,10 +705,17 @@ ifeq ($(DO_SGDOPT),YES)
 %.ls.param : BITSIZE=$(shell grep '^b ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : DIRECTED=$(shell grep '^DIRECTED ' $*.ls_sgdopt.param | cut -f 2 -d' ')
 %.ls.param : %.ls_sgdopt.param %.ls_sgdopt.gspan.gz %.ls_sgdopt.class
-	$(SVMSGDNSPDK) -a PARAMETERS_OPTIMIZATION -p $(SGDOPT_STEPS) \
-	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
-	-e $(EPOCHS) -l $(LAMBDA) \
-	-i $*.ls_sgdopt.gspan.gz -t $*.ls_sgdopt.class -m $@ \
+	$(SVMSGDNSPDK) -a PARAMETERS_OPTIMIZATION \
+	-i $*.ls_sgdopt.gspan.gz \
+	-t $*.ls_sgdopt.class \
+	-m $@ \
+	-p $(SGDOPT_STEPS) \
+	-r $(RADIUS) \
+	-d $(DISTANCE) \
+	-b $(BITSIZE) \
+	-g $(DIRECTED) \
+	-e $(EPOCHS) \
+	-l $(LAMBDA) \
 	&> $@.log
 	( cat $< | grep -v -e '^D ' -e '^R ' -e '^EPOCHS ' -e '^LAMBDA '; \
 	cat $*.ls_sgdopt.gspan.gz.opt_param | awk '{print "R",$$2,"\nD",$$4,"\nEPOCHS",$$6,"\nLAMBDA",$$8}' \
@@ -764,21 +793,32 @@ test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
 %.perf : %.predictions_class
-	cat $< | awk '$$1!=0' | sed 's/^-1/0/g' | $(PERF) -confusion 2> $@.log > $@
+	cat $< | \
+	awk '$$1!=0' | \
+	sed 's/^-1/0/g' | \
+	$(PERF) -confusion 2> $@.log > $@
 
 # plot precision-recall
 %.prplot : %.predictions_class
-	cat $< | sed 's/^-1/0/g' | $(PERF) -plot pr | awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
+	cat $< | \
+	sed 's/^-1/0/g' | \
+	$(PERF) -plot pr | \
+	awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
 
 %.prplot.svg : %.prplot
-	cat $< | gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+	cat $< | \
+	gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
 
 # compute correlation: correlation \t pvalue
 %.correlation : %.predictions_affy
-	cat $< | $(RBIN) --slave -e 'require(stats); data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
+	cat $< | \
+	$(RBIN) --slave \
+	-e 'require(stats); data=read.table("$<", col.names=c("prediction","measurement")); t <- cor.test(data$$measurement, data$$prediction, method="spearman", alternative="greater"); write.table(cbind(t$$estimate, t$$p.value), file="$@", col.names=F, row.names=F, quote=F, sep="\t")'
 
 results_aucpr.csv : $(PERF_FILES)
-	grep -H -e APR -e ROC $^ | tr ':' "\t" | $(RBIN) --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
+	grep -H -e APR -e ROC $^ | \
+	tr ':' "\t" | \
+	$(RBIN) --slave -e 'require(reshape); d<-read.table("stdin", col.names=c("id","variable","value")); write.table( cast(d), file="", row.names=F, quote=F, sep="\t")' > $@
 
 results_correlation.csv : $(CORRELATION_FILES)
 	$(CAT_TABLES) $(CORRELATION_FILES) > $@

@@ -15,7 +15,7 @@ PROTEINS:=testclip
 #   test input ID.test.fa built the same way
 EVAL_TYPE=CLIP
 
-# set SVM type: SVR / SGD / TOPSVR
+# set SVM type: SVR / SGD
 SVM=SGD
 
 # set graph type:
@@ -37,6 +37,8 @@ L_PRIMARY=100
 W_SECONDARY=
 SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
+# maximum number of shreps
+SHREPS_MAX=3
 
 # enable/disable line search: YES/NO
 DO_LINESEARCH=YES
