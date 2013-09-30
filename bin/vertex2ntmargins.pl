@@ -62,7 +62,8 @@ close DICT;
 my %pos2margin;
 while (<>) {
   my ( $seq_id, $vertex_id, $margin ) = split(/\s/);
-  defined $id2pos{$seq_id} or die "error: nothing known about id '$seq_id' in id2pos";
+#  defined $id2pos{$seq_id} or die "error: nothing known about id '$seq_id' in id2pos";
+	defined $id2pos{$seq_id}{$vertex_id} or next;
   my $pos = $id2pos{$seq_id}{$vertex_id};
   $pos2margin{$seq_id}{$pos} += $margin;
 }

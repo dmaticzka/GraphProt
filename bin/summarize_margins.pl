@@ -191,9 +191,10 @@ sub cmp_wins {
   # print output
   my $nlines     = @lines;
   my $nsummaries = @summaries;
-  say STDERR "found $nsummaries summaries for $nlines lines";
+  $debug and say STDERR "found $nsummaries summaries for $nlines lines";
   foreach my $line (@lines) {
     my $summary = shift @summaries;
+    next if (not defined $summary);
     say join( "\t", $line, $summary );
   }
 
@@ -216,7 +217,7 @@ while ( my $line = <> ) {
   } else {
 
     # push lines to windowing function
-    print STDERR "handling id '$current_seqid': ";
+    $debug and print STDERR "handling id '$current_seqid': ";
     cmp_wins( \@linestack );
 
     # start new linestack using current line
@@ -228,5 +229,5 @@ while ( my $line = <> ) {
 }
 
 # push lines to windowing function
-print STDERR "handling id '$current_seqid': ";
+$debug and print STDERR "handling id '$current_seqid': ";
 cmp_wins( \@linestack )

@@ -40,9 +40,9 @@ SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
 SHAPES_SHIFT=25
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=NO
+DO_LINESEARCH=YES
 # enable/disable sgd-internal optimization
-DO_SGDOPT=NO
+DO_SGDOPT=YES
 # try this many variations of each parameter
 SGDOPT_STEPS=5
 
@@ -57,9 +57,12 @@ LEARNINGCURVE_SPLITS:=10
 
 # profile generation parameters
 # window size
-MARGINS_WINDOW=6
+MARGINS_WINDOW=12
 # one of: (min, max, mean, median, sum)
 MARGINS_MEASURE=mean
+
+# motif elicitation: select the best TOP_WINDOWS for further processing
+TOP_WINDOWS=100
 
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
