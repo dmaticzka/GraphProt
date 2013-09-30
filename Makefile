@@ -802,21 +802,22 @@ testpart_coords : $(TESTPART_BIGWIG)
 # see if additional data will help improve classification
 learningcurve: $(LC_FILES)
 
-# keep fasta, predictions and results
+# keep fastasd, models, predictions and results
 clean:
-	-rm -rf log *.gspan *.gspan.gz *.threshold* *.feature *.affy *.feature_filtered \
-	*.filter *.class *top_wins *.sequence *.truncated *.prediction_part *_annot *.pup
+	-rm -rf *.gspan *.gspan.gz *.threshold* *.feature *.affy \
+	*.feature_filtered *.filter *.class *top_wins *.sequence *.truncated \
+	*.prediction_part *_annot *.pup *.vertex_margins *.vertex_dict *.log
 
 # calculate sequence motifs
 seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
 
-# delete all files
+# # delete all files except fastas
 distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
-	*.predictions_svr *.predictions_sgd *.ls.fa *.log *.csv *model \
+	*.predictions_svr *.predictions_sgd *.ls.fa *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
 	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins* \
-	*.vertex_margins *.vertex_dict *.logo.png *.logo_bit.png
+	*.logo.png *.logo_bit.png
 
 ifeq ($(EVAL_TYPE),CLIP)
 # test various stuff
