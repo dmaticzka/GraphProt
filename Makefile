@@ -255,7 +255,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 %.motif.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : %.test.fa | %.param
-	$(PERL) ~/projects/RBPplus/scratch/130726_motif_elicitation/RNAtools_annotate_structure/fasta2shrep_gspan.pl $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< 2> $*.test.struct_annot | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
+	$(PERL) $(FASTA2GSPAN) $(STACK) $(CUE) $(VIEWPOINT) --seq-graph-t --seq-graph-alph -abstr --abstr-out $*.test.struct_annot -stdout -t $(ABSTRACTION) -M 3 -wins '$(SHAPES_WINS)' -shift '$(SHAPES_SHIFT)' -fasta $< | awk -f $(GSPAN_SPLIT_GRAPHS) | gzip > $@; exit $${PIPESTATUS[0]}
 
 # different filenames for motif creation
 # compute margins of graph vertices
