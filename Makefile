@@ -867,6 +867,9 @@ clean:
 	*.feature_filtered *.filter *.class *top_wins *.sequence *.truncated \
 	*.prediction_part *_annot *.pup *.vertex_margins *.vertex_dict *.log
 
+# calculate all motifs
+motif: seqmotif
+
 # calculate sequence motifs
 seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
 
