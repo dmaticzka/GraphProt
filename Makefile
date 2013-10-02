@@ -121,12 +121,22 @@ endif
 PARAM_FILES:=$(patsubst %,%.param,$(BASENAMES))
 # results of crossvalidations
 CV_FILES:=$(patsubst %,%.train.cv,$(BASENAMES))
+# plots crossvalidation result curves
+CV_PLOTS:=\
+	$(patsubst %,%.train.cv.prplot.svg,$(BASENAMES)) \
+	$(patsubst %,%.train.cv.rocplot.svg,$(BASENAMES)) \
+	$(patsubst %,%.train.cv.accplot.svg,$(BASENAMES))
 # models
 MODEL_FILES:=$(patsubst %,%.train.model,$(BASENAMES))
 # final results spearman correlation
 CORRELATION_FILES:=$(patsubst %,%.test.correlation,$(BASENAMES))
 # final results from perf
 PERF_FILES:=$(patsubst %,%.test.perf,$(BASENAMES))
+# plot prediction result curves
+PERF_PLOTS:=\
+	$(patsubst %,%.test.prplot.svg,$(BASENAMES)) \
+	$(patsubst %,%.test.rocplot.svg,$(BASENAMES)) \
+	$(patsubst %,%.test.accplot.svg,$(BASENAMES))
 # nucleotide-wise margins
 TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 # nucleotide-wise margins as bigWig
@@ -790,6 +800,29 @@ endif
 	cat $< | \
 	gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
 
+# plot ROC curve
+%.rocplot : %.predictions_class
+	cat $< | \
+	sed 's/^-1/0/g' | \
+	$(PERF) -plot roc | \
+	awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
+
+%.rocplot.svg : %.rocplot
+	cat $< | \
+	gnuplot -e "set ylabel 'true positive rate'; set xlabel 'false positive rate'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+
+# plot accuracy
+%.accplot : %.predictions_class
+	cat $< | \
+	sed 's/^-1/0/g' | \
+	$(PERF) -plot roc | \
+	awk 'BEGIN{p=1}/ACC/{p=0}{if (p) {print}}' > $@
+
+%.accplot.svg : %.accplot
+	cat $< | \
+	gnuplot -e "set ylabel 'accuracy'; set xlabel 'threshold'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+
+
 # compute correlation: correlation \t pvalue
 %.correlation : %.predictions_affy
 	cat $< | \
@@ -827,11 +860,17 @@ ls : $(PARAM_FILES)
 # do crossvalidation
 cv : $(CV_FILES)
 
+# plot pr, roc and accuracies of crossvalidation
+cvplot : $(CV_PLOTS)
+
 # train target
 train : $(MODEL_FILES)
 
 # test target
 test : $(PERF_FILES) $(CORRELATION_FILES)
+
+# plot pr, roc and accuracies of predictions
+testplot : $(PERF_PLOTS)
 
 # compute nucleotide-wise margins
 testpart : $(TESTPART_FILES)
@@ -846,7 +885,8 @@ learningcurve: $(LC_FILES)
 clean:
 	-rm -rf *.gspan *.gspan.gz *.threshold* *.feature *.affy \
 	*.feature_filtered *.filter *.class *top_wins *.sequence *.truncated \
-	*.prediction_part *_annot *.pup *.vertex_margins *.vertex_dict *.log
+	*.prediction_part *_annot *.pup *.vertex_margins *.vertex_dict *.log \
+	*.rocplot* *.accplot* *.prplot*
 
 # calculate all motifs
 motif: seqmotif
