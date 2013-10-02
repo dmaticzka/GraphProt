@@ -750,25 +750,6 @@ endif
 %.test.param : %.param
 	ln -sf $< $@
 
-# get test data
-testclip.train.positives.fa : $(DATADIR)/testclip.train.positives.fa
-	cp -f $< $@
-
-testclip.train.negatives.fa : $(DATADIR)/testclip.train.negatives.fa
-	cp -f $< $@
-
-testclip.test.positives.fa : $(DATADIR)/testclip.test.positives.fa
-	cp -f $< $@
-
-testclip.test.negatives.fa : $(DATADIR)/testclip.test.negatives.fa
-	cp -f $< $@
-
-test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
-	cp -f $< $@
-
-test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
-	cp -f $< $@
-
 # create empty input
 %.unknowns.fa :
 	@echo ""
@@ -916,6 +897,25 @@ TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 %.unknowns.fa : %.unknowns.bed
 	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
+
+# get test data
+testclip.train.positives.fa : $(DATADIR)/testclip.train.positives.fa
+	cp -f $< $@
+
+testclip.train.negatives.fa : $(DATADIR)/testclip.train.negatives.fa
+	cp -f $< $@
+
+testclip.test.positives.fa : $(DATADIR)/testclip.test.positives.fa
+	cp -f $< $@
+
+testclip.test.negatives.fa : $(DATADIR)/testclip.test.negatives.fa
+	cp -f $< $@
+
+test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
+	cp -f $< $@
+
+test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
+	cp -f $< $@
 
 ## insert additional rules into this file
 ################################################################################
