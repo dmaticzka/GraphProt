@@ -1,4 +1,9 @@
 ## General parameters ##########################################################
+
+# use sge arrayjobs to create gspan and features
+# implemented for CONTEXTSHREP
+SGEARRAY=YES
+
 # prefix of train/test data
 # RNAcompete proteins
 #PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
@@ -24,7 +29,7 @@ SVM=SGD
 # SHREP: plain shrep graphs
 # CONTEXTSHREP: shrep graphs annotated with structural context
 # MEGA: pure sequence, shrep graphs and accessibility graphs
-GRAPH_TYPE=ONLYSEQ
+GRAPH_TYPE=CONTEXTSHREP
 
 # folding parameters:
 # The primary window sizes are used for both shreps and accessibilities.
@@ -41,7 +46,7 @@ SHAPES_SHIFT=25
 SHREPS_MAX=3
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+DO_LINESEARCH=NO
 # enable/disable sgd-internal optimization
 DO_SGDOPT=YES
 # try this many variations of each parameter

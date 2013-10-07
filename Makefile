@@ -239,6 +239,30 @@ ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
 LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 
+ifeq ($(SGEARRAY),YES)
+%.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
+%.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
+%.gspan.gz : %.fa | %.param
+	-rm -rf $@.GSPAN_DIR
+	$(FASTA2GSPAN) -fasta $< \
+	-sge -sge-script=$(PWD)/bin/generic_submit_to_cluster.sh \
+	-o $@.GSPAN_DIR \
+	--seq-graph-t --seq-graph-alph -abstr \
+	$(STACK) $(CUE) $(VIEWPOINT) \
+	-t $(ABSTRACTION) \
+	-M $(SHREPS_MAX) \
+	-wins '$(SHAPES_WINS)' \
+	-shift '$(SHAPES_SHIFT)'
+	NSEQS=`ls -l $@.GSPAN_DIR/*.gspan.bz2 | wc -l`; \
+	(for i in `seq 1 $$NSEQS`; \
+	do bzcat $@.GSPAN_DIR/$$i.gspan.bz2;\
+	done ) | gzip > $@
+	-rm -rf $@.GSPAN_DIR
+endif
+
+ifeq ($(SGEARRAY),NO)
 %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
 %.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
 %.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
@@ -252,6 +276,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
 	-wins '$(SHAPES_WINS)' \
 	-shift '$(SHAPES_SHIFT)' | \
 	gzip > $@; exit $${PIPESTATUS[0]}
+endif
 
 # for motif creation with contextshreps we evaluate each shrep as a single graph
 %.motif.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
