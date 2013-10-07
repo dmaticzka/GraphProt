@@ -506,10 +506,10 @@ ifeq ($(SVM),SGD)
 %.model : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.model : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.model : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.model : %.gspan.gz %.class | %.param
+%.model : %.feature.gz %.gspan.gz %.class | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
 	$(SVMSGDNSPDK) -a TRAIN \
-	-i $*.gspan.gz -t $*.class -m $@ \
+	-i $< -f SPARSE_VECTOR -t $*.class -m $@ \
 	-r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED) -b $(BITSIZE) \
 	-e $(EPOCHS) -l $(LAMBDA)
 
@@ -520,10 +520,10 @@ ifeq ($(SVM),SGD)
 %.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.predictions_sgd : %.train.model %.test.gspan.gz %.test.class | %.param
+%.test.predictions_sgd : %.train.model %.test.feature.gz %.test.gspan.gz %.test.class | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
 	$(SVMSGDNSPDK) -a TEST \
-	-m $< -i $*.test.gspan.gz -t $*.test.class \
+	-m $< -i $*.test.feature.gz -f SPARSE_VECTOR -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA)
 	mv $*.test.gspan.gz.prediction $*.test.predictions_sgd
@@ -543,10 +543,10 @@ ifeq ($(SVM),SGD)
 %.cv.predictions_class : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.cv.predictions_class : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.cv.predictions_class : %.gspan.gz %.class | %.param
+%.cv.predictions_class : %.feature.gz %.gspan.gz %.class | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.class && \
 	$(SVMSGDNSPDK) -a CROSS_VALIDATION -c $(CV_FOLD) \
-	-m $*.model -i $< -t $*.class \
+	-m $*.model -i $< -f SPARSE_VECTOR -t $*.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	cat $<.cv_predictions | awk '{print $$2==1?1:-1, $$4}' > $@
@@ -560,10 +560,10 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
+%.test.vertex_margins : %.test.feature.gz %.test.gspan.gz %.test.class %.train.model | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
 	$(SVMSGDNSPDK) -a TEST_PART \
-	-m $*.train.model -i $*.test.gspan.gz -t $*.test.class \
+	-m $*.train.model -i $< -f SPARSE_VECTOR -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	mv $<.prediction_part $@
@@ -576,10 +576,10 @@ ifeq ($(SVM),SGD)
 %.train.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.train.vertex_margins : %.train.gspan.gz %.train.class %.train.model | %.param
+%.train.vertex_margins : %.train.feature.gz %.train.gspan.gz %.train.class %.train.model | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
 	$(SVMSGDNSPDK) -a TEST_PART \
-	-m $*.train.model -i $*.train.gspan.gz -t $*.train.class \
+	-m $*.train.model -i $< -f SPARSE_VECTOR -t $*.train.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	mv $<.prediction_part $@
@@ -620,13 +620,13 @@ ifeq ($(SVM),SGD)
 %.lc.perf : DISTANCE=$(shell grep '^D ' $*.train.param | cut -f 2 -d' ')
 %.lc.perf : BITSIZE=$(shell grep '^b ' $*.train.param | cut -f 2 -d' ')
 %.lc.perf : DIRECTED=$(shell grep '^DIRECTED ' $*.train.param | cut -f 2 -d' ')
-%.lc.perf : %.train.class %.train.gspan.gz
+%.lc.perf : %.train.feature.gz %.train.class %.train.gspan.gz
 	-rm -f $*.train.dat_lc;
 	LC=10; \
 	NUM_REP=10; \
 	lcn=$$((LC+1)); \
 	for r in $$(seq 1 $$NUM_REP); \
-	do $(SVMSGDNSPDK) -a LEARNING_CURVE -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -i $*.train.gspan.gz -t $*.train.class -p $$lcn -R $$r > /dev/null; \
+	do $(SVMSGDNSPDK) -a LEARNING_CURVE -g $(DIRECTED) -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -e $(EPOCHS) -l $(LAMBDA) -i $< -f SPARSE_VECTOR -t $*.train.class -p $$lcn -R $$r > /dev/null; \
 	for i in $$(seq 1 $$LC); \
 	do \
 	dim=$$(cat  $*.train.gspan.gz.lc_predictions_train_fold_$$i | wc -l); \
