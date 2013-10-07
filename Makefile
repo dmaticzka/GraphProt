@@ -156,15 +156,34 @@ ACCMOTIFS:=$(BASENAMES:%=%.test.struct_annot_top_wins.truncated.pup.logo.png)
 
 ## general feature and affinity creation (overridden where apropriate)
 ################################################################################
+ifeq ($(SGEARRAY),NO)
 %.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
 %.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan.gz %.affy | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy
-	$(SVMSGDNSPDK) -a FEATURE -i $< -r $(RADIUS) -d $(DISTANCE) -g $(DIRECTED)
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy && \
+	OMP_NUM_THREADS=1 $(SVMSGDNSPDK) -a FEATURE -i $< -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED)
 	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
 	-rm -f $<.feature
+endif
+
+ifeq ($(SGEARRAY),YES)
+%.feature : RADIUS=$(shell grep '^R ' $*.param | cut -f 2 -d' ')
+%.feature : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
+%.feature : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
+%.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
+%.feature : %.gspan.gz %.affy | %.param
+	-rm -rf $@.FEATURE_DIR
+	mkdir $@.FEATURE_DIR
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy && \
+	OMP_NUM_THREADS=1 $(SVMSGDNSPDK) -a FEATURE -i $< -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED)
+	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -f $<.feature
+endif
+
+%.feature.gz : %.feature
+	gzip $<
 
 # extract affinities from fasta
 # expected to reside in last field of fasta header
