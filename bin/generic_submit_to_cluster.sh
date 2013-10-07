@@ -18,11 +18,17 @@ working_dir=$1
 perlscript=$2
 params=$3
 
+echo working_dir: $working_dir
+echo perlscript: $perlscript
+echo params: $params
+
 if [ -z "$SGE_TASK_ID" ]; then
 	echo "No SGE environment found! Set SGE_TASK_ID to 0!"
 	let SGE_TASK_ID=0
 fi
 
+echo call: "/usr/local/perl/bin/perl $perlscript $params --jobid $SGE_TASK_ID"
+
 cd $working_dir
-/usr/local/perl/bin/perl $perlscript $params
+/usr/local/perl/bin/perl $perlscript $params --jobid $SGE_TASK_ID
 

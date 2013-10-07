@@ -266,7 +266,7 @@ ifeq ($(SGEARRAY),YES)
 %.gspan.gz : %.fa | %.param
 	-rm -rf $@.GSPAN_DIR
 	$(FASTA2GSPAN) -fasta $< \
-	-sge -sge-script=$(PWD)/bin/generic_submit_to_cluster.sh \
+	-sge -sge-script $(PWD)/bin/generic_submit_to_cluster.sh \
 	-o $@.GSPAN_DIR \
 	--seq-graph-t --seq-graph-alph -abstr \
 	$(STACK) $(CUE) $(VIEWPOINT) \
