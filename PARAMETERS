@@ -3,6 +3,9 @@
 # use sge arrayjobs to create gspan and features
 # implemented for CONTEXTSHREP
 SGEARRAY=YES
+# old cluster: biui.informatik.uni-freiburg.de
+# new cluster: ui.bi.uni-freiburg.de
+SGE_SUBMIT_HOST=biui.informatik.uni-freiburg.de
 
 # prefix of train/test data
 # RNAcompete proteins

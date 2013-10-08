@@ -184,7 +184,7 @@ ifeq ($(SGEARRAY),YES)
 	$(SPLIT_GSPAN) -gspan_file $*.gspan.gz -feature_dir $@.FEATURE_DIR -group_size=100;
 	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
 	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
-	ssh `whoami`@biui.informatik.uni-freiburg.de \
+	ssh `whoami`@$(SGE_SUBMIT_HOST) \
 	'export SGE_ROOT=/opt/sge-6.0/; cd $(PWD); /opt/sge-6.0/bin/lx24-amd64/qsub -N feature_$@ -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
 	( for i in `seq 1 \`cat $@.NSEQS\``; \
 	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; \
@@ -277,7 +277,9 @@ ifeq ($(SGEARRAY),YES)
 %.gspan.gz : %.fa | %.param
 	-rm -rf $@.GSPAN_DIR
 	$(FASTA2GSPAN) -fasta $< \
-	-sge -group 100 -sge-script $(GENERICSUBMITTOCLUSTER) \
+	-sge -group 100 \
+	-sge-submit-host=$(SGE_SUBMIT_HOST) \
+	-sge-script $(GENERICSUBMITTOCLUSTER) \
 	-o $@.GSPAN_DIR \
 	--seq-graph-t --seq-graph-alph -abstr \
 	$(STACK) $(CUE) $(VIEWPOINT) \
