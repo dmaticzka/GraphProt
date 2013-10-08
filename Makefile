@@ -178,19 +178,19 @@ ifeq ($(SGEARRAY),YES)
 %.feature : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
 %.feature : %.gspan.gz %.affy | %.param
 	-rm -rf $@.FEATURE_DIR
-	mkdir $@.FEATURE_DIR
-	mkdir $@.FEATURE_DIR/SGEOUT
+	mkdir -p $@.FEATURE_DIR
+	mkdir -p $@.FEATURE_DIR/SGEOUT
 	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy;
-	$(SPLIT_GSPAN) -gspan_file $*.gspan.gz -feature_dir $@.FEATURE_DIR;
-
-# 	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
-# 	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
-# 	ssh `whoami`@biui.informatik.uni-freiburg.de 'export SGE_ROOT=/opt/sge-6.0/; cd $(PWD); /opt/sge-6.0/bin/lx24-amd64/qsub -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
-# 	(for i in `seq 1 $$NSEQS`; \
-# 	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; cat newline; \
-# 	done ) | gzip > $<.feature.gz
-# 	zcat $<.feature.gz | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-# 	-rm -f $<.feature.gz
+	$(SPLIT_GSPAN) -gspan_file $*.gspan.gz -feature_dir $@.FEATURE_DIR -group_size=100;
+	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
+	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
+	ssh `whoami`@biui.informatik.uni-freiburg.de \
+	'export SGE_ROOT=/opt/sge-6.0/; cd $(PWD); /opt/sge-6.0/bin/lx24-amd64/qsub -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
+	( for i in `seq 1 \`cat $@.NSEQS\``; \
+	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; \
+	done ) | \
+	grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+	-rm -rf $@.NSEQS $@.FEATURE_DIR
 endif
 
 %.feature.gz : %.feature

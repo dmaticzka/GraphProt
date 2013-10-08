@@ -1,7 +1,9 @@
 #!/bin/bash
 #$ -cwd
-#$ -l h_vmem=1G
+#$ -l h_vmem=2G
 #$ -sync yes
+
+# -m ea
 
 ######################################################################
 ## job script "generic_submit_to_cluster.sh"
