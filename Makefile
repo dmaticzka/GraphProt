@@ -62,6 +62,9 @@ SUBSET_NT_BY_THRESHOLD:=$(BINDIR)/subsetNTsbythreshold.pl
 SUBSET_TOP_WINS:=$(BINDIR)/subTopWins.pl
 MEDIAN_AWK:=$(BINDIR)/median.awk
 GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
+SPLIT_GSPAN:=$(BINDIR)/split_gspan.pl
+GENERICSUBMITTOCLUSTER:=$(PWD)/bin/generic_submit_to_cluster.sh
+MOREGENERICSGESUBMITSCRIPT:=$(PWD)/bin/more_generic_submit_to_cluster.sh
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -176,10 +179,18 @@ ifeq ($(SGEARRAY),YES)
 %.feature : %.gspan.gz %.affy | %.param
 	-rm -rf $@.FEATURE_DIR
 	mkdir $@.FEATURE_DIR
-	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy && \
-	OMP_NUM_THREADS=1 $(SVMSGDNSPDK) -a FEATURE -i $< -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED)
-	cat $<.feature | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
-	-rm -f $<.feature
+	mkdir $@.FEATURE_DIR/SGEOUT
+	$(CHECK_SYNC_GSPAN_CLASS) $*.gspan.gz $*.affy;
+	$(SPLIT_GSPAN) -gspan_file $*.gspan.gz -feature_dir $@.FEATURE_DIR;
+
+# 	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
+# 	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
+# 	ssh `whoami`@biui.informatik.uni-freiburg.de 'export SGE_ROOT=/opt/sge-6.0/; cd $(PWD); /opt/sge-6.0/bin/lx24-amd64/qsub -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
+# 	(for i in `seq 1 $$NSEQS`; \
+# 	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; cat newline; \
+# 	done ) | gzip > $<.feature.gz
+# 	zcat $<.feature.gz | grep -v \"^\$\" | paste -d' ' $*.affy - > $@
+# 	-rm -f $<.feature.gz
 endif
 
 %.feature.gz : %.feature
@@ -266,7 +277,7 @@ ifeq ($(SGEARRAY),YES)
 %.gspan.gz : %.fa | %.param
 	-rm -rf $@.GSPAN_DIR
 	$(FASTA2GSPAN) -fasta $< \
-	-sge -sge-script $(PWD)/bin/generic_submit_to_cluster.sh \
+	-sge -sge-script $(GENERICSUBMITTOCLUSTER) \
 	-o $@.GSPAN_DIR \
 	--seq-graph-t --seq-graph-alph -abstr \
 	$(STACK) $(CUE) $(VIEWPOINT) \
