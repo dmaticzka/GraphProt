@@ -185,7 +185,7 @@ ifeq ($(SGEARRAY),YES)
 	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
 	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
 	ssh `whoami`@$(SGE_SUBMIT_HOST) \
-	'export SGE_ROOT=/opt/sge-6.0/; cd $(PWD); /opt/sge-6.0/bin/lx24-amd64/qsub -N feature_$@ -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
+	'$(SGE_EXPPORT); cd $(PWD); $(SGE_BIN_PATH)/qsub -N feature_$@ -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
 	( for i in `seq 1 \`cat $@.NSEQS\``; \
 	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; \
 	done ) | \
