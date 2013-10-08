@@ -278,6 +278,7 @@ ifeq ($(SGEARRAY),YES)
 	-rm -rf $@.GSPAN_DIR
 	$(FASTA2GSPAN) -fasta $< \
 	-sge -group 100 \
+	-sge-submit-user=maticzkd \
 	-sge-submit-host=$(SGE_SUBMIT_HOST) \
 	-sge-script $(GENERICSUBMITTOCLUSTER) \
 	-o $@.GSPAN_DIR \
