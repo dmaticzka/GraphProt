@@ -277,7 +277,7 @@ ifeq ($(SGEARRAY),YES)
 %.gspan.gz : %.fa | %.param
 	-rm -rf $@.GSPAN_DIR
 	$(FASTA2GSPAN) -fasta $< \
-	-sge -sge-script $(GENERICSUBMITTOCLUSTER) \
+	-sge -group 100 -sge-script $(GENERICSUBMITTOCLUSTER) \
 	-o $@.GSPAN_DIR \
 	--seq-graph-t --seq-graph-alph -abstr \
 	$(STACK) $(CUE) $(VIEWPOINT) \
@@ -287,7 +287,7 @@ ifeq ($(SGEARRAY),YES)
 	-shift '$(SHAPES_SHIFT)'
 	NSEQS=`ls -l $@.GSPAN_DIR/*.gspan.bz2 | wc -l`; \
 	(for i in `seq 1 $$NSEQS`; \
-	do bzcat $@.GSPAN_DIR/$$i.gspan.bz2;\
+	do bzcat $@.GSPAN_DIR/$$i.group.gspan.bz2;\
 	done ) | gzip > $@
 	-rm -rf $@.GSPAN_DIR
 endif
