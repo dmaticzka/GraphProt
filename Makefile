@@ -540,7 +540,7 @@ ifeq ($(SVM),SGD)
 	-m $< -i $*.test.feature.gz -f SPARSE_VECTOR -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA)
-	mv $*.test.gspan.gz.prediction $*.test.predictions_sgd
+	mv $*.test.feature.gz.prediction $*.test.predictions_sgd
 
 # affinities and predictions default format
 %.predictions_affy : %.predictions_sgd %.affy
