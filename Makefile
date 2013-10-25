@@ -796,6 +796,7 @@ else
 endif
 endif
 
+ifeq ($(LS_DO_INNER_CV),YES)
 # subset fastas prior to line search
 %.ls.fa : %.train.fa
 	cat $< | \
@@ -804,6 +805,7 @@ endif
 	$(PERL) -ane \
 	'$$seq = pop @F; $$head = join(" ", @F); print $$head, "\n", $$seq, "\n";' > \
 	$@
+endif
 
 %.ls_sgdopt.fa : %.ls.fa
 	ln -s $< $@
