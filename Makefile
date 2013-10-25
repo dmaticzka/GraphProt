@@ -763,6 +763,7 @@ ifeq ($(DO_SGDOPT),YES)
 	-mf Makefile \
 	-of $@ \
 	-bindir $(PWD) \
+	-tmp $(PWD) \
 	-sgdopt 2> >(tee $@.log >&2)
 
 # call sgdsvmnspdk optimization and write file containing optimized parameters
@@ -792,7 +793,13 @@ ifeq ($(DO_SGDOPT),YES)
 else
 # do parameter optimization by line search
 %.param : %.ls.fa $(LSPAR)
-	$(LINESEARCH) -fa $< -param $(LSPAR) -mf Makefile -of $@ -bindir $(PWD) 2> >(tee $@.log >&2)
+	$(LINESEARCH) \
+	-fa $< \
+	-param $(LSPAR) \
+	-mf Makefile \
+	-of $@ \
+	-tmp $(PWD) \
+	-bindir $(PWD) 2> >(tee $@.log >&2)
 endif
 endif
 

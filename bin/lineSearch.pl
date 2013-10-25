@@ -32,6 +32,7 @@ Options:
                 * current parameters are written to intermediate parameter files
                 * intermediate parameter files contain default and extreme values
                   for parameters optimized directly by sgd: R, D, EPOCHS, LAMBDA
+    -tmp				prefix for temporary directory (default: /var/tmp/)
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -75,6 +76,7 @@ my $of;
 my $sgdopt;
 my $help;
 my $man;
+my $tmpopt;
 my $debug;
 my $result = GetOptions(
   "fa=s"     => \$fa,
@@ -83,6 +85,7 @@ my $result = GetOptions(
   "bindir=s" => \$bindir,
   "of=s"     => \$of,
   "sgdopt"   => \$sgdopt,
+  "tmp=s"		 => \$tmpopt,
   "help"     => \$help,
   "man"      => \$man,
   "debug"    => \$debug
@@ -98,6 +101,8 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ###############################################################################
 # main
 ###############################################################################
+
+$tmp_prefix = $tmpopt if (defined $tmpopt);
 
 # global variables
 my $CURRDIR = cwd();
