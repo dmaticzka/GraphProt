@@ -78,7 +78,7 @@ MARGINS_WINDOW=12
 MARGINS_MEASURE=mean
 
 # motif elicitation: select the best TOP_WINDOWS for further processing
-TOP_WINDOWS=100
+TOP_WINDOWS=1000
 
 # amount of cache in MB used by libSVM
 SVR_CACHE:=10000
