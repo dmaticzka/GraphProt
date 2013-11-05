@@ -43,6 +43,7 @@ CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 BASH:=/bin/bash
 BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
+GNUPLOT:=/home/maticzkd/local/bin/gnuplot
 
 
 ## project-internal tools
@@ -865,7 +866,7 @@ endif
 
 %.prplot.svg : %.prplot
 	cat $< | \
-	gnuplot -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+	$(GNUPLOT) -e "set ylabel 'precision'; set xlabel 'recall'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
 
 # plot ROC curve
 %.rocplot : %.predictions_class
@@ -876,7 +877,7 @@ endif
 
 %.rocplot.svg : %.rocplot
 	cat $< | \
-	gnuplot -e "set ylabel 'true positive rate'; set xlabel 'false positive rate'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+	$(GNUPLOT) -e "set ylabel 'true positive rate'; set xlabel 'false positive rate'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
 
 # plot accuracy
 %.accplot : %.predictions_class
@@ -887,7 +888,7 @@ endif
 
 %.accplot.svg : %.accplot
 	cat $< | \
-	gnuplot -e "set ylabel 'accuracy'; set xlabel 'threshold'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
+	$(GNUPLOT) -e "set ylabel 'accuracy'; set xlabel 'threshold'; set terminal svg; set style line 1 linecolor rgb 'black'; plot [0:1] [0:1] '-' using 1:2 with lines;" > $@
 
 
 # compute correlation: correlation \t pvalue
