@@ -325,7 +325,7 @@ endif
 	-t $(ABSTRACTION) \
 	-M $(SHREPS_MAX) \
 	-wins '$(SHAPES_WINS)' \
-	-shift '$(SHAPES_SHIFT)' \
+	-shift '$(SHAPES_SHIFT)' | \
 	awk -f $(GSPAN_SPLIT_GRAPHS) | \
 	gzip > $@; exit $${PIPESTATUS[0]}
 
