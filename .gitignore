@@ -41,3 +41,7 @@ output.cv_predictions.*
 *predictions
 *truncated
 *.prediction_part
+*.svg
+*.accplot
+*.rocplot
+*.prplot
