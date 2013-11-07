@@ -575,10 +575,10 @@ ifeq ($(SVM),SGD)
 %.test.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.vertex_margins : %.test.feature.gz %.test.gspan.gz %.test.class %.train.model | %.param
+%.test.vertex_margins : %.test.gspan.gz %.test.class %.train.model | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
 	$(SVMSGDNSPDK) -a TEST_PART \
-	-m $*.train.model -i $< -f SPARSE_VECTOR -t $*.test.class \
+	-m $*.train.model -i $< -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	mv $<.prediction_part $@
@@ -591,10 +591,10 @@ ifeq ($(SVM),SGD)
 %.train.vertex_margins : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.train.vertex_margins : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.train.vertex_margins : %.train.feature.gz %.train.gspan.gz %.train.class %.train.model | %.param
+%.train.vertex_margins : %.train.gspan.gz %.train.class %.train.model | %.param
 	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
 	$(SVMSGDNSPDK) -a TEST_PART \
-	-m $*.train.model -i $< -f SPARSE_VECTOR -t $*.train.class \
+	-m $*.train.model -i $< -t $*.train.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	mv $<.prediction_part $@
