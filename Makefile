@@ -358,8 +358,12 @@ endif
 # compute nucleotide-wise margins from vertice margins
 %.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict
 	cat $< | \
-	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict | \
-	awk '$$2!=0' > $@
+	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict > $@
+
+# removed this because it won't work with sequence only
+# I think I added this for the viewpoint stuff
+# check using testclip
+#	awk '$$2!=0' > $@
 
 %.sequence.nt_subset : %.sequence %.motif.nt_margins
 	$(PERL) $(SUBSET_NT_BY_THRESHOLD) \
@@ -607,7 +611,13 @@ ifeq ($(SVM),SGD)
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
-	cat $< | $(VERTEX2NTMARGINS) -dict $*.vertex_dict | awk '$$2!=0' > $@
+	cat $< | \
+	$(VERTEX2NTMARGINS) -dict $*.vertex_dict > $@
+
+# removed this because it won't work with sequence only
+# I think I added this for the viewpoint stuff
+# check using testclip
+#	awk '$$2!=0' > $@
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum
@@ -619,8 +629,11 @@ ifeq ($(SVM),SGD)
 %.nt_margins.summarized.bedGraph : %.nt_margins.summarized %.bed
 	@echo ""
 	@echo "converting margins to bedGraph"
-	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) < $< | \
-	$(BEDTOOLS) sort > $@
+	cat $< | \
+	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) | \
+	$(BEDTOOLS) sort > $@; \
+	exit $${PIPESTATUS[0]}
+
 
 # compute learningcurve
 # svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format 

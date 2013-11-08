@@ -11,11 +11,11 @@ use File::Basename;
 
 =head1 NAME
 
-vertex2ntmargins.awk -dict train.dict < NTMARGINS
+vertex2ntmargins.pl -dict train.dict < NTMARGINS
 
 =head1 SYNOPSIS
 
-vertex2ntmargins.awk -dict train.dict < NTMARGINS
+vertex2ntmargins.pl -dict train.dict < NTMARGINS
 
 Options:
 

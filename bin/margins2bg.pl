@@ -126,7 +126,7 @@ sub cmp_bedgraph {
       @aggregates ) = split "\t", $marginline;
     
     # save value of chosen aggregate measure
-    $margins[ $sequence_position - 1 ] = $aggregates[$aggregate_choice];
+    $margins[ $sequence_position ] = $aggregates[$aggregate_choice];
   }
 
   # reverse order of margins if on negative strand
@@ -135,19 +135,23 @@ sub cmp_bedgraph {
   }
 
   # print bedGraph lines
-  if ( length(@margins) != length(@genome_coords) ) {
+  if ( scalar @margins != scalar @genome_coords ) {
     say STDERR "warning: skipping entry because somehow we ended up with a " .
       "different number of coordinates and margins: " .
-      scalar @genome_coords . " != " . scalar @margins;
+      'genome_coords: ' . scalar @genome_coords . " != " . 'margins: ' . scalar @margins;
+		$debug and say STDERR '@genome_coords: ' . join(',', @genome_coords);
+		$debug and say STDERR '@margins: ' . join(',', @margins);
     return;
   }
-  $debug and say STDERR "iterating over " . scalar @genome_coords . " coordinates:";
-  $debug and say STDERR join( "\t", @genome_coords );
+  $debug and say STDERR "iterating over " . scalar @genome_coords . " coordinates and " . scalar @margins . " margins";
+  $debug and say STDERR '@genome_coords: ', join( "\t", @genome_coords );
   $debug and say STDERR "first coordinate: " . $genome_coords[0];
   $debug and say STDERR "last coordinate: " . $genome_coords[-1];
   foreach my $coord (@genome_coords) {
-    $debug and say "printing coordinate $coord";
+    $debug and say STDERR "printing coordinate $coord";
+#     say STDERR 'remaining margins: ', join(',', @margins);
     my $margin = shift @margins;
+    die ('error, $margin not defined') if (not defined $margin);
     my $bedGraph_output = join( "\t", $chrom, $coord, $coord + 1, $margin );
     say $bedGraph_output;
   }
@@ -168,7 +172,10 @@ my $nbed = scalar @bed;    # number of bed entries
 close BED;
 
 # parse margins; data for each sequence is forwarded to the conversion function
-my $current_seqid = 1;      # fist sequence id is expected to be 1
+my $current_seqid = 0;      # fist sequence id is expected to be 0
+# remark: this is the case with pure sequence graphs
+# changed this multiple times, maybe this is different with shreps?
+# no time to test this right now
 my @linestack;
 while ( my $line = <> ) {
   chomp $line;
@@ -196,6 +203,6 @@ my $bedline = shift @bed;
 cmp_bedgraph( \@linestack, $bedline );
 
 # final sanity check
-if ( $nbed != $current_seqid ) {
+if ( $nbed != $current_seqid + 1 ) {
   die "error: read $nbed bed entries, but got " . $current_seqid . " sequences";
 }
