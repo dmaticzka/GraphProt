@@ -66,6 +66,7 @@ GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
 SPLIT_GSPAN:=$(BINDIR)/split_gspan.pl
 GENERICSUBMITTOCLUSTER:=$(PWD)/bin/generic_submit_to_cluster.sh
 MOREGENERICSGESUBMITSCRIPT:=$(PWD)/bin/more_generic_submit_to_cluster.sh
+GSPAN2VDICT:=$(PWD)/bin/gspan2vertex_dict.awk
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -609,7 +610,7 @@ ifeq ($(SVM),SGD)
 # dict file format: seqid verticeid nt pos
 %.vertex_dict : %.gspan.gz
 	zcat $< | \
-	awk 'BEGIN{seqid=-1}/^t/{seqid++; vertex_id=0; nt_pos=0}/^v/&&!/\^/&&!/#/{print seqid, vertex_id++, $$3, nt_pos++}/^V/&&!/\^/&&!/#/{nt_pos++}' > $@
+	awk -f $(GSPAN2VDICT) > $@
 
 # compute nucleotide-wise margins from vertice margins
 %.nt_margins : %.vertex_margins %.vertex_dict
