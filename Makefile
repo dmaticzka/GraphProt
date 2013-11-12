@@ -197,7 +197,7 @@ ifeq ($(SGEARRAY),YES)
 endif
 
 %.feature.gz : %.feature
-	gzip $<
+	gzip -f $<
 
 # extract affinities from fasta
 # expected to reside in last field of fasta header
