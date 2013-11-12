@@ -31,6 +31,7 @@ Options:
     -aggregate  which aggregate measure to use. choose one of
                 (min, max, mean, median, sum)
                 (default: mean)
+    -strand     if set plus or minus; only calculate for this strand
     -debug      enable debug output
     -help       brief help message
     -man        full documentation
@@ -44,6 +45,7 @@ Options:
 ###############################################################################
 my $bed;
 my $aggregate;
+my $i_strand;
 my $help;
 my $man;
 my $debug;
@@ -51,7 +53,8 @@ my $result = GetOptions( "help" => \$help,
   "man"   => \$man,
   "debug" => \$debug,
   "bed=s" => \$bed,
-  "aggregate=s" => \$aggregate );
+  "aggregate=s" => \$aggregate,
+  "strand=s" => \$i_strand);
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result) or pod2usage(2);
@@ -64,6 +67,10 @@ my %aggregates = ("min" => 0, "max" => 1, "mean" => 2, "median" => 3, "sum" => 4
 my $aggregate_choice = $aggregates{$aggregate};
 if (not defined $aggregate_choice) {
 	die("error: don't know about aggregate '$aggregate'. choose one of: min, max, mean, median, sum");
+}
+
+if (defined $i_strand) {
+	$i_strand eq 'plus' or $i_strand eq 'minus' or pod2usage("if strand is set, must be plus or minus, not $i_strand");
 }
 
 ###############################################################################
@@ -84,6 +91,12 @@ sub cmp_bedgraph {
   }
   my ( $chrom, $chromStart, $chromEnd, undef, undef, $strand, undef, undef,
     undef, $blockCount, $blockSizes, $blockStarts ) = @bed;
+	
+	# skip output if not on the desired strand
+  if (defined $i_strand) {
+		return if ($i_strand eq 'minus' and $strand ne '-');
+		return if ($i_strand eq 'plus'  and $strand ne '+');
+  }
 
   my @blockSizes;
   my @blockStarts;
@@ -133,7 +146,7 @@ sub cmp_bedgraph {
   if ( $strand eq '-' ) {
     @margins = reverse @margins;
   }
-
+  
   # print bedGraph lines
   if ( scalar @margins != scalar @genome_coords ) {
     say STDERR "warning: skipping entry because somehow we ended up with a " .

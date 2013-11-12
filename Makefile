@@ -144,7 +144,9 @@ PERF_PLOTS:=\
 # nucleotide-wise margins
 TESTPART_FILES:=$(patsubst %,%.test.nt_margins.summarized,$(BASENAMES))
 # nucleotide-wise margins as bigWig
-TESTPART_BIGWIG:=$(patsubst %,%.test.nt_margins.summarized.bw,$(BASENAMES))
+TESTPART_BIGWIG:=\
+	$(patsubst %,%.test.nt_margins.summarized.plus.bw,$(BASENAMES)) \
+	$(patsubst %,%.test.nt_margins.summarized.minus.bw,$(BASENAMES))
 # files for learningcurve
 LC_FILES:=$(patsubst %,%.lc.png,$(BASENAMES))
 
@@ -626,14 +628,27 @@ ifeq ($(SVM),SGD)
 	@echo "summarizing nucleotide-wise margins:"
 	$(SUMMARIZE_MARGINS) -W $(MARGINS_WINDOW) < $< > $@
 
-%.nt_margins.summarized.bedGraph : %.nt_margins.summarized %.bed
+%.nt_margins.summarized.plus.bedGraph : %.nt_margins.summarized %.bed
 	@echo ""
 	@echo "converting margins to bedGraph"
 	cat $< | \
-	$(MARGINS2BG) -bed $*.bed --aggregate $(MARGINS_MEASURE) | \
+	$(MARGINS2BG) \
+	-strand plus \
+	-bed $*.bed \
+	--aggregate $(MARGINS_MEASURE) | \
 	$(BEDTOOLS) sort > $@; \
 	exit $${PIPESTATUS[0]}
 
+%.nt_margins.summarized.minus.bedGraph : %.nt_margins.summarized %.bed
+	@echo ""
+	@echo "converting margins to bedGraph"
+	cat $< | \
+	$(MARGINS2BG) \
+	-strand minus \
+	-bed $*.bed \
+	--aggregate $(MARGINS_MEASURE) | \
+	$(BEDTOOLS) sort > $@; \
+	exit $${PIPESTATUS[0]}
 
 # compute learningcurve
 # svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format 
