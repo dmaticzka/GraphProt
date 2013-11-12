@@ -164,7 +164,9 @@ sub cmp_bedgraph {
     $debug and say STDERR "printing coordinate $coord";
 #     say STDERR 'remaining margins: ', join(',', @margins);
     my $margin = shift @margins;
-    die ('error, $margin not defined') if (not defined $margin);
+    if (not defined $margin) {
+    	die ("Error, no margin left for coordinate $coord of bed record '$bedline'. Check if the number of nucleotides in the bed record matches the number of viewpoint nucleotides of the corresponding sequence.");
+    }
     my $bedGraph_output = join( "\t", $chrom, $coord, $coord + 1, $margin );
     say $bedGraph_output;
   }
