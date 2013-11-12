@@ -62,16 +62,17 @@ my @input = <INPUT>;
 # read locations, print substrings in order as defined by the locations file
 open LOC, '<', $location;
 while (my $loc = <LOC>) {
-	my ($seq_id, $pos, $margin) = split("\t", $loc);
+	my ($seq_id, $centeredpos, $margin) = split("\t", $loc);
 #	say STDERR $seq_id;
 	# get sequence
 	my $seq = $input[$seq_id];
 	chomp $seq;
 	# extract subsequence
-	# sequence position read from dictionary is 1-based
+	# sequence position read from dictionary is 0-based
 #	say STDERR $seq;
 #	say STDERR $pos;
 #	say STDERR length($seq) - ($pos-2);
+	my $pos = max(0, $centeredpos - floor($win_size/2));
 	my $subseq = substr($seq, $pos, min($win_size, length($seq) - $pos));
 	say $subseq;
 }
