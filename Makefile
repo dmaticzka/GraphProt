@@ -210,20 +210,6 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 endif
 
 ################################################################################
-ifeq ($(GRAPH_TYPE),STRUCTACC)
-# line search parameters
-LSPAR:=$(DATADIR)/ls.$(METHOD_ID).structacc.parameters
-
-%.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.gspan.gz : %.fa | %.param
-	$(CREATE_EXTENDED_ACC_GRAPH) -fa $< \
-	$(VIEWPOINT) \
-	-W $(W_PRIMARY) \
-	-L $(L_PRIMARY) | \
-	gzip > $@; exit $${PIPESTATUS[0]}
-endif
-
-################################################################################
 ifeq ($(GRAPH_TYPE),SHREP)
 # line search parameters
 LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
@@ -414,44 +400,6 @@ structmotif: $(STRUCTMOTIFS)
 accmotif: $(ACCMOTIFS)
 endif
 
-################################################################################
-ifeq ($(GRAPH_TYPE),MEGA)
-# line search parameters
-LSPAR:=$(DATADIR)/ls.$(METHOD_ID).mega.parameters
-
-# accessibility graphs
-%.acc.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.acc.gspan.gz : %.fa
-	$(CREATE_EXTENDED_ACC_GRAPH) \
-	-fa $< \
-	$(VIEWPOINT) \
-	-W $(W_PRIMARY) \
-	-L $(L_PRIMARY) | gzip > $@; exit $${PIPESTATUS[0]}
-
-# shrep graphs
-%.shrep.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
-%.shrep.gspan.gz : STACK=$(subst nil,,$(shell grep '^STACK ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
-%.shrep.gspan.gz : %.fa | %.param
-	$(FASTA2GSPAN) -stdout \
-	-fasta $< \
-	--seq-graph-t --seq-graph-alph \
-	$(STACK) \
-	$(CUE) \
-	$(VIEWPOINT) \
-	-t $(ABSTRACTION) \
-	-M $(SHREPS_MAX) \
-	-wins '$(SHAPES_WINS)' \
-	-shift '$(SHAPES_SHIFT) | \
-	gzip > $@; exit $${PIPESTATUS[0]}
-
-# merge gspans
-%.gspan.gz : %.shrep.gspan %.acc.gspan
-	$(MERGE_GSPAN) -shrep $*.shrep.gspan -acc $*.acc.gspan | \
-	gzip > $@; exit $${PIPESTATUS[0]}
-endif
-
 
 ## receipes specific to SVM type
 ################################################################################
@@ -591,11 +539,6 @@ ifeq ($(SVM),SGD)
 %.nt_margins : %.vertex_margins %.vertex_dict
 	cat $< | \
 	$(VERTEX2NTMARGINS) -dict $*.vertex_dict > $@
-
-# removed this because it won't work with sequence only
-# I think I added this for the viewpoint stuff
-# check using testclip
-#	awk '$$2!=0' > $@
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum
@@ -838,20 +781,10 @@ endif
 	@echo "using empty set of unknowns!"
 	touch $@
 
-# %.negatives.fa :
-# 	@echo ""
-# 	@echo "using empty set of negatives!"
-# 	touch $@
-
 %.unknowns.bed :
 	@echo ""
 	@echo "using empty set of unknowns!"
 	touch $@
-
-# %.negatives.bed :
-# 	@echo ""
-# 	@echo "using empty set of negatives!"
-# 	touch $@
 
 # compute performance measures
 # remove unknowns, set negative class to 0 for perf
