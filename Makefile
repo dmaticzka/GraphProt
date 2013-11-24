@@ -44,6 +44,7 @@ MOREGENERICSGESUBMITSCRIPT:=$(BINDIR)/more_generic_submit_to_cluster.sh
 GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
 FASTAPL:=$(BINDIR)/fastapl
 FASTA2GSPAN:=$(PWD)/fasta2shrep_gspan.pl
+CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 
 
 ## set appropriate id (used to determine which parameter sets to use)
@@ -185,7 +186,7 @@ endif
 
 ## receipes specific to graph type
 ################################################################################
-ifeq ($(GRAPH_TYPE),ONLYSEQ)
+ifeq ($(GRAPH_TYPE),SEQUENCE)
 # line search parameters
 LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 
@@ -901,6 +902,19 @@ motif: seqmotif
 # calculate sequence motifs
 seqmotif: $(SEQMOTIFS) $(SEQMOTIFS_BIT)
 
+# copy all files for the GraphProt distribution
+dist:
+	-rm -rf $(DIST_DIR)
+	-mkdir $(DIST_DIR)
+	# copy base progs
+	cp -v fasta2shrep_gspan.pl Makefile $(DIST_DIR)
+	# copy bin
+	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
+	# copy data
+	cp -rv data $(DIST_DIR)
+	# copy distribution parameters
+	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
+
 # # delete all files except fastas
 distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
@@ -931,17 +945,14 @@ endif
 	"select chrom, size from $*.chromInfo" | grep -v size > $@
 
 # get sequence from bed using twoBitToFa
-TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 %.positives.fa : %.positives.bed
 	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
 
 # get sequence from bed using twoBitToFa
-TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 %.negatives.fa : %.negatives.bed
 	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
 
 # get sequence from bed using twoBitToFa
-TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 %.unknowns.fa : %.unknowns.bed
 	 $(TWOBITTOFA) -bed=$< $(GENOME) $@
 

@@ -1,39 +1,24 @@
 ## Binaries ####################################################################
 
 ## Other Binaries ##############################################################
-PERL:=/usr/local/perl/bin/perl
-RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
-SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
-SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
-SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
-# set parralel environment for omp: -v OMP_NUM_THREADS=24 -pe '*' 24
-SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_130606/EDeN
-BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
+PERL:=perl
+RBIN:=R --vanilla
+SVRTRAIN:=svm-train -s 3 -t 0 -m $(SVR_CACHE)
+SVRPREDICT:=svm-predict
+SHUF:=shuf
+SVMSGDNSPDK:=EDeN
+BEDGRAPH2BIGWIG:=bedGraphToBigWig
 BASH:=/bin/bash
-BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
-GNUPLOT:=/home/maticzkd/local/bin/gnuplot
+BEDTOOLS:=bedtools
+GNUPLOT:=gnuplot
 # perf is available at http://www.cs.cornell.edu/~caruana/
 PERF:=perf
-TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
-
-## General parameters ##########################################################
-DIST_DIR:=GraphProt_distribution
-
-# use sge arrayjobs to create gspan and features
-# implemented for CONTEXTSHREP
-SGEARRAY=YES
-# old cluster:
-#SGE_SUBMIT_HOST=biui.informatik.uni-freiburg.de
-#SGE_EXPORT=export SGE_ROOT=/opt/sge-6.0/
-#SGE_BIN_PATH=/opt/sge-6.0/bin/lx24-amd64
-# new cluster:
-SGE_SUBMIT_HOST=ui.bi.uni-freiburg.de
-SGE_EXPORT=export SGE_ROOT=/opt/ogs; export SGE_CELL=BI1
-SGE_BIN_PATH=/opt/ogs/bin/linux-x64
+# from ucsc tools
+TWOBITTOFA:=twoBitToFa
 
 # prefix of train/test data
 # RNAcompete proteins
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+# PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 PROTEINS:=testclip
 
 # select evaluation type: RNACOMPETE / CLIP
