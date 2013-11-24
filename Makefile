@@ -232,7 +232,7 @@ endif
 ################################################################################
 ifeq ($(GRAPH_TYPE),CONTEXTSHREP)
 # line search parameters
-LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep_context.parameters
+LSPAR:=$(DATADIR)/ls.$(METHOD_ID).shrep.parameters
 
 ifeq ($(SGEARRAY),YES)
 %.gspan.gz : ABSTRACTION=$(shell grep '^ABSTRACTION ' $*.param | cut -f 2 -d' ')
