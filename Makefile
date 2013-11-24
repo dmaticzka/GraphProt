@@ -910,7 +910,7 @@ dist:
 	#-rm -rf $(DIST_DIR)
 	-mkdir -p $(DIST_DIR)
 	# copy base progs
-	cp -v fasta2shrep_gspan.pl Makefile $(DIST_DIR)
+	cp -v GraphProt.pl fasta2shrep_gspan.pl Makefile $(DIST_DIR)
 	# copy bin
 	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
 	# copy data
