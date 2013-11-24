@@ -914,7 +914,7 @@ dist:
 	# copy bin
 	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
 	# copy data
-	cp -rv data StructureLibrary $(DIST_DIR)
+	cp -rv EDeN data StructureLibrary $(DIST_DIR)
 	# copy distribution parameters
 	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
 
