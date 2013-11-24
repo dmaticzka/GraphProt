@@ -71,7 +71,7 @@ SHAPES_SHIFT=25
 SHREPS_MAX=3
 
 # enable/disable line search: YES/NO
-DO_LINESEARCH=YES
+DO_LINESEARCH=NO
 # enable inner crossvalidation for parameter optimization
 LS_DO_INNER_CV=NO
 # enable/disable sgd-internal optimization

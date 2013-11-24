@@ -42,6 +42,7 @@ use lib "$FindBin::Bin";
 use vars qw(%CONFIG);
 *CONFIG = \%StructureLibrary::RNAtoolsConfig::CONFIG;
 
+
 =head1 NAME
 
 
