@@ -34,16 +34,16 @@ VERTEX2NTMARGINS:=$(PERL) $(BINDIR)/vertex2ntmargins.pl
 PLOTLC:=$(BASH) $(BINDIR)/plotlc.sh
 CHECK_SYNC_GSPAN_CLASS:=$(BASH) $(BINDIR)/check_sync_gspan_class.sh
 SELECT_TOP_WIN_SHREPS:=$(BINDIR)/selectTopWinShreps.R
-SUBSET_NT_BY_THRESHOLD:=$(BINDIR)/subsetNTsbythreshold.pl
-SUBSET_TOP_WINS:=$(BINDIR)/subTopWins.pl
+SUBSET_NT_BY_THRESHOLD:=$(PERL) $(BINDIR)/subsetNTsbythreshold.pl
+SUBSET_TOP_WINS:=$(PERL) $(BINDIR)/subTopWins.pl
 MEDIAN_AWK:=$(BINDIR)/median.awk
 GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
-SPLIT_GSPAN:=$(BINDIR)/split_gspan.pl
-GENERICSUBMITTOCLUSTER:=$(BINDIR)/generic_submit_to_cluster.sh
-MOREGENERICSGESUBMITSCRIPT:=$(BINDIR)/more_generic_submit_to_cluster.sh
+SPLIT_GSPAN:=$(PERL) $(BINDIR)/split_gspan.pl
+GENERICSUBMITTOCLUSTER:=$(BASH) $(BINDIR)/generic_submit_to_cluster.sh
+MOREGENERICSGESUBMITSCRIPT:=$(BASH) $(BINDIR)/more_generic_submit_to_cluster.sh
 GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
-FASTAPL:=$(BINDIR)/fastapl
-FASTA2GSPAN:=$(PWD)/fasta2shrep_gspan.pl
+FASTAPL:=$(PERL) $(BINDIR)/fastapl
+FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 
 
@@ -199,7 +199,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 	zcat $< | awk '/^u/{print $$NF}' | tr 'tT' 'uU' > $@
 
 %.sequence.nt_subset : %.sequence %.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | \
+	$(SUBSET_NT_BY_THRESHOLD) -input $< -locations <(cat $*.nt_margins | \
 	awk -v thresh=`cat $*.nt_margins | \
 	cut -f 3 | sort -nr | \
 	awk -f $(MEDIAN_AWK)` '$$3 > thresh') | \
@@ -285,7 +285,7 @@ endif
 %.motif.gspan.gz : CUE=$(subst nil,,$(shell grep '^CUE ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : VIEWPOINT=$(subst nil,,$(shell grep '^VIEWPOINT ' $*.param | cut -f 2 -d' '))
 %.motif.gspan.gz : %.test.fa | %.param
-	$(PERL) $(FASTA2GSPAN) -fasta $< -stdout \
+	$(FASTA2GSPAN) -fasta $< -stdout \
 	$(STACK) $(CUE) $(VIEWPOINT) \
 	--seq-graph-t --seq-graph-alph -abstr \
 	--abstr-out $*.test.struct_annot \
@@ -333,7 +333,7 @@ endif
 #	awk '$$2!=0' > $@
 
 %.sequence.nt_subset : %.sequence %.motif.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) \
+	$(SUBSET_NT_BY_THRESHOLD) \
 	-input $< -locations <(cat $*.motif.nt_margins | \
 	awk -v thresh=`cat $*.nt_margins | \
 	cut -f 3 | \
@@ -348,14 +348,14 @@ endif
 	sort -k1,1n > $@
 
 %.struct_annot.nt_subset : %.struct_annot %.motif.nt_margins
-	$(PERL) $(SUBSET_NT_BY_THRESHOLD) \
+	$(SUBSET_NT_BY_THRESHOLD) \
 	-input $< \
 	-locations <(cat $*.nt_margins | \
 	awk -v thresh=`cat $*.nt_margins | cut -f 3 | sort -nr | awk -f $(MEDIAN_AWK)` '$$3 > 10') | \
 	tr 'EHSIMB' '_' > $@
 
 %.struct_annot_top_wins : %.struct_annot %.top_wins
-	$(PERL) $(SUBSET_TOP_WINS) \
+	$(SUBSET_TOP_WINS) \
 	--input $< \
 	--locations $*.top_wins \
 	--win_size $(MARGINS_WINDOW) > $@
@@ -418,7 +418,7 @@ ifeq ($(SVM),SVR)
 %.cv : %.cv_svr
 	cat $< | \
 	grep 'Cross Validation Squared correlation coefficient' | \
-	perl -ne 'print /(\d+.\d+)/' > $@
+	$(PERL) -ne 'print /(\d+.\d+)/' > $@
 
 # SVR model
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
