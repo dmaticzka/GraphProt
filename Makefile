@@ -39,9 +39,11 @@ SUBSET_TOP_WINS:=$(BINDIR)/subTopWins.pl
 MEDIAN_AWK:=$(BINDIR)/median.awk
 GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
 SPLIT_GSPAN:=$(BINDIR)/split_gspan.pl
-GENERICSUBMITTOCLUSTER:=$(PWD)/bin/generic_submit_to_cluster.sh
-MOREGENERICSGESUBMITSCRIPT:=$(PWD)/bin/more_generic_submit_to_cluster.sh
-GSPAN2VDICT:=$(PWD)/bin/gspan2vertex_dict.awk
+GENERICSUBMITTOCLUSTER:=$(BINDIR)/generic_submit_to_cluster.sh
+MOREGENERICSGESUBMITSCRIPT:=$(BINDIR)/more_generic_submit_to_cluster.sh
+GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
+FASTAPL:=$(BINDIR)/fastapl
+FASTA2GSPAN:=$(PWD)/fasta2shrep_gspan.pl
 
 
 ## set appropriate id (used to determine which parameter sets to use)

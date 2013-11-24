@@ -5,12 +5,7 @@ PERL:=/usr/local/perl/bin/perl
 RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
 SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
-PERF:=/home/maticzkd/src/stat/perf
 SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
-#FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
-FASTAPL:=/home/maticzkd/co/RNAtools/fastapl
-#FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
-FASTA2GSPAN:=/home/maticzkd/co/RNAtools/fasta2shrep_gspan.pl
 # set parralel environment for omp: -v OMP_NUM_THREADS=24 -pe '*' 24
 SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_130606/EDeN
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
@@ -18,6 +13,8 @@ BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
 BASH:=/bin/bash
 BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
 GNUPLOT:=/home/maticzkd/local/bin/gnuplot
+# perf is available at http://www.cs.cornell.edu/~caruana/
+PERF:=perf
 
 ## General parameters ##########################################################
 
