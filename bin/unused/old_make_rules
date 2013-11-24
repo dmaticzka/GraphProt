@@ -1,0 +1,27 @@
+## old code for MEME search
+################################################################################
+# # binaries
+# MEME_GETMARKOV:=/home/maticzkd/src/meme_4.7.0/local/bin/fasta-get-markov
+# MEME:=/home/maticzkd/src/meme_4.7.0/local/bin/meme
+# FASTAUID:=/usr/local/user/RNAtools/fastaUID.pl
+# # perform meme oops (only one per sequence) search
+# meme_oops: positives_unique.fa negatives_markov0.txt
+# 	$(MEME) $< -mod oops -maxsites 3 -minw 5 -maxw 15 -bfile negatives_markov0.txt -dna -nmotifs 5 -maxsize 300000 -oc $@
+#
+# # perform meme zoops (zero or one per sequence) search
+# meme_zoops: positives_unique.fa negatives_markov0.txt
+# 	$(MEME) $< -mod zoops -maxsites 3 -minw 5 -maxw 15 -bfile negatives_markov0.txt -dna -nmotifs 5 -maxsize 300000 -oc $@
+#
+# # assign unique ids to fasta headers
+# %_unique.fa: %.fa
+# 	$(FASTAUID) -id pos_ < $< > $@
+#
+# # create background model for meme motif search
+# negatives_markov0.txt: negatives.fa
+# 	$(MEME_GETMARKOV) -norc < $< > $@
+
+# root for fastas and thresholds
+PROJDIR:=/home/maticzkd/projects/RBPaffinity
+FA_DIR:=$(PROJDIR)/data/fasta
+THR_DIR:=$(PROJDIR)/data/thresholds/
+

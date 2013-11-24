@@ -5,7 +5,7 @@ include PARAMETERS
 
 ## general behaviour
 ################################################################################
-SHELL:=/bin/bash
+SHELL:=$(BASH)
 .DELETE_ON_ERROR:
 ifeq ($(SECONDARY),YES)
 # don't delete intermediate files
@@ -15,35 +15,10 @@ endif
 
 ## paths
 ################################################################################
-# root for fastas and thresholds
-PROJDIR:=/home/maticzkd/projects/RBPaffinity
-FA_DIR:=$(PROJDIR)/data/fasta
-THR_DIR:=$(PROJDIR)/data/thresholds/
 # expect binaries to reside in pwd/bin, otherwise this variable must be overwritten
 PWD:=$(shell pwd)
 BINDIR:=$(PWD)/bin
 DATADIR:=$(PWD)/data
-
-
-## global binaries
-################################################################################
-PERL:=/usr/local/perl/bin/perl
-RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
-SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
-SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
-PERF:=/home/maticzkd/src/stat/perf
-SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
-#FASTAPL:=$(PERL) /usr/local/user/RNAtools/fastapl
-FASTAPL:=/home/maticzkd/co/RNAtools/fastapl
-#FASTA2GSPAN:=$(PERL) /usr/local/user/RNAtools/fasta2shrep_gspan.pl
-FASTA2GSPAN:=/home/maticzkd/co/RNAtools/fasta2shrep_gspan.pl
-# set parralel environment for omp: -v OMP_NUM_THREADS=24 -pe '*' 24
-SVMSGDNSPDK:=/home/maticzkd/local/svmsgdnspdk_130606/EDeN
-CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
-BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
-BASH:=/bin/bash
-BEDTOOLS:=/usr/local/user/BEDTools-Version-2.17.0/bin/bedtools
-GNUPLOT:=/home/maticzkd/local/bin/gnuplot
 
 
 ## project-internal tools
@@ -704,8 +679,8 @@ ifeq ($(EVAL_TYPE),RNACOMPETE)
 
 # class memberships {-1,0,1}
 %.class : BASENAME=$(firstword $(subst _, ,$<))
-%.class : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.class : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.class : HT=$(shell grep $(BASENAME) $(DATA_DIR)/RNAcompete_positive_thresholds.txt | cut -f 2 -d' ')
+%.class : LT=$(shell grep $(BASENAME) $(DATA_DIR)/RNAcompete_negative_thresholds.txt | cut -f 2 -d' ')
 %.class : %.affy
 	cat $< | \
 	awk '{ if ($$1 > $(HT)) {print 1} else { if ($$1 < $(LT)) {print -1} else {print 0} } }' > $@
@@ -714,8 +689,8 @@ ifeq ($(EVAL_TYPE),RNACOMPETE)
 %.cstats : BASENAME=$(firstword $(subst _, ,$<))
 %.cstats : TYPE=$(word 3,$(subst _, ,$<))
 %.cstats : SET=$(word 4,$(subst ., ,$(subst _, ,$<)))
-%.cstats : HT=$(shell grep $(BASENAME) $(THR_DIR)/positive.txt | cut -f 2 -d' ')
-%.cstats : LT=$(shell grep $(BASENAME) $(THR_DIR)/negative.txt | cut -f 2 -d' ')
+%.cstats : HT=$(shell grep $(BASENAME) $(DATA_DIR)/RNAcompete_positive_thresholds.txt | cut -f 2 -d' ')
+%.cstats : LT=$(shell grep $(BASENAME) $(DATA_DIR)/RNAcompete_negative_thresholds.txt | cut -f 2 -d' ')
 %.cstats : HN=$(shell cat $< | grep '^>' | awk '$$NF > $(HT)' | wc -l)
 %.cstats : LN=$(shell cat $< | grep '^>' | awk '$$NF < $(LT)' | wc -l)
 %.cstats : %.fa
@@ -1054,29 +1029,3 @@ test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
 test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	cp -f $< $@
 
-## insert additional rules into this file
-################################################################################
-include EXPERIMENT_SPECIFIC_RULES
-
-
-## old code for MEME search
-################################################################################
-# # binaries
-# MEME_GETMARKOV:=/home/maticzkd/src/meme_4.7.0/local/bin/fasta-get-markov
-# MEME:=/home/maticzkd/src/meme_4.7.0/local/bin/meme
-# FASTAUID:=/usr/local/user/RNAtools/fastaUID.pl
-# # perform meme oops (only one per sequence) search
-# meme_oops: positives_unique.fa negatives_markov0.txt
-# 	$(MEME) $< -mod oops -maxsites 3 -minw 5 -maxw 15 -bfile negatives_markov0.txt -dna -nmotifs 5 -maxsize 300000 -oc $@
-#
-# # perform meme zoops (zero or one per sequence) search
-# meme_zoops: positives_unique.fa negatives_markov0.txt
-# 	$(MEME) $< -mod zoops -maxsites 3 -minw 5 -maxw 15 -bfile negatives_markov0.txt -dna -nmotifs 5 -maxsize 300000 -oc $@
-#
-# # assign unique ids to fasta headers
-# %_unique.fa: %.fa
-# 	$(FASTAUID) -id pos_ < $< > $@
-#
-# # create background model for meme motif search
-# negatives_markov0.txt: negatives.fa
-# 	$(MEME_GETMARKOV) -norc < $< > $@
