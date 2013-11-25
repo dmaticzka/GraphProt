@@ -468,8 +468,7 @@ ifeq ($(SVM),SGD)
 %.test.predictions_sgd : DISTANCE=$(shell grep '^D ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : BITSIZE=$(shell grep '^b ' $*.param | cut -f 2 -d' ')
 %.test.predictions_sgd : DIRECTED=$(shell grep '^DIRECTED ' $*.param | cut -f 2 -d' ')
-%.test.predictions_sgd : %.train.model %.test.feature.gz %.test.gspan.gz %.test.class | %.param
-	$(CHECK_SYNC_GSPAN_CLASS) $*.test.gspan.gz $*.test.class && \
+%.test.predictions_sgd : %.train.model %.test.feature.gz %.test.gspan.gz | %.param
 	$(SVMSGDNSPDK) -a TEST \
 	-m $< -i $*.test.feature.gz -f SPARSE_VECTOR -t $*.test.class \
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
@@ -663,7 +662,7 @@ ifeq ($(EVAL_TYPE),CLIP)
 
 # for clip data, affinities are actually the class
 %.class : %.affy
-	ln -sf $< $@
+	cp $< $@
 endif
 
 ## general motif generation
@@ -766,17 +765,17 @@ ifeq ($(LS_DO_INNER_CV),YES)
 endif
 
 %.ls_sgdopt.fa : %.ls.fa
-	ln -s $< $@
+	cp $< $@
 
 %.ls_sgdopt.affy : %.ls.affy
-	ln -s $< $@
+	cp $< $@
 
 # link parameter files
 %.train.param : %.param
-	ln -sf $< $@
+	cp $< $@
 
 %.test.param : %.param
-	ln -sf $< $@
+	cp $< $@
 
 # create empty input
 %.unknowns.fa :

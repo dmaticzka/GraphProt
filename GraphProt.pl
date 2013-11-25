@@ -34,6 +34,7 @@ Options:
     -affinities  list of affinities
                      one value per line, same order as binding sites (fasta)
     -negfasta    fasta file containing negative class sequences
+    -model       GraphProt model
     -abstraction RNAshapes abstraction level [RNA structure graphs]
                      default: 3
     -R           GraphProt radius
@@ -129,6 +130,7 @@ my $mode;
 my $action;
 my $onlyseq;
 my $fasta;
+my $model;
 my $negfasta;
 my $affys;
 my $R;
@@ -148,6 +150,7 @@ my $result = GetOptions (	"mode=s" => \$mode,
                             "fasta=s" => \$fasta,
                             "negfasta=s" => \$negfasta,
                             "affinities=s" => \$affys,
+                            "model=s" => \$model,
                             "R=i" => \$R,
                             "D=i" => \$D,
                             "c=f" => \$c,
@@ -210,6 +213,20 @@ sub check_param_affys {
         return 0;
     }
 }
+
+sub check_param_model {
+    if (not defined $model) {
+        say STDERR "missing parameter: please specify the GraphProt model to use";
+        $quit_with_help = 1;
+        return 0;
+    }
+    if (not -f $model) {
+        pod2usage("error: can't find file '$model'");
+        $quit_with_help = 1;
+        return 0;
+    }
+}
+
 
 sub check_param_R {
 #    if (not defined $R) {
@@ -359,6 +376,7 @@ if ($mode eq 'regression') {
         check_params_regression;
     } elsif ($action eq 'predict') {
         check_param_fasta;
+        check_param_model;
         check_params_regression;
     } elsif ($action eq 'predict_nt') {
         say STDERR "sorry, invalid action in regression setting";
@@ -383,14 +401,16 @@ if ($mode eq 'regression') {
         check_params_classification;
     } elsif ($action eq 'predict') {
         check_param_fasta;
-        check_param_negfasta;
+        check_param_model;
         check_params_classification;
     } elsif ($action eq 'predict_nt') {
         check_param_fasta;
-        check_params_classification;    
+        check_param_model;    
+        check_params_classification;
     } elsif ($action eq 'motif') {
         check_param_fasta;
-        check_params_classification;    
+        check_param_model;
+        check_params_classification;
     } else {
         pod2usage("error: unknown action '$action'\n");
     }
@@ -425,6 +445,7 @@ if ($action ne "ls") {
     say PARAMETERS "CUE nil";
     say PARAMETERS "STACK nil";
     say PARAMETERS "VIEWPOINT --vp";
+    say PARAMETERS "DIRECTED DIRECTED";
     close PARAMETERS;
 }
 
@@ -497,12 +518,20 @@ if ($mode eq 'regression') {
         $makecall .= " -e SVM=SGD ";
         # add targets
         $makecall .= " $tmpdir/ID.train.model";
+        system("$makecall");
+        # copy model
+        move("$tmpdir/ID.train.model", "$scriptdir/$fasta.model");
     } elsif ($action eq 'predict') {
-        # TODO
+        # copy files
+        copy($model,    "$tmpdir/ID.train.model");
+        copy($fasta,    "$tmpdir/ID.test.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir/ID.test.predictions_sgd";
+        system("$makecall");
+        # copy results
+        copy("$tmpdir/ID.test.predictions_sgd", "$fasta.predictions_sgd");
     } elsif ($action eq 'predict_nt') {
         # TODO
         # add parameters
