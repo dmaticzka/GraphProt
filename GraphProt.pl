@@ -7,6 +7,7 @@ use List::Util qw/ min max /;
 use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
+use Cwd qw/abs_path/;
 use File::Copy;
 
 =head1 NAME
@@ -93,9 +94,33 @@ my $def_c = 1;
 # check program paths
 ###############################################################################
 
-# TODO check RNAshapes
-# TODO check EDeN
-# TODO check make
+my $scriptdir = abs_path(dirname($0));
+
+# check RNAshapes
+`RNAshapes -h`;
+if ($? != 0) {
+    say STDERR "please check if RNAshapes is installed and in your PATH.";
+    exit;
+};
+# check EDeN
+`$scriptdir/EDeN/EDeN -h`;
+if ($? != 0) {
+    say STDERR "please check if the EDeN binary is executable on your system.";
+    exit;
+};
+# check make
+`make -h`;
+if ($? != 0) {
+    say STDERR "please check if GNU make is installed and in your PATH.";
+    exit;
+};
+# check perf
+`perf -h`;
+if ($? != 256) {
+    say STDERR "please check if perf is installed and in your PATH.";
+    exit;
+};
+
 
 ###############################################################################
 # parse command line options
@@ -375,6 +400,7 @@ if ($mode eq 'regression') {
 
 $quit_with_help and pod2usage();
 
+# TODO: check input files
 
 ###############################################################################
 # main
@@ -402,38 +428,41 @@ if ($action ne "ls") {
     close PARAMETERS;
 }
 
-# copy input files
-# TODO
-
 # collect make call
-my $scriptdir = dirname($0);
-my $makecall = "make -C $scriptdir ";
+my $makecall = "make";
 
 # use sequence graphs
 if (defined $onlyseq) {
-    $makecall .= " -e GRAPH_TYPE=SEQUENCE"
+    $makecall .= " -e GRAPH_TYPE=SEQUENCE";
 } else {
 # use structure graphs
-    $makecall .= " -e GRAPH_TYPE=CONTEXTSHREP"
+    $makecall .= " -e GRAPH_TYPE=CONTEXTSHREP";
 }
 
 if ($mode eq 'regression') {
     if ($action eq 'ls') {
+        # TODO fix
+        # copy input files
+        copy($fasta, "$tmpdir/ID.ls.fa");
+        copy($fasta, "$tmpdir/ID.ls.affy");
         # add parameters
-        $makecall .= " -e SVM=SVR ";
+        $makecall .= " -e SVM=SVR -e DO_LINESEARCH=YES";
         # add targets
-        $makecall .= " ";
+        $makecall .= " ID.param";
     } elsif ($action eq 'cv') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SVR ";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'train') {
+        # TODO        
         # add parameters
         $makecall .= " -e SVM=SVR ";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'predict') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SVR ";
         # add targets
@@ -449,31 +478,39 @@ if ($mode eq 'regression') {
     }
 } elsif ($mode eq 'classification') {
     if ($action eq 'ls') {
+        # TODO
         # add parameters
-        $makecall .= " -e SVM=SGD ";
+        $makecall .= " -e SVM=SGD  -e DO_LINESEARCH=YES";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'cv') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'train') {
+        # copy files
+        copy($fasta,    "$tmpdir/ID.train.positives.fa");
+        copy($negfasta, "$tmpdir/ID.train.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir/ID.train.model";
     } elsif ($action eq 'predict') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'predict_nt') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'motif') {
+        # TODO
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
@@ -486,5 +523,7 @@ if ($mode eq 'regression') {
 }
 
 # execute make call
+say STDOUT $tmpdir;
+print "$makecall";
 # get output files
 # clean up

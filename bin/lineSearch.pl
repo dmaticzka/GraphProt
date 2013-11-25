@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl
+#!/usr/bin/perl
 use feature ':5.10';
 use strict 'vars';
 use warnings;
@@ -239,7 +239,7 @@ do {
     # test parameter combination / get value from previous run
     # create parameter file
     chdir($tmpdir);
-    open PARS, '>', $param_file;
+    open PARS, '>', $param_file or die "error: can't open $param_file for writing";
     print STDERR 'parameters: ';
 
     # distinguish parameter source by parameter
