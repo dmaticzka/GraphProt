@@ -162,7 +162,7 @@ sub check_param_R {
         $quit_with_help = 1;
         return 0;
     }
-    if ($radius < 0) {
+    if ($R < 0) {
         pod2usage("error: please specify a positive radius (R)");
         $quit_with_help = 1;
         return 0;
@@ -248,7 +248,7 @@ sub check_param_epochs {
 }
 
 sub check_param_lambda {
-if (not defined $lambda) {
+    if (not defined $lambda) {
         say STDERR "missing parameter: please specify SGD parameter lambda (lambda)";
         $quit_with_help = 1;
         return 0;
@@ -260,24 +260,24 @@ if (not defined $lambda) {
     }
 }
 
-sub check_param_params_regression {
+sub check_params_regression {
     # only check when creating a structure model
-    $onlyseq or check_param_R
-    $onlyseq or check_param_D
-    $onlyseq or check_param_abstraction
-    check_param_bitsize
-    check_param_c
-    check_param_epsilon
+    defined $onlyseq or check_param_R();
+    defined $onlyseq or check_param_D;
+    defined $onlyseq or check_param_abstraction;
+    check_param_bitsize;
+    check_param_c;
+    check_param_epsilon;
 }
 
-sub check_param_params_classification {
+sub check_params_classification {
     # only check when creating a structure model
-    $onlyseq or check_param_R
-    $onlyseq or check_param_D
-    $onlyseq or check_param_abstraction
-    check_param_bitsize
-    check_param_epochs
-    check_param_lambda
+    defined $onlyseq or check_param_R;
+    defined $onlyseq or check_param_D;
+    defined $onlyseq or check_param_abstraction;
+    check_param_bitsize;
+    check_param_epochs;
+    check_param_lambda;
 }
 
 defined $action or pod2usage("please specify the GraphProt action\n");
@@ -289,14 +289,14 @@ if ($mode eq 'regression') {
     } elsif ($action eq 'cv') {
         check_param_fasta;
         check_param_affys;
-        check_param_params_regression;
+        check_params_regression;
     } elsif ($action eq 'train') {
         check_param_fasta;
         check_param_affys;
-        check_param_params_regression;
+        check_params_regression;
     } elsif ($action eq 'predict') {
         check_param_fasta;
-        check_param_params_regression;
+        check_params_regression;
     } elsif ($action eq 'predict_nt') {
         say STDERR "sorry, invalid action in regression setting";
         exit 2;
@@ -313,21 +313,21 @@ if ($mode eq 'regression') {
     } elsif ($action eq 'cv') {
         check_param_fasta;
         check_param_negfasta;
-        check_param_params_classification;
+        check_params_classification;
     } elsif ($action eq 'train') {
         check_param_fasta;
         check_param_negfasta;
-        check_param_params_classification;
+        check_params_classification;
     } elsif ($action eq 'predict') {
         check_param_fasta;
         check_param_negfasta;
-        check_param_params_classification;
+        check_params_classification;
     } elsif ($action eq 'predict_nt') {
         check_param_fasta;
-        check_param_params_classification;    
+        check_params_classification;    
     } elsif ($action eq 'motif') {
         check_param_fasta;
-        check_param_params_classification;    
+        check_params_classification;    
     } else {
         pod2usage("error: unknown action '$action'\n");
     }
