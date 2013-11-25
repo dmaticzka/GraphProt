@@ -18,27 +18,39 @@ GraphProt.pl -mode {regression,classification} -action {ls,train,test,cv,ntmargi
 
 Options:
 
-    -mode       'regression' or 'classification'
-                    default: classification
-    -action     what should GraphProt do?
-                    ls: optimize parameters
-                    cv: run a crossvalidation
-                    train: train a model
-                    predict: predict margins given a model
-                    predict_nt: predict nucleotide-wise margins given a model
-                    motif: create sequence and structure motifs given a model
-    -onlyseq    use GraphProt sequence models
-    -fasta      fasta file containing binding sites
-    -affinities list of affinities
-                    one value per line, same order as binding sites (fasta)
-    -negfasta   fasta file containing negative class sequences
-    -R          GraphProt radius
-    -D          GraphProt distance
-    -bitsize    GraphProt bitsize
-    
-    -debug      enable debug output
-    -help       brief help message
-    -man        full documentation
+    -mode        'regression' or 'classification'
+                     default: classification
+    -action      what should GraphProt do?
+                     ls: optimize parameters
+                     cv: run a crossvalidation
+                     train: train a model
+                     predict: predict margins given a model
+                     predict_nt: predict nucleotide-wise margins given a model
+                     motif: create sequence and structure motifs given a model
+    -onlyseq     use GraphProt sequence models
+    -fasta       fasta file containing binding sites
+    -affinities  list of affinities
+                     one value per line, same order as binding sites (fasta)
+    -negfasta    fasta file containing negative class sequences
+    -abstraction RNAshapes abstraction level [RNA structure graphs]
+                     default: 3
+    -R           GraphProt radius
+                     default: 1
+    -D           GraphProt distance
+                     default: 4
+    -bitsize     GraphProt bitsize used for feature encoding
+                     default: 14
+    -c           SVR parameter c       [regression]
+                     default: 1
+    -epsilon     SVR parameter epsilon [regression]
+                     default: 0.1
+    -lambda      SGD parameter lambda  [classification]
+                     default: 10e-4
+    -epochs      SGD parameter epochs  [classification]
+                     default: 10
+    -debug       enable debug output
+    -help        brief help message
+    -man         full documentation
 
 =head1 DESCRIPTION
 
@@ -66,6 +78,18 @@ sub end_handler {
 	File::Temp::cleanup();
 	die();
 }
+
+###############################################################################
+# defaults
+###############################################################################
+my $def_abstraction = 3;
+my $def_R = 1;
+my $def_D = 4;
+my $def_bitsize = 14;
+my $def_epochs = 10;
+my $def_lambda = 10e-4;
+my $def_epsilon = 0.1;
+my $def_c = 1;
 
 ###############################################################################
 # parse command line options
@@ -157,11 +181,12 @@ sub check_param_affys {
 }
 
 sub check_param_R {
-    if (not defined $R) {
-        say STDERR "missing parameter: please specify the radius (R)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $R) {
+#        say STDERR "missing parameter: please specify the radius (R)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $R or $R = $def_R;
     if ($R < 0) {
         pod2usage("error: please specify a positive radius (R)");
         $quit_with_help = 1;
@@ -170,11 +195,12 @@ sub check_param_R {
 }
 
 sub check_param_D {
-    if (not defined $D) {
-        say STDERR "missing parameter: please specify the distance (D)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $D) {
+#        say STDERR "missing parameter: please specify the distance (D)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $D or $D = $def_D;
     if ($D < 0) {
         pod2usage("error: please specify a positive distance (D)");
         $quit_with_help = 1;
@@ -183,11 +209,12 @@ sub check_param_D {
 }
 
 sub check_param_bitsize {
-    if (not defined $bitsize) {
-        say STDERR "missing parameter: please specify the bitsize (bitsize)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $bitsize) {
+#        say STDERR "missing parameter: please specify the bitsize (bitsize)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $bitsize or $bitsize = $def_bitsize;
     if ($bitsize < 8) {
         pod2usage("error: please specify a positive bitsize larger than 8 (bitsize)");
         $quit_with_help = 1;
@@ -196,11 +223,12 @@ sub check_param_bitsize {
 }
 
 sub check_param_abstraction {
-    if (not defined $abstraction) {
-        say STDERR "missing parameter: please specify the RNAshapes abstraction level (abstraction)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $abstraction) {
+#        say STDERR "missing parameter: please specify the RNAshapes abstraction level (abstraction)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $abstraction or $abstraction = $def_abstraction;
     if ($abstraction < 1 or $abstraction > 5) {
         pod2usage("error: please specify an RNAshapes abstraction level between 1 and 5 (abstraction)");
         $quit_with_help = 1;
@@ -209,11 +237,12 @@ sub check_param_abstraction {
 }
 
 sub check_param_c {
-    if (not defined $c) {
-        say STDERR "missing parameter: please specify SVR parameter c (c)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $c) {
+#        say STDERR "missing parameter: please specify SVR parameter c (c)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $c or $c = $def_c;
     if ($c <= 0) {
         pod2usage("error: please specify the SVR parameter c (c)");
         $quit_with_help = 1;
@@ -222,11 +251,12 @@ sub check_param_c {
 }
 
 sub check_param_epsilon {
-    if (not defined $epsilon) {
-        say STDERR "missing parameter: please specify SVR parameter epsilon (epsilon)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $epsilon) {
+#        say STDERR "missing parameter: please specify SVR parameter epsilon (epsilon)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $epsilon or $epsilon = $def_epsilon;
     if ($c <= 0) {
         pod2usage("error: please specify a positive epsilon (epsilon)");
         $quit_with_help = 1;
@@ -235,11 +265,12 @@ sub check_param_epsilon {
 }
 
 sub check_param_epochs {
-    if (not defined $epochs) {
-        say STDERR "missing parameter: please specify SGD parameter epochs (epochs)";
-        $quit_with_help = 1;
-        return 0;
-    }
+#    if (not defined $epochs) {
+#        say STDERR "missing parameter: please specify SGD parameter epochs (epochs)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
+    defined $epochs or $epochs = $def_epochs;
     if ($epochs <= 0) {
         pod2usage("error: please specify a value larger 0 (epochs)");
         $quit_with_help = 1;
@@ -248,11 +279,12 @@ sub check_param_epochs {
 }
 
 sub check_param_lambda {
-    if (not defined $lambda) {
-        say STDERR "missing parameter: please specify SGD parameter lambda (lambda)";
-        $quit_with_help = 1;
-        return 0;
-    }
+    defined $lambda or $lambda = $def_lambda;
+#    if (not defined $lambda) {
+#        say STDERR "missing parameter: please specify SGD parameter lambda (lambda)";
+#        $quit_with_help = 1;
+#        return 0;
+#    }
     if ($lambda <= 0) {
         pod2usage("error: please specify a positive lambda (lambda)");
         $quit_with_help = 1;
