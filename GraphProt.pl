@@ -7,6 +7,7 @@ use List::Util qw/ min max /;
 use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
+use File::Copy;
 
 =head1 NAME
 
@@ -62,9 +63,6 @@ Options:
 # SIGUSR{1/2} are sent by the sge prior to the uncatchable SIGKILL if the
 # option -notify was set
 ###############################################################################
-my $tmp_template = 'template-XXXXXX';
-my $tmp_prefix = '/var/tmp/';
-my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
 $SIG{'INT'} = 'end_handler';
 $SIG{'TERM'} = 'end_handler';
 $SIG{'ABRT'} = 'end_handler';
@@ -90,6 +88,14 @@ my $def_epochs = 10;
 my $def_lambda = 10e-4;
 my $def_epsilon = 0.1;
 my $def_c = 1;
+
+###############################################################################
+# check program paths
+###############################################################################
+
+# TODO check RNAshapes
+# TODO check EDeN
+# TODO check make
 
 ###############################################################################
 # parse command line options
@@ -369,12 +375,116 @@ if ($mode eq 'regression') {
 
 $quit_with_help and pod2usage();
 
-###############################################################################
-# check program paths
-###############################################################################
-
 
 ###############################################################################
 # main
 ###############################################################################
 
+# set up temporary directory
+my $tmp_template = 'GraphProt-XXXXXX';
+my $tmp_prefix = './';
+my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 0);
+
+# write parameters
+if ($action ne "ls") {
+    open PARAMETERS, ">", "$tmpdir/ID.param";
+    defined $R and say PARAMETERS "R $R";
+    defined $D and say PARAMETERS "D $D"; 
+    defined $c and say PARAMETERS "c $c"; 
+    defined $epsilon and say PARAMETERS "e $epsilon"; 
+    defined $epochs and say PARAMETERS "EPOCHS $epochs"; 
+    defined $lambda and say PARAMETERS "LAMBDA $lambda"; 
+    defined $abstraction and say PARAMETERS "ABSTRACTION $abstraction"; 
+    defined $bitsize and say PARAMETERS "b $bitsize"; 
+    say PARAMETERS "CUE nil";
+    say PARAMETERS "STACK nil";
+    say PARAMETERS "VIEWPOINT --vp";
+    close PARAMETERS;
+}
+
+# copy input files
+# TODO
+
+# collect make call
+my $scriptdir = dirname($0);
+my $makecall = "make -C $scriptdir ";
+
+# use sequence graphs
+if (defined $onlyseq) {
+    $makecall .= " -e GRAPH_TYPE=SEQUENCE"
+} else {
+# use structure graphs
+    $makecall .= " -e GRAPH_TYPE=CONTEXTSHREP"
+}
+
+if ($mode eq 'regression') {
+    if ($action eq 'ls') {
+        # add parameters
+        $makecall .= " -e SVM=SVR ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'cv') {
+        # add parameters
+        $makecall .= " -e SVM=SVR ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'train') {
+        # add parameters
+        $makecall .= " -e SVM=SVR ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'predict') {
+        # add parameters
+        $makecall .= " -e SVM=SVR ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'predict_nt') {
+        say STDERR "sorry, invalid action in regression setting";
+        exit 2;
+    } elsif ($action eq 'motif') {
+        say STDERR "sorry, invalid action in regression setting";
+        exit 2;
+    } else {
+        pod2usage("error: unknown action '$action'\n");
+    }
+} elsif ($mode eq 'classification') {
+    if ($action eq 'ls') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'cv') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'train') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'predict') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'predict_nt') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } elsif ($action eq 'motif') {
+        # add parameters
+        $makecall .= " -e SVM=SGD ";
+        # add targets
+        $makecall .= " ";
+    } else {
+        pod2usage("error: unknown action '$action'\n");
+    }
+} else {
+    pod2usage("error: unknown mode '$mode'\n");
+}
+
+# execute make call
+# get output files
+# clean up
