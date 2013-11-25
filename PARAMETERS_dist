@@ -47,12 +47,9 @@ GRAPH_TYPE=CONTEXTSHREP
 # The primary window sizes are used for both shreps and accessibilities.
 # Secondary window size is only used for shreps.
 # W_PRIMARY defaults to 150 according to Lange & Maticzka et al. 2011.
-# L_PRIMARY is used for RNAplfold computation of accessibilities. Defaults to
 # W_PRIMARY-50 according to Lange & Maticzka et al. 2011.
 W_PRIMARY=150
-L_PRIMARY=100
-W_SECONDARY=
-SHAPES_WINS=$(W_PRIMARY),$(W_SECONDARY)
+SHAPES_WINS=$(W_PRIMARY)
 SHAPES_SHIFT=25
 # maximum number of shreps
 SHREPS_MAX=3
