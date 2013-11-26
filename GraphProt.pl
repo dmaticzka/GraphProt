@@ -7,7 +7,7 @@ use List::Util qw/ min max /;
 use POSIX qw/ceil floor/;
 use File::Temp qw(tempdir);
 use File::Basename;
-use Cwd qw/abs_path/;
+use Cwd qw/abs_path getcwd/;
 use File::Copy;
 
 =head1 NAME
@@ -499,7 +499,7 @@ sub parse_param_file {
 
 # set up temporary directory
 my $tmp_template = 'GraphProt_tmp-XXXXXX';
-my $tmp_prefix = "$scriptdir/";
+my $tmp_prefix = abs_path(getcwd());
 my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
 
 # write parameters
@@ -521,7 +521,7 @@ if ($action ne "ls") {
 }
 
 # collect make call
-my $makecall = "make -C $scriptdir";
+my $makecall = "make -C $scriptdir -e PWD=$scriptdir";
 
 # use sequence graphs
 if (defined $onlyseq) {
