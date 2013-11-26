@@ -684,4 +684,4 @@ if ($mode eq 'regression') {
 }
 
 # clean up
-# unlink glob "$tmpdir.*";
+unlink glob "$tmpdir.*";
