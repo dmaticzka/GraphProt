@@ -575,7 +575,19 @@ if ($mode eq 'regression') {
     } elsif ($action eq 'predict') {
         # copy input files
         copy($fasta, "$tmpdir.test.fa");
-        copy($affys, "$tmpdir.test.affy");
+        if (defined $affys) {
+          copy($affys, "$tmpdir.test.affy");
+        } else {
+          open FASTA, "<", $fasta;
+          open DUMMY, ">", "$tmpdir.test.affy";
+          while (my $line = <FASTA>) {
+            if ($line =~ /^>/) {
+              print DUMMY "1\n";
+            }
+          }
+          close DUMMY;
+          close FASTA;
+        }
         copy($model,"$tmpdir.train.model");
         # add parameters
         $makecall .= " -e SVM=SVR";
@@ -621,8 +633,8 @@ if ($mode eq 'regression') {
         # add targets
         $makecall .= " $tmpdir.train.cv.perf";
         system("$makecall");
-        move("$tmpdir.train.cv.perf", "$prefix.crossvalidation_perf");
-        print "GraphProt crossvalidation results written to file $prefix.crossvalidation_perf\n";
+        move("$tmpdir.train.cv.perf", "$prefix.cv_results");
+        print "GraphProt crossvalidation results written to file $prefix.cv_results\n";
     } elsif ($action eq 'train') {
         # copy files
         copy($fasta,    "$tmpdir.train.positives.fa");
