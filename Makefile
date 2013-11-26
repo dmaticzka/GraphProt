@@ -669,7 +669,7 @@ endif
 ################################################################################
 
 %.sequence_top_wins : %.sequence %.top_wins
-	$(PERL) $(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
+	$(SUBSET_TOP_WINS) --input $< --locations $*.top_wins --win_size $(MARGINS_WINDOW) > $@
 
 %.truncated : %
 	cat $< | awk 'length($$0)==$(MARGINS_WINDOW)' > $@

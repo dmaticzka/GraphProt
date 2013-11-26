@@ -581,7 +581,6 @@ if ($mode eq 'regression') {
         # copy model
         move("$tmpdir.train.model", "$prefix.model");
     } elsif ($action eq 'predict') {
-        # TODO: return class of sequences, 
         # copy files
         copy($model,    "$tmpdir.train.model");
         copy($fasta,    "$tmpdir.test.positives.fa");
@@ -611,11 +610,24 @@ if ($mode eq 'regression') {
         # copy results
         copy("$tmpdir.test.nt_margins", "$prefix.nt_margins");
     } elsif ($action eq 'motif') {
-        # TODO
+        # copy files
+        copy($model,    "$tmpdir.train.model");
+        copy($fasta,    "$tmpdir.test.positives.fa");
+        system("touch $tmpdir.test.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.test.sequence_top_wins.truncated";
+        system("$makecall");
+        if (not defined $onlyseq) {
+          $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated";
+          system("$makecall");
+        }
+        # copy results
+        copy("$tmpdir.test.sequence_top_wins.truncated", "$prefix.sequence_motif");
+        if (not defined $onlyseq) {
+          copy("$tmpdir.test.struct_annot_top_wins.truncated", "$prefix.structure_motif");
+        }
     } else {
         pod2usage("error: unknown action '$action'\n");
     }
@@ -624,4 +636,4 @@ if ($mode eq 'regression') {
 }
 
 # clean up
-unlink glob "$tmpdir.*";
+# unlink glob "$tmpdir.*";
