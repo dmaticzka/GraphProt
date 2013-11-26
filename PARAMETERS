@@ -15,7 +15,7 @@ PERF:=perf
 TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 
 ## General parameters ##########################################################
-DIST_DIR:=GraphProt_distribution
+DIST_DIR:=GraphProt_distribution_check
 
 # use sge arrayjobs to create gspan and features
 # implemented for CONTEXTSHREP

@@ -913,9 +913,11 @@ dist:
 	# copy bin
 	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
 	# copy data
-# 	cp -rv EDeN data StructureLibrary $(DIST_DIR)
+	cp -rv EDeN data StructureLibrary $(DIST_DIR)
 	# copy distribution parameters
 	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
+	# markdown
+	multimarkdown README.md > $(DIST_DIR)/README.html
 
 # # delete all files except fastas
 distclean: clean

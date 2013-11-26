@@ -549,6 +549,7 @@ if ($mode eq 'regression') {
         open NICEPARAMS, '>', "$prefix.params";
         print NICEPARAMS $lspars;
         close NICEPARAMS;
+        print "parameters written to file $prefix.params\n";
     } elsif ($action eq 'cv') {
         # copy input files
         copy($fasta, "$tmpdir.train.fa");
@@ -559,6 +560,7 @@ if ($mode eq 'regression') {
         $makecall .= " $tmpdir.train.cv_svr";
         system("$makecall");
         move("$tmpdir.train.cv_svr", "$prefix.cv_results");
+        print "crossvalidation results written to file $prefix.cv_results\n";
     } elsif ($action eq 'train') {
         # copy input files
         copy($fasta, "$tmpdir.train.fa");
@@ -569,6 +571,7 @@ if ($mode eq 'regression') {
         $makecall .= " $tmpdir.train.model";
         system("$makecall");
         move("$tmpdir.train.model", "$prefix.model");
+        print "GraphProt model written to file $prefix.model\n";
     } elsif ($action eq 'predict') {
         # copy input files
         copy($fasta, "$tmpdir.test.fa");
@@ -581,6 +584,7 @@ if ($mode eq 'regression') {
         print "$makecall\n";
         system("$makecall");
         move("$tmpdir.test.predictions_affy", "$prefix.predictions");
+        print "GraphProt predictions written to file $prefix.predictions\n";
     } elsif ($action eq 'predict_nt') {
         print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
@@ -607,6 +611,7 @@ if ($mode eq 'regression') {
         open NICEPARAMS, '>', "$prefix.params";
         print NICEPARAMS $lspars;
         close NICEPARAMS;
+        print "parameters written to file $prefix.params\n";
     } elsif ($action eq 'cv') {
         # copy files
         copy($fasta,    "$tmpdir.train.positives.fa");
@@ -617,6 +622,7 @@ if ($mode eq 'regression') {
         $makecall .= " $tmpdir.train.cv.perf";
         system("$makecall");
         move("$tmpdir.train.cv.perf", "$prefix.crossvalidation_perf");
+        print "GraphProt crossvalidation results written to file $prefix.crossvalidation_perf\n";
     } elsif ($action eq 'train') {
         # copy files
         copy($fasta,    "$tmpdir.train.positives.fa");
@@ -628,6 +634,7 @@ if ($mode eq 'regression') {
         system("$makecall");
         # copy model
         move("$tmpdir.train.model", "$prefix.model");
+        print "GraphProt model written to file $prefix.model\n";
     } elsif ($action eq 'predict') {
         # copy files
         copy($model,    "$tmpdir.train.model");
@@ -645,6 +652,7 @@ if ($mode eq 'regression') {
         system("$makecall");
         # copy results
         copy("$tmpdir.test.predictions_class", "$prefix.predictions");
+        print "GraphProt predictions written to file $prefix.predictions\n";
     } elsif ($action eq 'predict_nt') {
         # copy files
         copy($model,    "$tmpdir.train.model");
@@ -657,6 +665,7 @@ if ($mode eq 'regression') {
         system("$makecall");
         # copy results
         copy("$tmpdir.test.nt_margins", "$prefix.nt_margins");
+        print "GraphProt nucleotide-wise margins written to file $prefix.nt_margins\n";
     } elsif ($action eq 'motif') {
         # copy files
         copy($model,    "$tmpdir.train.model");
@@ -673,8 +682,10 @@ if ($mode eq 'regression') {
         }
         # copy results
         copy("$tmpdir.test.sequence_top_wins.truncated", "$prefix.sequence_motif");
+        print "GraphProt sequence motif written to file $prefix.sequence_motif\n";
         if (not defined $onlyseq) {
           copy("$tmpdir.test.struct_annot_top_wins.truncated", "$prefix.structure_motif");
+          print "GraphProt structure motif written to file $prefix.structure_motif\n";
         }
     } else {
         pod2usage("error: unknown action '$action'\n");
