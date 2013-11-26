@@ -474,7 +474,7 @@ sub parse_param_file {
 # set up temporary directory
 my $tmp_template = 'GraphProt_tmp-XXXXXX';
 my $tmp_prefix = "$scriptdir/";
-my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 0);
+my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 1);
 
 # write parameters
 if ($action ne "ls") {
@@ -560,11 +560,15 @@ if ($mode eq 'regression') {
         print NICEPARAMS $lspars;
         close NICEPARAMS;
     } elsif ($action eq 'cv') {
-        # TODO
+        # copy files
+        copy($fasta,    "$tmpdir.train.positives.fa");
+        copy($negfasta, "$tmpdir.train.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.train.cv.perf";
+        system("$makecall");
+        move("$tmpdir.train.cv.perf", "$prefix.crossvalidation_perf");
     } elsif ($action eq 'train') {
         # copy files
         copy($fasta,    "$tmpdir.train.positives.fa");
@@ -608,4 +612,4 @@ if ($mode eq 'regression') {
 }
 
 # clean up
-unlink("$tmpdir.*");
+unlink glob "$tmpdir.*";
