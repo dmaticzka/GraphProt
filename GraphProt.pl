@@ -180,12 +180,12 @@ if ($? != 256) {
 
 if ($mode eq 'regression') {
   # check svm-train
-  `svm-train -h`;
+  `svm-train --help`;
   if ($? != 256) {
       print STDERR "please check if libsvm is installed and in your PATH (can't call smv-train).\n";
       exit;
   };
-  `svm-predict -h`;
+  `svm-predict`;
   if ($? != 256) {
       print STDERR "please check if libsvm is installed and in your PATH (can't call svm-predict).\n";
       exit;
@@ -521,7 +521,6 @@ if (defined $onlyseq) {
 
 if ($mode eq 'regression') {
     if ($action eq 'ls') {
-        # TODO bugfix
         # copy input files
         copy($fasta, "$tmpdir.ls.fa");
         copy($affys, "$tmpdir.ls.affy");
@@ -548,17 +547,27 @@ if ($mode eq 'regression') {
         system("$makecall");
         move("$tmpdir.train.cv_svr", "$prefix.cv_results");
     } elsif ($action eq 'train') {
-        # TODO        
+        # copy input files
+        copy($fasta, "$tmpdir.train.fa");
+        copy($affys, "$tmpdir.train.affy");
         # add parameters
-        $makecall .= " -e SVM=SVR ";
+        $makecall .= " -e SVM=SVR";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.train.model";
+        system("$makecall");
+        move("$tmpdir.train.model", "$prefix.model");
     } elsif ($action eq 'predict') {
-        # TODO
+        # copy input files
+        copy($fasta, "$tmpdir.test.fa");
+        copy($affys, "$tmpdir.test.affy");
+        copy($model,"$tmpdir.train.model");
         # add parameters
-        $makecall .= " -e SVM=SVR ";
+        $makecall .= " -e SVM=SVR";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.test.predictions_affy";
+        print "$makecall\n";
+        system("$makecall");
+        move("$tmpdir.test.predictions_affy", "$prefix.predictions");
     } elsif ($action eq 'predict_nt') {
         print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
