@@ -30,11 +30,15 @@ Options:
                      predict_nt: predict nucleotide-wise margins given a model
                      motif: create sequence and structure motifs given a model
     -onlyseq     use GraphProt sequence models
-    -fasta       fasta file containing binding sites
-    -affinities  list of affinities
-                     one value per line, same order as binding sites (fasta)
-    -negfasta    fasta file containing negative class sequences
+    -prefix			 this prefix is used for all results
+    								 default: GraphProt
     -model       GraphProt model
+    -fasta       fasta file containing binding sites
+    -help        brief help message
+    -man         full documentation
+
+Graph and Feature options:
+
     -abstraction RNAshapes abstraction level [RNA structure graphs]
                      default: 3
     -R           GraphProt radius
@@ -43,17 +47,23 @@ Options:
                      default: 4
     -bitsize     GraphProt bitsize used for feature encoding
                      default: 14
-    -c           SVR parameter c       [regression]
-                     default: 1
-    -epsilon     SVR parameter epsilon [regression]
-                     default: 0.1
+
+Classification options:
+
+    -negfasta    fasta file containing negative class sequences
     -lambda      SGD parameter lambda  [classification]
                      default: 10e-4
     -epochs      SGD parameter epochs  [classification]
                      default: 10
-    -debug       enable debug output
-    -help        brief help message
-    -man         full documentation
+
+Regression options:
+
+    -affinities  list of affinities
+                     one value per line, same order as binding sites (fasta)
+    -c           SVR parameter c       [regression]
+                     default: 1
+    -epsilon     SVR parameter epsilon [regression]
+                     default: 0.1
 
 =head1 DESCRIPTION
 
@@ -90,6 +100,52 @@ my $def_epochs = 10;
 my $def_lambda = 10e-4;
 my $def_epsilon = 0.1;
 my $def_c = 1;
+my $def_prefix = 'GraphProt';
+
+###############################################################################
+# parse command line options
+###############################################################################
+
+my $mode;
+my $action;
+my $onlyseq;
+my $prefix;
+my $fasta;
+my $model;
+my $negfasta;
+my $affys;
+my $R;
+my $D;
+my $c;
+my $epsilon;
+my $epochs;
+my $lambda;
+my $abstraction;
+my $bitsize;
+my $help;
+my $man;
+my $debug;
+my $result = GetOptions (	"mode=s" => \$mode,
+                            "action=s" => \$action,
+                            "prefix=s" => \$prefix,
+                            "onlyseq" => \$onlyseq,
+                            "fasta=s" => \$fasta,
+                            "negfasta=s" => \$negfasta,
+                            "affinities=s" => \$affys,
+                            "model=s" => \$model,
+                            "R=i" => \$R,
+                            "D=i" => \$D,
+                            "c=f" => \$c,
+                            "epsilon=f" => \$epsilon,
+                            "epochs=i" => \$epochs,
+                            "lambda=f" => \$lambda,
+                            "abstraction=i" => \$abstraction,
+                            "bitsize=i" => \$bitsize,
+                            "help"	=> \$help,
+							"man"	=> \$man,
+							"debug" => \$debug);
+pod2usage(-exitstatus => 1, -verbose => 1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 
 ###############################################################################
 # check program paths
@@ -124,51 +180,10 @@ if ($? != 256) {
 
 
 ###############################################################################
-# parse command line options
-###############################################################################
-my $mode;
-my $action;
-my $onlyseq;
-my $fasta;
-my $model;
-my $negfasta;
-my $affys;
-my $R;
-my $D;
-my $c;
-my $epsilon;
-my $epochs;
-my $lambda;
-my $abstraction;
-my $bitsize;
-my $help;
-my $man;
-my $debug;
-my $result = GetOptions (	"mode=s" => \$mode,
-                            "action=s" => \$action,
-                            "onlyseq" => \$onlyseq,
-                            "fasta=s" => \$fasta,
-                            "negfasta=s" => \$negfasta,
-                            "affinities=s" => \$affys,
-                            "model=s" => \$model,
-                            "R=i" => \$R,
-                            "D=i" => \$D,
-                            "c=f" => \$c,
-                            "epsilon=f" => \$epsilon,
-                            "epochs=i" => \$epochs,
-                            "lambda=f" => \$lambda,
-                            "abstraction=i" => \$abstraction,
-                            "bitsize=i" => \$bitsize,
-                            "help"	=> \$help,
-							"man"	=> \$man,
-							"debug" => \$debug);
-pod2usage(-exitstatus => 1, -verbose => 1) if $help;
-pod2usage(-exitstatus => 0, -verbose => 2) if $man;
-($result) or pod2usage(2);
-
-###############################################################################
 # check parameters
 ###############################################################################
+
+($result) or pod2usage(2);
 
 (defined $mode) or $mode='classification';
 (defined $action) or pod2usage("please specify -action\n");
@@ -361,6 +376,7 @@ sub check_params_classification {
 }
 
 defined $action or pod2usage("please specify the GraphProt action\n");
+defined $prefix or $prefix = $def_prefix;
 
 if ($mode eq 'regression') {
     if ($action eq 'ls') {
@@ -427,13 +443,13 @@ $quit_with_help and pod2usage();
 ###############################################################################
 
 # set up temporary directory
-my $tmp_template = 'GraphProt-XXXXXX';
-my $tmp_prefix = './';
+my $tmp_template = 'GraphProt_tmp-XXXXXX';
+my $tmp_prefix = "$scriptdir/";
 my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 0);
 
 # write parameters
 if ($action ne "ls") {
-    open PARAMETERS, ">", "$tmpdir/ID.param";
+    open PARAMETERS, ">", "$tmpdir.param";
     defined $R and say PARAMETERS "R $R";
     defined $D and say PARAMETERS "D $D"; 
     defined $c and say PARAMETERS "c $c"; 
@@ -464,8 +480,8 @@ if ($mode eq 'regression') {
     if ($action eq 'ls') {
         # TODO fix
         # copy input files
-        copy($fasta, "$tmpdir/ID.ls.fa");
-        copy($fasta, "$tmpdir/ID.ls.affy");
+        copy($fasta, "$tmpdir.ls.fa");
+        copy($fasta, "$tmpdir.ls.affy");
         # add parameters
         $makecall .= " -e SVM=SVR -e DO_LINESEARCH=YES";
         # add targets
@@ -512,26 +528,26 @@ if ($mode eq 'regression') {
         $makecall .= " ";
     } elsif ($action eq 'train') {
         # copy files
-        copy($fasta,    "$tmpdir/ID.train.positives.fa");
-        copy($negfasta, "$tmpdir/ID.train.negatives.fa");
+        copy($fasta,    "$tmpdir.train.positives.fa");
+        copy($negfasta, "$tmpdir.train.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " $tmpdir/ID.train.model";
+        $makecall .= " $tmpdir.train.model";
         system("$makecall");
         # copy model
-        move("$tmpdir/ID.train.model", "$scriptdir/$fasta.model");
+        move("$tmpdir.train.model", "$prefix.model");
     } elsif ($action eq 'predict') {
         # copy files
-        copy($model,    "$tmpdir/ID.train.model");
-        copy($fasta,    "$tmpdir/ID.test.fa");
+        copy($model,    "$tmpdir.train.model");
+        copy($fasta,    "$tmpdir.test.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " $tmpdir/ID.test.predictions_sgd";
+        $makecall .= " $tmpdir.test.predictions_sgd";
         system("$makecall");
         # copy results
-        copy("$tmpdir/ID.test.predictions_sgd", "$fasta.predictions_sgd");
+        copy("$tmpdir.test.predictions_sgd", "$prefix.predictions_sgd");
     } elsif ($action eq 'predict_nt') {
         # TODO
         # add parameters
