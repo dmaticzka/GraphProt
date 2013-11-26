@@ -6,7 +6,6 @@ RBIN:=R --vanilla
 SVRTRAIN:=svm-train -s 3 -t 0 -m $(SVR_CACHE)
 SVRPREDICT:=svm-predict
 SHUF:=shuf
-SVMSGDNSPDK:=EDeN/EDeN
 BEDGRAPH2BIGWIG:=bedGraphToBigWig
 BASH:=/bin/bash
 BEDTOOLS:=bedtools

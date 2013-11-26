@@ -156,25 +156,25 @@ my $scriptdir = abs_path(dirname($0));
 # check RNAshapes
 `RNAshapes -h`;
 if ($? != 0) {
-    say STDERR "please check if RNAshapes is installed and in your PATH.";
+    print STDERR "please check if RNAshapes is installed and in your PATH.\n";
     exit;
 };
 # check EDeN
 `$scriptdir/EDeN/EDeN -h`;
 if ($? != 0) {
-    say STDERR "please check if the EDeN binary is executable on your system.";
+    print STDERR "please check if the EDeN binary is executable on your system.\n";
     exit;
 };
 # check make
 `make -h`;
 if ($? != 0) {
-    say STDERR "please check if GNU make is installed and in your PATH.";
+    print STDERR "please check if GNU make is installed and in your PATH.\n";
     exit;
 };
 # check perf
 `perf -h`;
 if ($? != 256) {
-    say STDERR "please check if perf is installed and in your PATH.";
+    print STDERR "please check if perf is installed and in your PATH.\n";
     exit;
 };
 
@@ -192,7 +192,7 @@ my $quit_with_help = 0;
 
 sub check_param_fasta {
     if (not defined $fasta) {
-        say STDERR "missing parameter: please specify a set of binding sites (fasta)";
+        print STDERR "missing parameter: please specify a set of binding sites (fasta)\n";
         $quit_with_help = 1;
         return 0;
     }
@@ -205,7 +205,7 @@ sub check_param_fasta {
 
 sub check_param_negfasta {
     if (not defined $negfasta) {
-        say STDERR "missing parameter: please specify a set of unbound sites";
+        print STDERR "missing parameter: please specify a set of unbound sites\n";
         $quit_with_help = 1;
         return 0;
     }
@@ -218,7 +218,7 @@ sub check_param_negfasta {
 
 sub check_param_affys {
     if (not defined $affys) {
-        say STDERR "missing parameter: please specify the list of affinities (affinities)";
+        print STDERR "missing parameter: please specify the list of affinities (affinities)\n";
         $quit_with_help = 1;
         return 0;
     }
@@ -231,7 +231,7 @@ sub check_param_affys {
 
 sub check_param_model {
     if (not defined $model) {
-        say STDERR "missing parameter: please specify the GraphProt model to use";
+        print STDERR "missing parameter: please specify the GraphProt model to use\n";
         $quit_with_help = 1;
         return 0;
     }
@@ -245,7 +245,7 @@ sub check_param_model {
 
 sub check_param_R {
 #    if (not defined $R) {
-#        say STDERR "missing parameter: please specify the radius (R)";
+#        print STDERR "missing parameter: please specify the radius (R)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -259,7 +259,7 @@ sub check_param_R {
 
 sub check_param_D {
 #    if (not defined $D) {
-#        say STDERR "missing parameter: please specify the distance (D)";
+#        print STDERR "missing parameter: please specify the distance (D)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -273,7 +273,7 @@ sub check_param_D {
 
 sub check_param_bitsize {
 #    if (not defined $bitsize) {
-#        say STDERR "missing parameter: please specify the bitsize (bitsize)";
+#        print STDERR "missing parameter: please specify the bitsize (bitsize)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -287,7 +287,7 @@ sub check_param_bitsize {
 
 sub check_param_abstraction {
 #    if (not defined $abstraction) {
-#        say STDERR "missing parameter: please specify the RNAshapes abstraction level (abstraction)";
+#        print STDERR "missing parameter: please specify the RNAshapes abstraction level (abstraction)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -301,7 +301,7 @@ sub check_param_abstraction {
 
 sub check_param_c {
 #    if (not defined $c) {
-#        say STDERR "missing parameter: please specify SVR parameter c (c)";
+#        print STDERR "missing parameter: please specify SVR parameter c (c)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -315,7 +315,7 @@ sub check_param_c {
 
 sub check_param_epsilon {
 #    if (not defined $epsilon) {
-#        say STDERR "missing parameter: please specify SVR parameter epsilon (epsilon)";
+#        print STDERR "missing parameter: please specify SVR parameter epsilon (epsilon)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -329,7 +329,7 @@ sub check_param_epsilon {
 
 sub check_param_epochs {
 #    if (not defined $epochs) {
-#        say STDERR "missing parameter: please specify SGD parameter epochs (epochs)";
+#        print STDERR "missing parameter: please specify SGD parameter epochs (epochs)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -344,7 +344,7 @@ sub check_param_epochs {
 sub check_param_lambda {
     defined $lambda or $lambda = $def_lambda;
 #    if (not defined $lambda) {
-#        say STDERR "missing parameter: please specify SGD parameter lambda (lambda)";
+#        print STDERR "missing parameter: please specify SGD parameter lambda (lambda)\n";
 #        $quit_with_help = 1;
 #        return 0;
 #    }
@@ -395,10 +395,10 @@ if ($mode eq 'regression') {
         check_param_model;
         check_params_regression;
     } elsif ($action eq 'predict_nt') {
-        say STDERR "sorry, invalid action in regression setting";
+        print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
     } elsif ($action eq 'motif') {
-        say STDERR "sorry, invalid action in regression setting";
+        print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
     } else {
         pod2usage("error: unknown action '$action'\n");
@@ -442,6 +442,20 @@ $quit_with_help and pod2usage();
 # main
 ###############################################################################
 
+sub parse_param_file {
+    my ($param_fname) = @_;
+    my $parsed_params = "";
+
+    open LSPARS, "<", $param_fname;
+    while (my $paramline = <LSPARS>) {
+      my ($param_name, $param_val) = split(' ', $paramline);
+      $parsed_params .= "$param_name: $param_val\n";
+    }
+    close LSPARS;
+
+    return $parsed_params;
+}
+
 # set up temporary directory
 my $tmp_template = 'GraphProt_tmp-XXXXXX';
 my $tmp_prefix = "$scriptdir/";
@@ -450,18 +464,18 @@ my $tmpdir = tempdir($tmp_template, DIR => $tmp_prefix, CLEANUP => 0);
 # write parameters
 if ($action ne "ls") {
     open PARAMETERS, ">", "$tmpdir.param";
-    defined $R and say PARAMETERS "R $R";
-    defined $D and say PARAMETERS "D $D"; 
-    defined $c and say PARAMETERS "c $c"; 
-    defined $epsilon and say PARAMETERS "e $epsilon"; 
-    defined $epochs and say PARAMETERS "EPOCHS $epochs"; 
-    defined $lambda and say PARAMETERS "LAMBDA $lambda"; 
-    defined $abstraction and say PARAMETERS "ABSTRACTION $abstraction"; 
-    defined $bitsize and say PARAMETERS "b $bitsize"; 
-    say PARAMETERS "CUE nil";
-    say PARAMETERS "STACK nil";
-    say PARAMETERS "VIEWPOINT --vp";
-    say PARAMETERS "DIRECTED DIRECTED";
+    defined $R and print PARAMETERS "R $R\n";
+    defined $D and print PARAMETERS "D $D\n"; 
+    defined $c and print PARAMETERS "c $c\n"; 
+    defined $epsilon and print PARAMETERS "e $epsilon\n"; 
+    defined $epochs and print PARAMETERS "EPOCHS $epochs\n"; 
+    defined $lambda and print PARAMETERS "LAMBDA $lambda\n"; 
+    defined $abstraction and print PARAMETERS "ABSTRACTION $abstraction\n"; 
+    defined $bitsize and print PARAMETERS "b $bitsize\n"; 
+    print PARAMETERS "CUE nil\n";
+    print PARAMETERS "STACK nil\n";
+    print PARAMETERS "VIEWPOINT --vp\n";
+    print PARAMETERS "DIRECTED DIRECTED\n";
     close PARAMETERS;
 }
 
@@ -505,21 +519,31 @@ if ($mode eq 'regression') {
         # add targets
         $makecall .= " ";
     } elsif ($action eq 'predict_nt') {
-        say STDERR "sorry, invalid action in regression setting";
+        print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
     } elsif ($action eq 'motif') {
-        say STDERR "sorry, invalid action in regression setting";
+        print STDERR "sorry, invalid action in regression setting\n";
         exit 2;
     } else {
         pod2usage("error: unknown action '$action'\n");
     }
 } elsif ($mode eq 'classification') {
     if ($action eq 'ls') {
-        # TODO
+        # copy files
+        copy($fasta,    "$tmpdir.ls.positives.fa");
+        copy($negfasta, "$tmpdir.ls.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD  -e DO_LINESEARCH=YES";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.param";
+        system("$makecall");
+        # parse and report parameters
+        my $lspars = parse_param_file("$tmpdir.param");
+        print "optimized parameters:\n";
+        print $lspars;
+        open NICEPARAMS, '>', "$prefix.params";
+        print NICEPARAMS $lspars;
+        close NICEPARAMS;
     } elsif ($action eq 'cv') {
         # TODO
         # add parameters
@@ -538,6 +562,7 @@ if ($mode eq 'regression') {
         # copy model
         move("$tmpdir.train.model", "$prefix.model");
     } elsif ($action eq 'predict') {
+        # TODO: return class of sequences, enable negfasta (create empty if not supplied)
         # copy files
         copy($model,    "$tmpdir.train.model");
         copy($fasta,    "$tmpdir.test.fa");
@@ -567,8 +592,5 @@ if ($mode eq 'regression') {
     pod2usage("error: unknown mode '$mode'\n");
 }
 
-# execute make call
-say STDOUT $tmpdir;
-print "$makecall";
-# get output files
 # clean up
+unlink("$tmpdir.*");
