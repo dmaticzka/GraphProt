@@ -178,6 +178,20 @@ if ($? != 256) {
     exit;
 };
 
+if ($mode eq 'regression') {
+  # check svm-train
+  `svm-train -h`;
+  if ($? != 256) {
+      print STDERR "please check if libsvm is installed and in your PATH (can't call smv-train).\n";
+      exit;
+  };
+  `svm-predict -h`;
+  if ($? != 256) {
+      print STDERR "please check if libsvm is installed and in your PATH (can't call svm-predict).\n";
+      exit;
+  };
+}
+
 
 ###############################################################################
 # check parameters
@@ -507,20 +521,32 @@ if (defined $onlyseq) {
 
 if ($mode eq 'regression') {
     if ($action eq 'ls') {
-        # TODO fix
+        # TODO bugfix
         # copy input files
         copy($fasta, "$tmpdir.ls.fa");
-        copy($fasta, "$tmpdir.ls.affy");
+        copy($affys, "$tmpdir.ls.affy");
         # add parameters
-        $makecall .= " -e SVM=SVR -e DO_LINESEARCH=YES";
+        $makecall .= " -e SVM=SVR -e DO_LINESEARCH=YES -e DO_SGDOPT=NO";
         # add targets
-        $makecall .= " ID.param";
+        $makecall .= " $tmpdir.param";
+        system("$makecall");
+        # parse and report parameters
+        my $lspars = parse_param_file("$tmpdir.param");
+        print "optimized parameters:\n";
+        print $lspars;
+        open NICEPARAMS, '>', "$prefix.params";
+        print NICEPARAMS $lspars;
+        close NICEPARAMS;
     } elsif ($action eq 'cv') {
-        # TODO
+        # copy input files
+        copy($fasta, "$tmpdir.train.fa");
+        copy($affys, "$tmpdir.train.affy");
         # add parameters
-        $makecall .= " -e SVM=SVR ";
+        $makecall .= " -e SVM=SVR";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.train.cv_svr";
+        system("$makecall");
+        move("$tmpdir.train.cv_svr", "$prefix.cv_results");
     } elsif ($action eq 'train') {
         # TODO        
         # add parameters

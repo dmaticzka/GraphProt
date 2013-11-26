@@ -3,7 +3,7 @@
 ## Other Binaries ##############################################################
 PERL:=perl
 RBIN:=R --vanilla
-SVRTRAIN:=svm-train -s 3 -t 0 -m $(SVR_CACHE)
+SVRTRAIN:=svm-train
 SVRPREDICT:=svm-predict
 SHUF:=shuf
 BEDGRAPH2BIGWIG:=bedGraphToBigWig

@@ -3,7 +3,7 @@
 ## Other Binaries ##############################################################
 PERL:=/usr/local/perl/bin/perl
 RBIN:=/usr/local/R/2.15.1-lx/bin/R --vanilla
-SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m $(SVR_CACHE)
+SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train
 SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
 SHUF:=/home/maticzkd/src/coreutils-8.15/src/shuf
 BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig

@@ -412,7 +412,7 @@ ifeq ($(SVM),SVR)
 %.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv_svr : %.feature | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+	time  $(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # final result of cross validation: squared correlation coefficient
 %.cv : %.cv_svr
@@ -424,7 +424,7 @@ ifeq ($(SVM),SVR)
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
 %.model : %.feature | %.param
-	time $(SVRTRAIN) -c $(C) -p $(EPSILON) $< $@
+	time  $(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
 %.test.predictions_svr : %.train.model %.test.feature
@@ -913,14 +913,14 @@ dist:
 	# copy bin
 	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
 	# copy data
-	cp -rv EDeN data StructureLibrary $(DIST_DIR)
+# 	cp -rv EDeN data StructureLibrary $(DIST_DIR)
 	# copy distribution parameters
 	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
 
 # # delete all files except fastas
 distclean: clean
 	-rm -rf *.param *.perf *.predictions_class *.predictions_affy \
-	*.predictions_svr *.predictions_sgd *.ls.fa *.csv *model \
+	*.predictions *.predictions_sgd *.ls.fa *.csv *model \
 	*.sgeout *.class *.correlation *.cv *.cv.predictions \
 	*.cv_svr *.model_* *.prplot *.prplot.svg $(LC_FILES) *.nt_margins* \
 	*.logo.png *.logo_bit.png
