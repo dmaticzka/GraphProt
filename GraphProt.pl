@@ -192,6 +192,19 @@ if ($mode eq 'regression') {
   };
 }
 
+if ($action eq 'motif') {
+  `R --help`;
+  if ($? != 0) {
+      print STDERR "please check if R is installed and in your path (can't call R).\n";
+      exit;
+  };
+  `echo 'require(plyr)' | R --slave`;
+  if ($? != 0) {
+      print STDERR "please check please make sure that the R package 'plyr' is installed.\n";
+      exit;
+  };
+}
+
 
 ###############################################################################
 # check parameters
@@ -509,7 +522,7 @@ if ($action ne "ls") {
 }
 
 # collect make call
-my $makecall = "make";
+my $makecall = "make -C $scriptdir ";
 
 # use sequence graphs
 if (defined $onlyseq) {

@@ -1,3 +1,4 @@
+require(ddply)
 # parse command line arguments
 args <- commandArgs(trailingOnly=T)
 nt_margins <- args[1]
