@@ -178,7 +178,7 @@ if ($? != 256) {
     exit;
 };
 
-if ($mode eq 'regression') {
+if (defined $mode and $mode eq 'regression') {
   # check svm-train
   `svm-train --help`;
   if ($? != 256) {
@@ -522,7 +522,7 @@ if ($action ne "ls") {
 }
 
 # collect make call
-my $makecall = "make -C $scriptdir ";
+my $makecall = "make -C $scriptdir";
 
 # use sequence graphs
 if (defined $onlyseq) {
@@ -554,6 +554,7 @@ if ($mode eq 'regression') {
         # copy input files
         copy($fasta, "$tmpdir.train.fa");
         copy($affys, "$tmpdir.train.affy");
+        copy("$tmpdir.param", "$tmpdir.train.param");
         # add parameters
         $makecall .= " -e SVM=SVR";
         # add targets

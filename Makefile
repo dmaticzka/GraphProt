@@ -699,11 +699,11 @@ endif
 %.gspan : %.gspan.gz
 	zcat $< > $@
 
-ifeq ($(DO_LINESEARCH),NO)
-# just use defaults instead of doing line search
-%.param : $(LSPAR)
-	cut -f 1,2 -d' ' < $< > $@
-else
+#ifeq ($(DO_LINESEARCH),NO)
+## just use defaults instead of doing line search
+#%.param : $(LSPAR)
+#	cut -f 1,2 -d' ' < $< > $@
+#else
 ifeq ($(DO_SGDOPT),YES)
 # do parameter optimization by line search but also use sgd-internal optimization
 %.param : %.ls.fa $(LSPAR)
@@ -751,7 +751,7 @@ else
 	-tmp $(PWD) \
 	-bindir $(PWD) 2> >(tee $@.log >&2)
 endif
-endif
+#endif
 
 ifeq ($(LS_DO_INNER_CV),YES)
 # subset fastas prior to line search

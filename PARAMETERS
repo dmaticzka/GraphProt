@@ -19,15 +19,15 @@ DIST_DIR:=GraphProt-1.0
 
 # use sge arrayjobs to create gspan and features
 # implemented for CONTEXTSHREP
-SGEARRAY=YES
+SGEARRAY=NO
 # old cluster:
-#SGE_SUBMIT_HOST=biui.informatik.uni-freiburg.de
-#SGE_EXPORT=export SGE_ROOT=/opt/sge-6.0/
-#SGE_BIN_PATH=/opt/sge-6.0/bin/lx24-amd64
+SGE_SUBMIT_HOST=biui.informatik.uni-freiburg.de
+SGE_EXPORT=export SGE_ROOT=/opt/sge-6.0/
+SGE_BIN_PATH=/opt/sge-6.0/bin/lx24-amd64
 # new cluster:
-SGE_SUBMIT_HOST=ui.bi.uni-freiburg.de
-SGE_EXPORT=export SGE_ROOT=/opt/ogs; export SGE_CELL=BI1
-SGE_BIN_PATH=/opt/ogs/bin/linux-x64
+%SGE_SUBMIT_HOST=ui.bi.uni-freiburg.de
+%SGE_EXPORT=export SGE_ROOT=/opt/ogs; export SGE_CELL=BI1
+%SGE_BIN_PATH=/opt/ogs/bin/linux-x64
 
 # prefix of train/test data
 # RNAcompete proteins
