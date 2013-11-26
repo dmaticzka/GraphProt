@@ -45,7 +45,7 @@ GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
 FASTAPL:=$(PERL) $(BINDIR)/fastapl
 FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
-
+SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################

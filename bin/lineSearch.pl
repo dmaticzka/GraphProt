@@ -299,6 +299,8 @@ do {
       $debug
         and say 'skipping parameter because of sgd-internal optimization: '
         . $par;
+      # exit temp directory
+      chdir($CURRDIR);
       next;
     }
 
@@ -310,6 +312,8 @@ do {
       and $started_at_least_one_evaluation )
     {
       $debug and say 'skipping parameter that does not vary: ' . $par;
+      # exit temp directory
+      chdir($CURRDIR);
       next;
     }
     $started_at_least_one_evaluation = 1;
