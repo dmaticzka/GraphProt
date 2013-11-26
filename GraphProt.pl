@@ -478,11 +478,10 @@ sub parse_param_file {
       my ($param_name, $param_val) = split(' ', $paramline);
 
       # prettyprint parameters
-      $param_name =~ s/^EPOCHS/epochs/;
-      $param_name =~ s/^LAMBDA/lambda/;
       $param_name =~ s/^b/bitsize/;
-      $param_name =~ s/^ABSTRACTION/abstraction/;
       $param_name =~ s/^e/epsilon/;
+      $param_name =~ s/^ABSTRACTION/abstraction/;
+      $param_name =~ s/^EPOCHS/epochs/;
       $param_name =~ s/^LAMBDA/lambda/;
 
       # skip defaults
@@ -554,7 +553,6 @@ if ($mode eq 'regression') {
         # copy input files
         copy($fasta, "$tmpdir.train.fa");
         copy($affys, "$tmpdir.train.affy");
-        copy("$tmpdir.param", "$tmpdir.train.param");
         # add parameters
         $makecall .= " -e SVM=SVR";
         # add targets
