@@ -581,17 +581,23 @@ if ($mode eq 'regression') {
         # copy model
         move("$tmpdir.train.model", "$prefix.model");
     } elsif ($action eq 'predict') {
-        # TODO: return class of sequences, enable negfasta (create empty if not supplied)
+        # TODO: return class of sequences, 
         # copy files
         copy($model,    "$tmpdir.train.model");
-        copy($fasta,    "$tmpdir.test.fa");
+        copy($fasta,    "$tmpdir.test.positives.fa");
+        # enable negfasta (create empty if not supplied)
+        if (defined $negfasta) {
+          copy($negfasta,  "$tmpdir.test.negatives.fa");
+        } else {
+          system("touch $tmpdir.test.negatives.fa");
+        }
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " $tmpdir.test.predictions_sgd";
+        $makecall .= " $tmpdir.test.predictions_class";
         system("$makecall");
         # copy results
-        copy("$tmpdir.test.predictions_sgd", "$prefix.predictions_sgd");
+        copy("$tmpdir.test.predictions_class", "$prefix.predictions");
     } elsif ($action eq 'predict_nt') {
         # TODO
         # add parameters
