@@ -599,11 +599,17 @@ if ($mode eq 'regression') {
         # copy results
         copy("$tmpdir.test.predictions_class", "$prefix.predictions");
     } elsif ($action eq 'predict_nt') {
-        # TODO
+        # copy files
+        copy($model,    "$tmpdir.train.model");
+        copy($fasta,    "$tmpdir.test.positives.fa");
+        system("touch $tmpdir.test.negatives.fa");
         # add parameters
         $makecall .= " -e SVM=SGD ";
         # add targets
-        $makecall .= " ";
+        $makecall .= " $tmpdir.test.nt_margins";
+        system("$makecall");
+        # copy results
+        copy("$tmpdir.test.nt_margins", "$prefix.nt_margins");
     } elsif ($action eq 'motif') {
         # TODO
         # add parameters
