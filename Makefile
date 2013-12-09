@@ -39,8 +39,8 @@ SUBSET_TOP_WINS:=$(PERL) $(BINDIR)/subTopWins.pl
 MEDIAN_AWK:=$(BINDIR)/median.awk
 GSPAN_SPLIT_GRAPHS:=$(BINDIR)/gspan_split_shreps.awk
 SPLIT_GSPAN:=$(PERL) $(BINDIR)/split_gspan.pl
-GENERICSUBMITTOCLUSTER:=$(BASH) $(BINDIR)/generic_submit_to_cluster.sh
-MOREGENERICSGESUBMITSCRIPT:=$(BASH) $(BINDIR)/more_generic_submit_to_cluster.sh
+GENERICSUBMITTOCLUSTER:=$(BINDIR)/generic_submit_to_cluster.sh
+MOREGENERICSGESUBMITSCRIPT:=$(BINDIR)/more_generic_submit_to_cluster.sh
 GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
 FASTAPL:=$(PERL) $(BINDIR)/fastapl
 FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
@@ -167,7 +167,7 @@ ifeq ($(SGEARRAY),YES)
 	ls -l $@.FEATURE_DIR/*.gspan.gz | wc -l > $@.NSEQS;
 	echo "$(SVMSGDNSPDK) -a FEATURE -r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) -i " > $@.FEATURE_DIR/edencall
 	ssh `whoami`@$(SGE_SUBMIT_HOST) \
-	'$(SGE_EXPORT); cd $(PWD); $(SGE_BIN_PATH)/qsub -N feature_$@ -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
+	'$(SGE_EXPORT); cd $(PWD); $(SGE_BIN_PATH)/qsub -N `echo feature_$@ | tr "/" "_"` -t 1-`cat $@.NSEQS` -o $@.FEATURE_DIR/SGEOUT -e $@.FEATURE_DIR/SGEOUT $(MOREGENERICSGESUBMITSCRIPT) $@.FEATURE_DIR $@.FEATURE_DIR/edencall'
 	( for i in `seq 1 \`cat $@.NSEQS\``; \
 	do cat $@.FEATURE_DIR/$$i.gspan.gz.feature; \
 	done ) | \

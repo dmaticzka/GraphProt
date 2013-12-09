@@ -319,8 +319,8 @@ if ( $i_sge_submit_host eq 'biui.informatik.uni-freiburg.de' ) {
   $SGE_BIN_PATH = '/opt/sge-6.0/bin/lx24-amd64/';
   $SGE_EXPORTS  = 'export SGE_ROOT=/opt/sge-6.0/;';
 } elsif ( $i_sge_submit_host eq 'ui.bi.uni-freiburg.de' ) {
-  $SGE_BIN_PATH = '/opt/ogs/bin/linux-x64/';
-  $SGE_EXPORTS  = 'export SGE_ROOT=/opt/ogs; export SGE_CELL=BI1;';
+  $SGE_BIN_PATH = '/opt/sge/bin/lx-amd64/';
+  $SGE_EXPORTS  = 'export SGE_ROOT=/opt/sge; export SGE_CELL=BI2;';
 }
 
 $i_add_seq_graph_t = 1 if ($i_no_structure);
