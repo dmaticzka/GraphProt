@@ -410,9 +410,9 @@ sub check_param_lambda {
 sub check_params_regression {
 
   # only check when creating a structure model
-  defined $onlyseq or check_param_R();
-  defined $onlyseq or check_param_D;
   defined $onlyseq or check_param_abstraction;
+  check_param_R;
+  check_param_D;
   check_param_bitsize;
   check_param_c;
   check_param_epsilon;
@@ -421,9 +421,9 @@ sub check_params_regression {
 sub check_params_classification {
 
   # only check when creating a structure model
-  defined $onlyseq or check_param_R;
-  defined $onlyseq or check_param_D;
   defined $onlyseq or check_param_abstraction;
+  check_param_R;
+  check_param_D;
   check_param_bitsize;
   check_param_epochs;
   check_param_lambda;
@@ -776,4 +776,4 @@ if ( $mode eq 'regression' ) {
 }
 
 # clean up
-unlink glob "$tmpdir.*";
+unlink glob "$tmpdir.*" if (not defined $debug);
