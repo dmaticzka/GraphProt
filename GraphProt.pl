@@ -28,6 +28,7 @@ Options:
                      train: train a model
                      predict: predict binding for a whole site
                      predict_profile: predict binding profiles
+                     predict_has: predict high-affinity sites
                      motif: create sequence and structure motifs given a model
     -onlyseq     use GraphProt sequence models
     -prefix      this prefix is used for all results
@@ -64,6 +65,12 @@ Regression options:
                      default: 1
     -epsilon     SVR parameter epsilon [regression]
                      default: 0.1
+
+Prediction options:
+
+    -percentile  keep only regions with average score above a percentile
+                 as high-affinity sites
+                     default: 99
 
 =head1 DESCRIPTION
 
@@ -103,6 +110,7 @@ my $def_lambda      = 10e-4;
 my $def_epsilon     = 0.1;
 my $def_c           = 1;
 my $def_prefix      = 'GraphProt';
+my $def_percentile  = 99;
 
 ###############################################################################
 # parse command line options
@@ -124,6 +132,7 @@ my $epochs;
 my $lambda;
 my $abstraction;
 my $bitsize;
+my $percentile;
 my $help;
 my $man;
 my $debug;
@@ -144,6 +153,7 @@ my $result = GetOptions(
   "lambda=f"      => \$lambda,
   "abstraction=i" => \$abstraction,
   "bitsize=i"     => \$bitsize,
+  "percentile=f"  => \$percentile,
   "help"          => \$help,
   "man"           => \$man,
   "debug"         => \$debug
@@ -419,6 +429,16 @@ sub check_param_lambda {
   }
 }
 
+sub check_param_percentile {
+  defined $percentile or $percentile = $def_percentile;
+
+  if ( $percentile <= 0 or $percentile >= 100 ) {
+    pod2usage("error: please specify a percentile in (0,100)");
+    $quit_with_help = 1;
+    return 0;
+  }
+}
+
 sub check_params_regression {
 
   # only check when creating a structure model
@@ -463,6 +483,9 @@ if ( $mode eq 'regression' ) {
   } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
+  } elsif ( $action eq 'predict_has' ) {
+    print STDERR "sorry, invalid action in regression setting\n";
+    exit 2;
   } elsif ( $action eq 'motif' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
@@ -489,6 +512,11 @@ if ( $mode eq 'regression' ) {
     check_param_fasta;
     check_param_model;
     check_params_classification;
+  } elsif ( $action eq 'predict_profile' ) {
+    check_param_fasta;
+    check_param_model;
+    check_params_classification;
+    check_param_percentile;
   } elsif ( $action eq 'motif' ) {
     check_param_fasta;
     check_param_model;

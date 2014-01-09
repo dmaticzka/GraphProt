@@ -90,7 +90,7 @@ Please note that with GraphProt structure models this action currently only supp
 #### predict_has - Predict high-affinity binding sites ####
 
 Predict high-affinity target sites as showcased in the GraphProt paper.
-Selects all regions with average scores above a given percentile (parameter --percentile, defaults to 0.99).
+Selects all regions with average scores above a given percentile (parameter --percentile, defaults to 99).
 
 #### motif - Create RNA sequence and structure motifs ####
 

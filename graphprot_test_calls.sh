@@ -21,6 +21,9 @@ echo; echo; echo; echo classification, predict using only positives
 echo; echo; echo; echo classification nt margins
 ./GraphProt.pl -mode classification -action predict_profile --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_ntmargins
 
+echo; echo; echo; echo classification nt margins
+./GraphProt.pl -mode classification -action predict_has --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -percentile 55 -prefix CL_has
+
 echo; echo; echo; echo classification motif
 ./GraphProt.pl -mode classification -action motif -fasta testclip.train.positives.fa -model CL_train.model  -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_motif
 
