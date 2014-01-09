@@ -210,11 +210,23 @@ if ( $action eq 'motif' ) {
       "please check if R is installed and in your path (can't call R).\n";
     exit;
   }
-  `echo 'require(plyr)' | R --slave`;
+  `echo 'require(plyr)' | R --slave &> /dev/null`;
   if ( $? != 0 ) {
     print STDERR
-      "please check please make sure that the R package 'plyr' is installed.\n";
+      "please make sure that the R package 'plyr' is installed.\n";
     exit;
+  }
+  my $weblogo_version = `weblogo --version`;
+  chomp $weblogo_version;
+  if ( $? != 0 ) {
+    print STDERR
+      "please make sure that WebLogo 3.2 is installed and in your PATH (can't call weblogo).\n";
+    exit;
+  }
+  if ($weblogo_version !~ /WebLogo 3\.2/) {
+    print STDERR
+      "\n WARNING: WebLogo reports version '$weblogo_version'." .
+      "\n GraphProt was tested for version 3.2, motif plotting may fail!\n";
   }
 }
 
@@ -752,21 +764,27 @@ if ( $mode eq 'regression' ) {
 
     # add targets
     $makecall .= " $tmpdir.test.sequence_top_wins.truncated";
+    $makecall .= " $tmpdir.test.sequence_top_wins.truncated.logo.png";
     system("$makecall");
     if ( not defined $onlyseq ) {
       $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated";
+      $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated.logo.png";
       system("$makecall");
     }
 
     # copy results
     copy( "$tmpdir.test.sequence_top_wins.truncated",
       "$prefix.sequence_motif" );
-    print "GraphProt sequence motif written to file $prefix.sequence_motif\n";
+    copy( "$tmpdir.test.sequence_top_wins.truncated.logo.png",
+      "$prefix.sequence_motif.png" );
+    print "GraphProt sequence motif written to file $prefix.sequence_motif.png\n";
     if ( not defined $onlyseq ) {
       copy( "$tmpdir.test.struct_annot_top_wins.truncated",
         "$prefix.structure_motif" );
+      copy( "$tmpdir.test.struct_annot_top_wins.truncated.logo.png",
+        "$prefix.structure_motif.png" );
       print
-        "GraphProt structure motif written to file $prefix.structure_motif\n";
+        "GraphProt structure motif written to file $prefix.structure_motif.png\n";
     }
   } else {
     pod2usage("error: unknown action '$action'\n");

@@ -13,6 +13,7 @@ GNUPLOT:=/home/maticzkd/local/bin/gnuplot
 # perf is available at http://www.cs.cornell.edu/~caruana/
 PERF:=perf
 TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
+WEBLOGO:=~/src/weblogo-3.2/weblogo
 
 ## General parameters ##########################################################
 DIST_DIR:=GraphProt-1.0

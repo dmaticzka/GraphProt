@@ -14,6 +14,7 @@ GNUPLOT:=gnuplot
 PERF:=perf
 # from ucsc tools
 TWOBITTOFA:=twoBitToFa
+WEBLOGO:=weblogo
 
 # prefix of train/test data
 # RNAcompete proteins

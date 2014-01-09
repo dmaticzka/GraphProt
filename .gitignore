@@ -45,3 +45,4 @@ output.cv_predictions.*
 *.accplot
 *.rocplot
 *.prplot
+*_motif

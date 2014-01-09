@@ -21,6 +21,7 @@ follwing programs are installed and accessible via the PATH environment variable
 * GNU make is used as the pipeline backend ([http://www.gnu.org/software/make/](http://www.gnu.org/software/make/))
 * R is used to process nucleotide-wise margins for motif creation ([www.r-project.org/](www.r-project.org/))
 * The R plyr package is required for calculating motifs ([http://plyr.had.co.nz/](http://plyr.had.co.nz/)) and can be installed from within R by issuing the command "install.packages('plyr')".
+* GraphProt uses WebLogo3 to plot sequence and structure motifs. GraphProt was tested using version WebLogo 3.2 [http://code.google.com/p/weblogo/downloads](http://code.google.com/p/weblogo/downloads).
 
 GraphProt will scan for these programs and notify you if something seems amiss.
 GraphProt contains a copy of fastapl ([http://seq.cbrc.jp/fastapl/index.html.en](http://seq.cbrc.jp/fastapl/index.html.en)).
@@ -90,9 +91,7 @@ at most 150 nt.
 #### motif - Create RNA sequence and structure motifs ####
 
 Create RNA sequence and structure motifs. High-scoring 12-mers are written to
-files "GraphProt.sequence_motif" and "GraphProt.structure_motif" and can be
-used to create sequence logos (for example using WebLogo 
-[http://weblogo.threeplusone.com/](http://weblogo.threeplusone.com/)).
+files "GraphProt.sequence_motif.png" and "GraphProt.structure_motif.png".
 
 ## Advanced Usage ##
 

@@ -365,7 +365,7 @@ endif
 
 %.struct_annot_top_wins.truncated.logo.png : %.struct_annot_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	$(WEBLOGO) -F png_print -o $@ \
 	--alphabet 'BEHIMS' \
 	--errorbars NO \
 	--fineprint '' \
@@ -381,7 +381,7 @@ endif
 
 %.struct_annot_top_wins.truncated.pup.logo.png : %.struct_annot_top_wins.truncated.pup
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	$(WEBLOGO) -F png_print -o $@ \
 	--color-scheme classic \
 	--alphabet 'UP' \
 	--color red P 'Paired' \
