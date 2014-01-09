@@ -68,7 +68,7 @@ Runs a 10-fold crossvalidation. Crossvalidation results are written to file
 
 Trains a GraphProt model. The model is written to file "GraphProt.model".
 
-#### predict - Predictions based on a model ####
+#### predict - Predict binding for a whole site ####
 
 Predict SVM margins for whole sequences. Margins are written to file
 "GraphProt.predictions". Each line of this file gives the margin for one sequence in the second column,
@@ -76,17 +76,21 @@ in the same order as the fasta file. In classification setting the first column 
 in regression setting the first column contains, if specified, the affinities, otherwise
 1.
 
-#### predict_nt - Nucleotide-wise predictions based on a model ####
+#### predict_profile - Predict binding profiles ####
 
-Predict nucleotide-wise margins for sequences. Nucleotide-wise margins are written
+Predict binding profiles (nucleotide-wise margins) for sequences. Nucleotide-wise margins are written
 to file "GraphProt.nt_margins" and contain three columns:
 
 1. number of sequence
 2. number of nucleotide
-3. margin of this nucleotide
+3. prediction margin of this nucleotide
 
-Please note that nucleotide wise margins are only supported for sequences with
-at most 150 nt.
+Please note that with GraphProt structure models this action currently only supports sequences of up to 150 nt.
+
+#### predict_has - Predict high-affinity binding sites ####
+
+Predict high-affinity target sites as showcased in the GraphProt paper.
+Selects all regions with average scores above a given percentile (parameter --percentile, defaults to 0.99).
 
 #### motif - Create RNA sequence and structure motifs ####
 

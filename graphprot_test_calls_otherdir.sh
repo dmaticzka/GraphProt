@@ -14,7 +14,7 @@ GraphProt_distribution/GraphProt.pl -mode classification -action predict    -fas
 GraphProt_distribution/GraphProt.pl -mode classification -action predict    -fasta testclip.train.positives.fa -model GraphProt.model -R 1 -D 0 -bitsize 10
 
 # classification nt margins
-GraphProt_distribution/GraphProt.pl -mode classification -action predict_nt --onlyseq -fasta testclip.train.positives.fa -model GraphProt.model -R 1 -D 0 -bitsize 10
+GraphProt_distribution/GraphProt.pl -mode classification -action predict_profile --onlyseq -fasta testclip.train.positives.fa -model GraphProt.model -R 1 -D 0 -bitsize 10
 
 # classification motif
 GraphProt_distribution/GraphProt.pl -mode classification -action motif -fasta testclip.train.positives.fa -model GraphProt.model -R 1 -D 0 -bitsize 10

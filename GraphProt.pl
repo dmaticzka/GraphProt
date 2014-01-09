@@ -26,8 +26,8 @@ Options:
                      ls: optimize parameters
                      cv: run a crossvalidation
                      train: train a model
-                     predict: predict margins given a model
-                     predict_nt: predict nucleotide-wise margins given a model
+                     predict: predict binding for a whole site
+                     predict_profile: predict binding profiles
                      motif: create sequence and structure motifs given a model
     -onlyseq     use GraphProt sequence models
     -prefix      this prefix is used for all results
@@ -460,7 +460,7 @@ if ( $mode eq 'regression' ) {
     check_param_fasta;
     check_param_model;
     check_params_regression;
-  } elsif ( $action eq 'predict_nt' ) {
+  } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
   } elsif ( $action eq 'motif' ) {
@@ -485,7 +485,7 @@ if ( $mode eq 'regression' ) {
     check_param_fasta;
     check_param_model;
     check_params_classification;
-  } elsif ( $action eq 'predict_nt' ) {
+  } elsif ( $action eq 'predict_profile' ) {
     check_param_fasta;
     check_param_model;
     check_params_classification;
@@ -649,7 +649,7 @@ if ( $mode eq 'regression' ) {
     system("$makecall");
     move( "$tmpdir.test.predictions_affy", "$prefix.predictions" );
     print "GraphProt predictions written to file $prefix.predictions\n";
-  } elsif ( $action eq 'predict_nt' ) {
+  } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
   } elsif ( $action eq 'motif' ) {
@@ -734,7 +734,7 @@ if ( $mode eq 'regression' ) {
     # copy results
     copy( "$tmpdir.test.predictions_class", "$prefix.predictions" );
     print "GraphProt predictions written to file $prefix.predictions\n";
-  } elsif ( $action eq 'predict_nt' ) {
+  } elsif ( $action eq 'predict_profile' ) {
 
     # copy files
     copy( $model, "$tmpdir.train.model" );
