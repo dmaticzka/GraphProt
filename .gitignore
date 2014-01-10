@@ -46,3 +46,4 @@ output.cv_predictions.*
 *.rocplot
 *.prplot
 *_motif
+*.perc_thresh

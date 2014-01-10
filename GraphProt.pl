@@ -512,7 +512,7 @@ if ( $mode eq 'regression' ) {
     check_param_fasta;
     check_param_model;
     check_params_classification;
-  } elsif ( $action eq 'predict_profile' ) {
+  } elsif ( $action eq 'predict_has' ) {
     check_param_fasta;
     check_param_model;
     check_params_classification;
@@ -780,7 +780,25 @@ if ( $mode eq 'regression' ) {
     copy( "$tmpdir.test.nt_margins", "$prefix.nt_margins" );
     print
       "GraphProt nucleotide-wise margins written to file $prefix.nt_margins\n";
-  } elsif ( $action eq 'motif' ) {
+  } elsif ( $action eq 'predict_has' ) {
+
+    # copy files
+    copy( $model, "$tmpdir.train.model" );
+    copy( $fasta, "$tmpdir.test.positives.fa" );
+    system("touch $tmpdir.test.negatives.fa");
+
+    # add parameters
+    $makecall .= " -e SVM=SGD -e HAS_PERCENTILE=$percentile";
+
+    # add targets
+    $makecall .= " $tmpdir.test.nt_margins.perc_thresh";
+    system("$makecall");
+
+    # copy results
+    copy( "$tmpdir.test.nt_margins.perc_thresh", "$prefix.has" );
+    print
+      "GraphProt high affinity sites written to file $prefix.has\n";
+} elsif ( $action eq 'motif' ) {
 
     # copy files
     copy( $model, "$tmpdir.train.model" );

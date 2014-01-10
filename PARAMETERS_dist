@@ -72,6 +72,9 @@ CV_FOLD:=10
 # number of iterations for the learningcurve evaluation
 LEARNINGCURVE_SPLITS:=10
 
+# select margins above this percentile as high affinity sites
+HAS_PERCENTILE=99
+
 # profile generation parameters
 # window size
 MARGINS_WINDOW=12

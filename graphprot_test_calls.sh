@@ -2,7 +2,6 @@ echo; echo; echo; echo prepare input data
 head -n 20 data/testclip.train.positives.fa > testclip.train.positives.fa
 head -n 20 data/testclip.train.negatives.fa > testclip.train.negatives.fa
 
-# TODO: running
 echo; echo; echo; echo classification, ls
 ./GraphProt.pl -mode classification -action ls -fasta testclip.train.positives.fa -negfasta testclip.train.negatives.fa -prefix CL_ls
 

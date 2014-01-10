@@ -46,6 +46,7 @@ FASTAPL:=$(PERL) $(BINDIR)/fastapl
 FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
+THRESH_MARGINS:=$(PWD)/bin/subset_margins_by_quant.R
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
@@ -548,6 +549,14 @@ ifeq ($(SVM),SGD)
 	@echo ""
 	@echo "summarizing nucleotide-wise margins:"
 	$(SUMMARIZE_MARGINS) -W $(MARGINS_WINDOW) < $< > $@
+
+%.nt_margins.perc_thresh : %.nt_margins.summarized
+	@echo ""
+	@echo "selecting high affinity sites ($(PERCENTILE)th percentile)"
+	cat $< | \
+	cut -f 1,2,6 > $@.tmp
+	$(RBIN) --slave --args $(HAS_PERCENTILE) $@.tmp $@ < $(THRESH_MARGINS)
+	@rm $@.tmp
 
 %.nt_margins.summarized.plus.bedGraph : %.nt_margins.summarized %.bed
 	@echo ""
