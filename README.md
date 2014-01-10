@@ -70,7 +70,7 @@ Trains a GraphProt model. The model is written to file "GraphProt.model".
 
 #### predict - Predict binding for a whole site ####
 
-Predict SVM margins for whole sequences. Margins are written to file
+Predict binding of whole sequences, e.g. CLIP sites. Margins are written to file
 "GraphProt.predictions". Each line of this file gives the margin for one sequence in the second column,
 in the same order as the fasta file. In classification setting the first column contains the class,
 in regression setting the first column contains, if specified, the affinities, otherwise
@@ -79,23 +79,29 @@ in regression setting the first column contains, if specified, the affinities, o
 #### predict_profile - Predict binding profiles ####
 
 Predict binding profiles (nucleotide-wise margins) for sequences. Nucleotide-wise margins are written
-to file "GraphProt.nt_margins" and contain three columns:
+to file "GraphProt.profile", this file contains three columns:
 
 1. number of sequence
 2. number of nucleotide
-3. prediction margin of this nucleotide
+3. prediction for this nucleotide
 
 Please note that with GraphProt structure models this action currently only supports sequences of up to 150 nt.
 
 #### predict_has - Predict high-affinity binding sites ####
 
 Predict high-affinity target sites as showcased in the GraphProt paper.
-Selects all regions with average scores above a given percentile (parameter --percentile, defaults to 99).
+Selects all regions with average scores within 12nt above a given percentile (parameter -percentile, defaults to 99).
+Average nucleotide-wise margins of high-affinity sites are written to file GraphProt.has.
+This file contains three columns:
+
+1. number of sequence
+2. number of nucleotide
+3. average prediction this nucleotide
 
 #### motif - Create RNA sequence and structure motifs ####
 
-Create RNA sequence and structure motifs. High-scoring 12-mers are written to
-files "GraphProt.sequence_motif.png" and "GraphProt.structure_motif.png".
+Create RNA sequence and structure motifs as described in the "GraphProt" paper.
+Motifs are written to files "GraphProt.sequence_motif.png" and "GraphProt.structure_motif.png".
 
 ## Advanced Usage ##
 

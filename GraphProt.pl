@@ -16,7 +16,7 @@ GraphProt.pl
 
 =head1 SYNOPSIS
 
-GraphProt.pl -mode {regression,classification} -action {ls,train,test,cv,ntmargins,motif}
+GraphProt.pl -mode {regression,classification} -action {ls,cv,train,predict,predict_profile,predict_has,motif}
 
 Options:
 
@@ -777,9 +777,9 @@ if ( $mode eq 'regression' ) {
     system("$makecall");
 
     # copy results
-    copy( "$tmpdir.test.nt_margins", "$prefix.nt_margins" );
+    copy( "$tmpdir.test.nt_margins", "$prefix.profile" );
     print
-      "GraphProt nucleotide-wise margins written to file $prefix.nt_margins\n";
+      "GraphProt nucleotide-wise margins written to file $prefix.profile\n";
   } elsif ( $action eq 'predict_has' ) {
 
     # copy files
