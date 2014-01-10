@@ -2,8 +2,8 @@ echo; echo; echo; echo prepare input data
 head -n 20 data/testclip.train.positives.fa > testclip.train.positives.fa
 head -n 20 data/testclip.train.negatives.fa > testclip.train.negatives.fa
 
-echo; echo; echo; echo classification, ls
-./GraphProt.pl -mode classification -action ls -fasta testclip.train.positives.fa -negfasta testclip.train.negatives.fa -prefix CL_ls
+# echo; echo; echo; echo classification, ls
+# ./GraphProt.pl -mode classification -action ls -fasta testclip.train.positives.fa -negfasta testclip.train.negatives.fa -prefix CL_ls
 
 echo; echo; echo; echo classification, cv
 ./GraphProt.pl -mode classification -action cv -fasta testclip.train.positives.fa  -negfasta testclip.train.negatives.fa -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_cv
@@ -33,9 +33,9 @@ echo; echo; echo; echo prepare input data
 cp data/test_data_full_A.train.fa ./
 grep '^>' test_data_full_A.train.fa | awk '{print $2}' > test_data_full_A.train.affys
 
-echo; echo; echo; echo regression, ls
-export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
-./GraphProt.pl -mode regression -action ls    -fasta test_data_full_A.train.fa  -affinities test_data_full_A.train.affys -prefix REG_ls -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10
+# echo; echo; echo; echo regression, ls
+# export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
+# ./GraphProt.pl -mode regression -action ls    -fasta test_data_full_A.train.fa  -affinities test_data_full_A.train.affys -prefix REG_ls -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10
 
 echo; echo; echo; echo regression, cv
 export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
