@@ -685,7 +685,7 @@ endif
 
 %.sequence_top_wins.truncated.logo.png : %.sequence_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	$(WEBLOGO) -F png_print -o $@ \
 	--color-scheme classic \
 	--sequence-type rna \
 	--errorbars NO \
@@ -696,7 +696,7 @@ endif
 
 %.sequence_top_wins.truncated.logo_bit.png : %.sequence_top_wins.truncated
 	cat $< | awk '{print ">"i++"\n"$$0}' | \
-	~/src/weblogo-3.2/weblogo -F png_print -o $@ \
+	$(WEBLOGO) -F png_print -o $@ \
 	--color-scheme classic \
 	--sequence-type rna \
 	--fineprint ''
