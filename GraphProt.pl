@@ -72,6 +72,10 @@ Prediction options:
                  as high-affinity sites
                      default: 99
 
+Advanced options:
+
+    -keep-tmp    retain temporary files
+
 =head1 DESCRIPTION
 
 =cut
@@ -136,6 +140,7 @@ my $percentile;
 my $help;
 my $man;
 my $debug;
+my $keep_tmp;
 my $result = GetOptions(
   "mode=s"        => \$mode,
   "action=s"      => \$action,
@@ -156,7 +161,8 @@ my $result = GetOptions(
   "percentile=f"  => \$percentile,
   "help"          => \$help,
   "man"           => \$man,
-  "debug"         => \$debug
+  "debug"         => \$debug,
+  "keep-tmp"      => \$keep_tmp
 );
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
@@ -773,7 +779,7 @@ if ( $mode eq 'regression' ) {
     $makecall .= " -e SVM=SGD ";
 
     # add targets
-    $makecall .= " $tmpdir.test.nt_margins";
+    $makecall .= " $tmpdir.test.nt_margins $tmpdir.test.nt_margins.summarized";
     system("$makecall");
 
     # copy results
@@ -839,5 +845,16 @@ if ( $mode eq 'regression' ) {
   pod2usage("error: unknown mode '$mode'\n");
 }
 
-# clean up
-unlink glob "$tmpdir.*" if (not defined $debug);
+if (defined $keep_tmp) {
+	foreach my $tmpfile (glob "$tmpdir.*") {
+		my $newfile = $tmpfile;
+		$newfile =~ s/$tmpdir\./$prefix\./;
+		$debug and print STDERR "renaming: ", $tmpfile, " -> ", $newfile, "\n";
+		rename $tmpfile, $newfile;
+	}
+} else {
+	# clean up
+	unlink glob "$tmpdir.*";
+	chdir();
+  File::Temp::cleanup();
+}
