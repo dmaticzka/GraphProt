@@ -1,3 +1,11 @@
+## generate usage message
+################################################################################
+
+usage:
+	@echo 
+	@echo Plese run GraphProt using the command \"GraphProt.pl\".
+	@echo \"GraphProt.pl --help\" will display a short summary of the required parameters.
+
 ## user defined  parameters are located here
 ################################################################################
 include PARAMETERS
