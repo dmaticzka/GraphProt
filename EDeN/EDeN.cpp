@@ -4061,7 +4061,8 @@ public:
 			//output statistics on original train data (no class balance)
 			OutputModelInfo();
 			cout << "Performance on train set:" << endl;
-			OutputPerformanceMeasures(cout, margin_list, target_list);
+			vector<double> train_margin_list=Test(aTrainsetIDList);
+			OutputPerformanceMeasures(cout, train_margin_list, target_list);
 		}
 		if (n == 0) { //if no instance has negative class then re-test model only on real training data to extract margins and predictions
 			margin_list = Test(aTrainsetIDList);
