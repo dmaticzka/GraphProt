@@ -71,11 +71,8 @@ Trains a GraphProt model. The model is written to file "GraphProt.model".
 
 #### predict - Predict binding for a whole site ####
 
-Predict binding of whole sequences, e.g. CLIP sites. Margins are written to file
-"GraphProt.predictions". Each line of this file gives the margin for one sequence in the second column,
-in the same order as the fasta file. In classification setting the first column contains the class,
-in regression setting the first column contains, if specified, the affinities, otherwise
-1.
+Predict binding of whole sequences, e.g. CLIP sites. Each prediction in "GraphProt.predictions"
+contains three columns: the id from the fasta file, the predicted class and the prediction margin.
 
 #### predict_profile - Predict binding profiles ####
 

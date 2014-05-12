@@ -687,8 +687,13 @@ if ( $mode eq 'regression' ) {
     $makecall .= " $tmpdir.test.predictions_affy";
     print "$makecall\n";
     system("$makecall");
-    move( "$tmpdir.test.predictions_affy", "$prefix.predictions" );
+    
+    # prepare results
+    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
+    system('awk "{if (\$1 > 0) {\$1=1}; if(\$1 < 0) {\$1=-1}; print \$1}"' . " < ${tmpdir}.test.predictions_svr > $tmpdir.test.predicted_class");
+    system('paste -d "\t" ' . "${tmpdir}.test.fa.id $tmpdir.test.predicted_class ${tmpdir}.test.predictions_svr > $prefix.predictions");
     print "GraphProt predictions written to file $prefix.predictions\n";
+    
   } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
@@ -771,8 +776,9 @@ if ( $mode eq 'regression' ) {
     $makecall .= " $tmpdir.test.predictions_class";
     system("$makecall");
 
-    # copy results
-    copy( "$tmpdir.test.predictions_class", "$prefix.predictions" );
+    # prepare results
+    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
+    system('paste -d "\t" ' . "${tmpdir}.test.fa.id " . "${tmpdir}.test.predictions_sgd" . ' | tr " " "\t" > ' . "$prefix.predictions");
     print "GraphProt predictions written to file $prefix.predictions\n";
   } elsif ( $action eq 'predict_profile' ) {
 
