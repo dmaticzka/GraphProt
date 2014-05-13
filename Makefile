@@ -932,7 +932,7 @@ dist:
 	# copy bin
 	rsync -avP bin/ $(DIST_DIR)/bin --exclude=unused
 	# copy data
-	cp -rv EDeN data StructureLibrary recompile_EDeN.sh $(DIST_DIR)
+	cp -rv EDeN data StructureLibrary recompile_EDeN.sh $(DIST_DIR) --exclude='*.o'
 	# copy distribution parameters
 	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
 	# markdown
