@@ -600,7 +600,7 @@ if ( $action ne "ls" ) {
 }
 
 # collect make call
-my $makecall = "make -C $scriptdir -e PWD=$scriptdir";
+my $makecall = "make -C $scriptdir -e PWD=$scriptdir -e TMPDIR=${tmp_prefix}";
 
 # use sequence graphs
 if ( defined $onlyseq ) {

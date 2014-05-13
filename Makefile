@@ -25,6 +25,8 @@ endif
 ################################################################################
 # expect binaries to reside in pwd/bin, otherwise this variable must be overwritten
 PWD:=$(shell pwd)
+# overwritten by GraphProt.pl to put it into same directory
+TMPDIR=$(PWD)
 BINDIR:=$(PWD)/bin
 DATADIR:=$(PWD)/data
 
@@ -730,7 +732,7 @@ ifeq ($(DO_SGDOPT),YES)
 	-mf Makefile \
 	-of $@ \
 	-bindir $(PWD) \
-	-tmp $(PWD) \
+	-tmp $(TMPDIR) \
 	-sgdopt &> $@.log
 
 # call sgdsvmnspdk optimization and write file containing optimized parameters
@@ -765,7 +767,7 @@ else
 	-param $(LSPAR) \
 	-mf Makefile \
 	-of $@ \
-	-tmp $(PWD) \
+	-tmp $(TMPDIR) \
 	-bindir $(PWD) &> $@.log
 endif
 #endif
