@@ -15,7 +15,7 @@ touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.ls.unknowns.fa
 	-mf Makefile \
 	-of /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param \
 	-bindir /home/maticzkd/co/GraphProt \
-	-tmp /home/maticzkd/co/GraphProt \
+	-tmp /home/maticzkd/co/GraphProt/tests \
 	-sgdopt &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param.log
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 optimized parameters:

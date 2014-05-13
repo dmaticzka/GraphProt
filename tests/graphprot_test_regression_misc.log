@@ -26,11 +26,7 @@ Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train
 Total run-time:
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
 rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
-time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 -h 0 -v 10 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv_svr
-
-real	0m0.054s
-user	0m0.010s
-sys	0m0.001s
+/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 -h 0 -v 10 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv_svr
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 crossvalidation results written to file REG_cv.cv_results
 
@@ -61,23 +57,19 @@ Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train
 Total run-time:
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
 rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
-time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
+/home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
 *.*
 optimization finished, #iter = 117
 nu = 0.567461
 obj = -108.610010, rho = -0.443524
 nSV = 34, nBSV = 24
-
-real	0m0.219s
-user	0m0.005s
-sys	0m0.002s
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 GraphProt model written to file REG_train.model
 
 
 
 regression, predict
-make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e TMPDIR=/home/maticzkd/co/GraphProt/tests -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
 make: Entering directory `/home/maticzkd/co/GraphProt'
 cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
@@ -102,13 +94,9 @@ Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.
 Total run-time:
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
 rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
-time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
+/home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
 Mean squared error = 0.171034 (regression)
 Squared correlation coefficient = 0.20851 (regression)
-
-real	0m0.046s
-user	0m0.003s
-sys	0m0.003s
 paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 GraphProt predictions written to file REG_predict.predictions
@@ -116,7 +104,7 @@ GraphProt predictions written to file REG_predict.predictions
 
 
 regression, predict no affys
-make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e TMPDIR=/home/maticzkd/co/GraphProt/tests -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
 make: Entering directory `/home/maticzkd/co/GraphProt'
 cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
@@ -141,13 +129,9 @@ Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.
 Total run-time:
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
 rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
-time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
+/home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
 Mean squared error = 1.21821 (regression)
 Squared correlation coefficient = nan (regression)
-
-real	0m0.052s
-user	0m0.004s
-sys	0m0.001s
 paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 GraphProt predictions written to file REG_predict_noaffys.predictions

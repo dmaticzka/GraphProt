@@ -3,8 +3,8 @@ EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
 
-Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.class .... read: 20 values.
-Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.feature.gz
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.class .... read: 20 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.feature.gz
 
 No row index list specified. Assuming all 20 row indices as valid.
 
@@ -43,7 +43,7 @@ Performance on train set:
     -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_1
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_1
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -77,7 +77,7 @@ Performance on train set:
     -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
     bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_2
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_2
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -111,7 +111,7 @@ Performance on train set:
     -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_3
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_3
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -145,7 +145,7 @@ Performance on train set:
     -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
     bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_4
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_4
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -179,7 +179,7 @@ Performance on train set:
     -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
     bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_5
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_5
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -213,7 +213,7 @@ Performance on train set:
     -Precision:0.75 -Recall:1 -F-measure:0.857143
     bPrecision:0.875 bRecall:0.833333 bF-measure:0.828571
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_6
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_6
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -247,7 +247,7 @@ Performance on train set:
     -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
     bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_7
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_7
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -281,7 +281,7 @@ Performance on train set:
     -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_8
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_8
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -315,7 +315,7 @@ Performance on train set:
     -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_9
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_9
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -349,7 +349,7 @@ Performance on train set:
     -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_10
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.model_10
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -364,7 +364,7 @@ Performance on data set in cross validation:
     -Precision:0.75 -Recall:0.9 -F-measure:0.818182
     bPrecision:0.8125 bRecall:0.8 bF-measure:0.79798
 
-Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.feature.gz.cv_predictions
+Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-vTbhOJ.train.feature.gz.cv_predictions
 Crossvalidation concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 Total run-time:
