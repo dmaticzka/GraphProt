@@ -72,13 +72,14 @@ Prediction options:
                  as high-affinity sites
                      default: 99
 
-Advanced options:
-
-    -keep-tmp    retain temporary files
-
 =head1 DESCRIPTION
 
 =cut
+
+#Advanced options:
+#
+#    -keep-tmp    retain temporary files
+
 
 ###############################################################################
 # create temporary directory
