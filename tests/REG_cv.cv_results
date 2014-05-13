@@ -1,0 +1,52 @@
+*
+optimization finished, #iter = 82
+nu = 0.593801
+obj = -101.604640, rho = -0.597684
+nSV = 30, nBSV = 23
+.*
+optimization finished, #iter = 104
+nu = 0.574021
+obj = -86.655016, rho = -0.055720
+nSV = 30, nBSV = 23
+*
+optimization finished, #iter = 76
+nu = 0.577778
+obj = -95.839431, rho = -0.342296
+nSV = 28, nBSV = 22
+*
+optimization finished, #iter = 36
+nu = 0.564001
+obj = -100.135802, rho = -0.272902
+nSV = 28, nBSV = 24
+.*
+optimization finished, #iter = 100
+nu = 0.552665
+obj = -75.820256, rho = -0.393628
+nSV = 31, nBSV = 23
+*
+optimization finished, #iter = 68
+nu = 0.627155
+obj = -105.216965, rho = -0.109013
+nSV = 32, nBSV = 25
+.*
+optimization finished, #iter = 146
+nu = 0.603290
+obj = -104.461815, rho = -0.432220
+nSV = 31, nBSV = 23
+.*
+optimization finished, #iter = 109
+nu = 0.629550
+obj = -107.223173, rho = -0.569714
+nSV = 31, nBSV = 22
+..*
+optimization finished, #iter = 207
+nu = 0.563408
+obj = -98.705213, rho = -0.295692
+nSV = 31, nBSV = 22
+*
+optimization finished, #iter = 69
+nu = 0.575915
+obj = -101.711037, rho = -0.486719
+nSV = 30, nBSV = 22
+Cross Validation Mean squared error = 0.190587
+Cross Validation Squared correlation coefficient = 0.124957

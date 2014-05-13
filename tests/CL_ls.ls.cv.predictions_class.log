@@ -1,0 +1,371 @@
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.class .... read: 20 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.feature.gz
+
+No row index list specified. Assuming all 20 row indices as valid.
+
+No col index list specified. Assuming all 20 col indices as valid.
+
+Counted 20 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 1 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 15.8116
+Bias: 0.0171171
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_1
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 2 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 15.602
+Bias: -0.0361972
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_2
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 3 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 16.7009
+Bias: -0.0331664
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_3
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 4 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 15.491
+Bias: -0.0181981
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_4
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 5 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 16.4475
+Bias: 0.00167269
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_5
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 6 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 12.8759
+Bias: 0.0364092
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_6
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 7 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 14.953
+Bias: -0.0599043
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_7
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 8 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 15.5563
+Bias: -0.0422402
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_8
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 9 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 15.9211
+Bias: -0.0205356
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_9
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 10 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.001
+Epochs: 30
+----------------------------------------------------------------
+Training for 30 epochs.
+..............................
+Counted 30 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 14.5762
+Bias: 0.000791757
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 18 ( 100 %)
+    Error: 0 ( 0 %)
+    Confusion table:
+    TP:9 FP:0
+    FN:0 TN:9
+    +Precision:1 +Recall:1 +F-measure:1
+    -Precision:1 -Recall:1 -F-measure:1
+    bPrecision:1 bRecall:1 bF-measure:1
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.model_10
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Performance on data set in cross validation:
+    Size: 20
+    Correct: 19 ( 95 %)
+    Error: 1 ( 5 %)
+    Confusion table:
+    TP:10 FP:1
+    FN:0 TN:9
+    +Precision:0.909091 +Recall:1 +F-measure:0.952381
+    -Precision:1 -Recall:0.9 -F-measure:0.947368
+    bPrecision:0.954545 bRecall:0.95 bF-measure:0.949875
+
+Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-W1LFzJ.ls.feature.gz.cv_predictions
+Crossvalidation concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+Total run-time:
+Elapsed time: h: 0 m: 0 s: 0

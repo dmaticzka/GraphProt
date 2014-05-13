@@ -38,9 +38,11 @@ echo; echo; echo; echo classification motif onlyseq
 #cp data/test_data_full_A.train.fa ./
 #grep '^>' test_data_full_A.train.fa | awk '{print $2}' > test_data_full_A.train.affys
 
+export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
+
 echo; echo; echo; echo regression, cv
 export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
-../GraphProt.pl -mode regression -action cv    -fasta test_data_full_A.train.fa  -affinities test_data_full_A.train.affys -prefix REG_cv -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp
+../GraphProt.pl -mode regression -action cv -fasta test_data_full_A.train.fa -affinities test_data_full_A.train.affys -prefix REG_cv -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp
 
 echo; echo; echo; echo regression, train
 export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH

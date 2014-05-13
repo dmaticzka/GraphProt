@@ -1,0 +1,6 @@
+epsilon: 0.001
+c: 1
+R: 1
+D: 4
+bitsize: 14
+abstraction: 3

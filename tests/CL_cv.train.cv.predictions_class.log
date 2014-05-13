@@ -1,0 +1,371 @@
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.class .... read: 20 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz
+
+No row index list specified. Assuming all 20 row indices as valid.
+
+No col index list specified. Assuming all 20 col indices as valid.
+
+Counted 20 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 1 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.70105
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 12 ( 66.6667 %)
+    Error: 6 ( 33.3333 %)
+    Confusion table:
+    TP:6 FP:3
+    FN:3 TN:6
+    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
+    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
+    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_1
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 2 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.81167
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:7 FP:3
+    FN:2 TN:6
+    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
+    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_2
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 3 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.6167
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 14 ( 77.7778 %)
+    Error: 4 ( 22.2222 %)
+    Confusion table:
+    TP:8 FP:3
+    FN:1 TN:6
+    +Precision:0.727273 +Recall:0.888889 +F-measure:0.8
+    -Precision:0.857143 -Recall:0.666667 -F-measure:0.75
+    bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_3
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 4 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.77226
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:7 FP:3
+    FN:2 TN:6
+    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
+    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_4
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 5 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.66073
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:7 FP:3
+    FN:2 TN:6
+    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
+    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_5
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 6 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.8953
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:6 FP:2
+    FN:3 TN:7
+    +Precision:0.75 +Recall:0.666667 +F-measure:0.705882
+    -Precision:0.7 -Recall:0.777778 -F-measure:0.736842
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_6
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 7 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.73574
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:7 FP:3
+    FN:2 TN:6
+    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
+    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_7
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 8 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.73153
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 13 ( 72.2222 %)
+    Error: 5 ( 27.7778 %)
+    Confusion table:
+    TP:6 FP:2
+    FN:3 TN:7
+    +Precision:0.75 +Recall:0.666667 +F-measure:0.705882
+    -Precision:0.7 -Recall:0.777778 -F-measure:0.736842
+    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_8
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 9 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.69507
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 12 ( 66.6667 %)
+    Error: 6 ( 33.3333 %)
+    Confusion table:
+    TP:6 FP:3
+    FN:3 TN:6
+    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
+    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
+    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_9
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+        Fold: 10 of 10
+Class distribution: 18 (+:9 -:9) [+:0.5 -:0.5]
+Rebalanced dataset: 18 (+:9 -:9)
+----------------------------------------------------------------
+Training information
+----------------------------------------------------------------
+Lambda: 0.1
+Epochs: 2
+----------------------------------------------------------------
+Training for 2 epochs.
+..
+Counted 2 times.
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 1.63186
+Bias: 0.0084545
+----------------------------------------------------------------
+Performance on train set:
+    Size: 18
+    Correct: 12 ( 66.6667 %)
+    Error: 6 ( 33.3333 %)
+    Confusion table:
+    TP:6 FP:3
+    FN:3 TN:6
+    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
+    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
+    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_10
+Fold phase concluded in:
+Elapsed time: h: 0 m: 0 s: 0
+----------------------------------------------------------------
+Performance on data set in cross validation:
+    Size: 20
+    Correct: 16 ( 80 %)
+    Error: 4 ( 20 %)
+    Confusion table:
+    TP:7 FP:1
+    FN:3 TN:9
+    +Precision:0.875 +Recall:0.7 +F-measure:0.777778
+    -Precision:0.75 -Recall:0.9 -F-measure:0.818182
+    bPrecision:0.8125 bRecall:0.8 bF-measure:0.79798
+
+Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz.cv_predictions
+Crossvalidation concluded in:
+Elapsed time: h: 0 m: 0 s: 1
+Total run-time:
+Elapsed time: h: 0 m: 0 s: 1
