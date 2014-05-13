@@ -215,7 +215,7 @@ LSPAR:=$(DATADIR)/ls.$(METHOD_ID).onlyseq.parameters
 	tr 'ACGU' '_' > $@
 
 %.top_wins : %.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
+	$(RBIN) --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
 	sort -k3,3nr | \
 	head -n $(TOP_WINDOWS) | \
 	sort -k1,1n > $@
@@ -351,7 +351,7 @@ endif
 	tr 'ACGU' '_' > $@
 
 %.test.top_wins : %.motif.nt_margins.summarized $(SELECT_TOP_WIN_SHREPS)
-	/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
+	$(RBIN) --slave --no-save --args $< < $(SELECT_TOP_WIN_SHREPS) | \
 	sort -k3,3nr | \
 	head -n $(TOP_WINDOWS) | \
 	sort -k1,1n > $@
