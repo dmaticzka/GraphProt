@@ -55,3 +55,14 @@ export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
 echo; echo; echo; echo regression, predict no affys
 export PATH=/home/maticzkd/src/libsvm-3.12/:$PATH
 ../GraphProt.pl -mode regression -action predict -fasta test_data_full_A.train.fa -model REG_train.model -prefix REG_predict_noaffys -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp
+
+################################################################################
+### classification test for EDeN accuracy bug
+
+echo; echo; echo; echo "train model for test-on-train results"
+
+../GraphProt.pl --action train --fasta testedenacc.train.positives.fa --negfasta testedenacc.train.negatives.fa -prefix test_edenacc_train --keep-tmp
+
+echo; echo; echo; echo "manual test-on-train"
+
+../GraphProt.pl --action predict --fasta testedenacc.train.positives.fa --negfasta testedenacc.train.negatives.fa -model test_edenacc_train.model -prefix test_edenacc_manualtestontrain --keep-tmp
