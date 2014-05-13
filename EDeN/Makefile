@@ -22,8 +22,8 @@
 
 #CHECKLIMITS activates the limit check for graph operations
 
-CXX=g++44
-C=gcc44
+CXX=g++
+C=gcc
 OPTS=-g -O3 -Wno-deprecated -DLOSS=1  -fopenmp -static  #-DDEBUGON -DCHECKLIMITS
 #OPTS=-g -Wno-deprecated -DLOSS=1 -DDEBUGON
 #OPTS=-g -Wno-deprecated -static -pg
