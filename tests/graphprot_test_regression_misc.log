@@ -1,0 +1,137 @@
+
+
+
+regression, cv
+make: Entering directory `/home/maticzkd/co/GraphProt'
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 1 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz; exit ${PIPESTATUS[0]}
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy && \
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+OK: gspan and class in sync
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz
+
+Counted 50 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
+Total run-time:
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
+time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 -h 0 -v 10 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv_svr
+make: Leaving directory `/home/maticzkd/co/GraphProt'
+crossvalidation results written to file REG_cv.cv_results
+
+
+
+regression, train
+make: Entering directory `/home/maticzkd/co/GraphProt'
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 1 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz; exit ${PIPESTATUS[0]}
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy && \
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+OK: gspan and class in sync
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz
+
+Counted 50 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
+Total run-time:
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
+time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
+*.*
+optimization finished, #iter = 117
+nu = 0.567461
+obj = -108.610010, rho = -0.443524
+nSV = 34, nBSV = 24
+make: Leaving directory `/home/maticzkd/co/GraphProt'
+GraphProt model written to file REG_train.model
+
+
+
+regression, predict
+make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make: Entering directory `/home/maticzkd/co/GraphProt'
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 1 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz; exit ${PIPESTATUS[0]}
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy && \
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+OK: gspan and class in sync
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz
+
+Counted 50 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
+Total run-time:
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
+time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
+Mean squared error = 0.171034 (regression)
+Squared correlation coefficient = 0.20851 (regression)
+paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make: Leaving directory `/home/maticzkd/co/GraphProt'
+GraphProt predictions written to file REG_predict.predictions
+
+
+
+regression, predict no affys
+make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make: Entering directory `/home/maticzkd/co/GraphProt'
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 1 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz; exit ${PIPESTATUS[0]}
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy && \
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+OK: gspan and class in sync
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz
+
+Counted 50 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
+Total run-time:
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
+time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr
+Mean squared error = 1.21821 (regression)
+Squared correlation coefficient = nan (regression)
+paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_affy
+make: Leaving directory `/home/maticzkd/co/GraphProt'
+GraphProt predictions written to file REG_predict_noaffys.predictions

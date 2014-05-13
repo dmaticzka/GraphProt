@@ -1,702 +1,157 @@
 
 
 
-classification, cv
+train model for test-on-train results
 make: Entering directory `/home/maticzkd/co/GraphProt'
 
 using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.affy
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.unknowns.fa
+( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.positives.fa; \
+  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.negatives.fa; \
+  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa -stdout \
+--seq-graph-t --seq-graph-alph -abstr \
+  --vp \
+-t 3 \
+-M 3 \
+-wins '150' \
+-shift '25' | \
+gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz; exit ${PIPESTATUS[0]}
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy && \
+OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz
-
-Counted 20 times.
-Elapsed time: h: 0 m: 0 s: 3
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz.feature
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz
+.
+Counted 100 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
 Total run-time:
-Elapsed time: h: 0 m: 0 s: 3
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz.feature
-gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.class
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.class && \
-	/home/maticzkd/co/GraphProt/EDeN/EDeN -a CROSS_VALIDATION -c 10 \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.class \
-	-r 0 -d 0 -b 10 -g DIRECTED \
-	-e 2 -l 0.1 &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.predictions_class.log
-OK: gspan and class in sync
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz.cv_predictions | awk '{print $2==1?1:-1, $4}' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.predictions_class
-rm  -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz.cv_predictions/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.model_*
-rm: cannot remove `/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.feature.gz.cv_predictions/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train': Not a directory
-make: [/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.predictions_class] Error 1 (ignored)
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.predictions_class | \
-	awk '$1!=0' | \
-	sed 's/^-1/0/g' | \
-	/usr/local/user/stat/perf -confusion 2> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.perf.log > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-SSBwcR.train.cv.perf
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt crossvalidation results written to file CL_cv.cv_results
-
-
-
-classification, train
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.affy
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz
-
-Counted 20 times.
-Elapsed time: h: 0 m: 0 s: 3
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 3
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz.feature
-gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.feature
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.class
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.class && \
-	/home/maticzkd/co/GraphProt/EDeN/EDeN -a TRAIN \
-	-i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.class -m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.model \
-	-r 0 -d 0 -g DIRECTED -b 10 \
-	-e 2 -l 0.1
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.feature
+gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class && \
+/home/maticzkd/co/GraphProt/EDeN/EDeN -a TRAIN \
+-i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class -m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model \
+-r 1 -d 4 -g DIRECTED -b 14 \
+-e 10 -l 0.001
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
 
-Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.class .... read: 20 values.
-Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.feature.gz
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class .... read: 100 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz
+.
+No row index list specified. Assuming all 100 row indices as valid.
 
-No row index list specified. Assuming all 20 row indices as valid.
+No col index list specified. Assuming all 100 col indices as valid.
 
-No col index list specified. Assuming all 20 col indices as valid.
-
-Counted 20 times.
-Elapsed time: h: 0 m: 0 s: 0
+Counted 100 times.
 
 ----------------------------------------------------------------
 Train phase
 ----------------------------------------------------------------
-Class distribution: 20 (+:10 -:10) [+:0.5 -:0.5]
-Rebalanced dataset: 20 (+:10 -:10)
+Class distribution: 100 (+:50 -:50) [+:0.5 -:0.5]
+Rebalanced dataset: 100 (+:50 -:50)
 ----------------------------------------------------------------
 Training information
 ----------------------------------------------------------------
-Lambda: 0.1
-Epochs: 2
+Lambda: 0.001
+Epochs: 10
 ----------------------------------------------------------------
-Training for 2 epochs.
-..
-Counted 2 times.
-Elapsed time: h: 0 m: 0 s: 0
+Training for 10 epochs.
+..........
+Counted 10 times.
 ----------------------------------------------------------------
 Model information
 ----------------------------------------------------------------
-W Norm: 1.73468
-Bias: 0.00856223
+W Norm: 18.4218
+Bias: 0.0200383
 ----------------------------------------------------------------
 Performance on train set:
-    Size: 20
-    Correct: 14 ( 70 %)
-    Error: 6 ( 30 %)
+    Size: 100
+    Correct: 96 ( 96 %)
+    Error: 4 ( 4 %)
     Confusion table:
-    TP:7 FP:3
-    FN:3 TN:7
-    +Precision:0.7 +Recall:0.7 +F-measure:0.7
-    -Precision:0.7 -Recall:0.7 -F-measure:0.7
-    bPrecision:0.7 bRecall:0.7 bF-measure:0.7
+    TP:48 FP:2
+    FN:2 TN:48
+    +Precision:0.96 +Recall:0.96 +F-measure:0.96
+    -Precision:0.96 -Recall:0.96 -F-measure:0.96
+    bPrecision:0.96 bRecall:0.96 bF-measure:0.96
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tZhXzp.train.model
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
 
-Train phase completed:Elapsed time: h: 0 m: 0 s: 0
+Train phase completed:Elapsed time: h: 0 m: 0 s: 1
 Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
 make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt model written to file CL_train.model
+GraphProt model written to file test_edenacc_train.model
 
 
 
-classification, predict
+manual test-on-train
 make: Entering directory `/home/maticzkd/co/GraphProt'
 
 using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.affy
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
+touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.unknowns.fa
+( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.positives.fa; \
+  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.negatives.fa; \
+  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
+--seq-graph-t --seq-graph-alph -abstr \
+  --vp \
+-t 3 \
+-M 3 \
+-wins '150' \
+-shift '25' | \
+gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz; exit ${PIPESTATUS[0]}
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy && \
+OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz
-
-Counted 20 times.
-Elapsed time: h: 0 m: 0 s: 3
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 3
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.gspan.gz.feature
-gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature
-/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.class \
-	-r 0 -d 0 -b 10 -g DIRECTED \
-	-e 2 -l 0.1
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-
-Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.train.model
-----------------------------------------------------------------
-Model information
-----------------------------------------------------------------
-W Norm: 1.73468
-Bias: 0.00856223
-----------------------------------------------------------------
-
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature.gz
-
-Counted 21 times.
-Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature.gz.prediction
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.feature.gz.prediction /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.predictions_sgd
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.class
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.predictions_sgd | awk '{print $2}' | paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.class - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-0yb1Xh.test.predictions_class
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt predictions written to file CL_predict.predictions
-
-
-
-classification, predict using only positives
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.affy
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz
-
-Counted 10 times.
-Elapsed time: h: 0 m: 0 s: 1
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 1
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.gspan.gz.feature
-gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature
-/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.class \
-	-r 0 -d 0 -b 10 -g DIRECTED \
-	-e 2 -l 0.1
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-
-Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.train.model
-----------------------------------------------------------------
-Model information
-----------------------------------------------------------------
-W Norm: 1.73468
-Bias: 0.00856223
-----------------------------------------------------------------
-
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature.gz
-
-Counted 11 times.
-Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature.gz.prediction
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.feature.gz.prediction /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.predictions_sgd
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.class
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.predictions_sgd | awk '{print $2}' | paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.class - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-KKNRAo.test.predictions_class
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt predictions written to file CL_predict_onlypos.predictions
-
-
-
-classification nt margins
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl --vp --seq-graph-t -nostr -stdout -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.fa | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.affy
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.class
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.class && \
-	/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST_PART \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.gspan.gz -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.class \
-	-r 0 -d 0 -b 10 -g DIRECTED \
-	-e 2 -l 0.1 &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.vertex_margins.log
-OK: gspan and class in sync
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.gspan.gz.prediction_part /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.vertex_margins
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.gspan.gz | \
-	awk -f /home/maticzkd/co/GraphProt/bin/gspan2vertex_dict.awk > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.vertex_dict
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.vertex_margins | \
-	/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/vertex2ntmargins.pl -dict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.vertex_dict > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.nt_margins
-
-summarizing nucleotide-wise margins:
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Uva1XZ.test.nt_margins.summarized
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt nucleotide-wise margins written to file CL_ntmargins.profile
-
-
-
-classification nt margins
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl --vp --seq-graph-t -nostr -stdout -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.fa | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.gspan.gz; exit ${PIPESTATUS[0]}
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.affy
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.class
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.class && \
-	/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST_PART \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.gspan.gz -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.class \
-	-r 0 -d 0 -b 10 -g DIRECTED \
-	-e 2 -l 0.1 &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.vertex_margins.log
-OK: gspan and class in sync
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.gspan.gz.prediction_part /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.vertex_margins
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.gspan.gz | \
-	awk -f /home/maticzkd/co/GraphProt/bin/gspan2vertex_dict.awk > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.vertex_dict
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.vertex_margins | \
-	/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/vertex2ntmargins.pl -dict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.vertex_dict > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins
-
-summarizing nucleotide-wise margins:
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins.summarized
-
-selecting high affinity sites (th percentile)
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins.summarized | \
-	cut -f 1,2,6 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins.perc_thresh.tmp
-/usr/local/R/2.15.1-lx/bin/R --vanilla --slave --args 55 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins.perc_thresh.tmp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-uezWgz.test.nt_margins.perc_thresh < /home/maticzkd/co/GraphProt/bin/subset_margins_by_quant.R
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt high affinity sites written to file CL_has.has
-
-
-
-classification motif
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.fa
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.fa -stdout \
-	  --vp \
-	--seq-graph-t --seq-graph-alph -abstr \
-	--abstr-out /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	awk -f /home/maticzkd/co/GraphProt/bin/gspan_split_shreps.awk | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz; exit ${PIPESTATUS[0]}
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz | awk '/^t/{print $NF}' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.affy
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.class
-/home/maticzkd/co/GraphProt/EDeN/EDeN \
-	-a TEST_PART \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.train.model \
-	-i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz \
-	-t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.class \
-	-g DIRECTED \
-	-r 0 \
-	-d 0 \
-	-b 10 \
-	-e 2 \
-	-l 0.1
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-
-Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.train.model
-----------------------------------------------------------------
-Model information
-----------------------------------------------------------------
-W Norm: 1.73468
-Bias: 0.00856223
-----------------------------------------------------------------
-
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz
 .
-Counted 148 times.
-Elapsed time: h: 0 m: 0 s: 1
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz.prediction_part
+Counted 100 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
 Total run-time:
-Elapsed time: h: 0 m: 0 s: 1
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz.prediction_part /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.vertex_margins
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.gspan.gz | \
-	awk -f /home/maticzkd/co/GraphProt/bin/gspan2vertex_dict.awk > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.vertex_dict
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.vertex_margins | \
-	/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/vertex2ntmargins.pl -dict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.vertex_dict > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.nt_margins
-
-summarizing nucleotide-wise margins:
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.nt_margins.summarized
-/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.motif.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
-	sort -k3,3nr | \
-	head -n 1000 | \
-	sort -k1,1n > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.top_wins
-Loading required package: plyr
-Loading required package: ggplot2
-Loading required package: stats
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following object(s) are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: data.table
-Loading required package: ddply
-Warning message:
-In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
-  there is no package called ‘ddply’
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/subTopWins.pl --input /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence --locations /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.top_wins --win_size 12 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins | awk 'length($0)==12' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins.truncated
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins.truncated | awk '{print ">"i++"\n"$0}' | \
-	/usr/local/user/weblogo/weblogo-3.2/weblogo -F png_print -o /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins.truncated.logo.png \
-	--color-scheme classic \
-	--sequence-type rna \
-	--errorbars NO \
-	--fineprint '' \
-	--units probability \
-	--show-yaxis NO \
-	--show-xaxis NO
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-make: Entering directory `/home/maticzkd/co/GraphProt'
-make: `/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins.truncated' is up to date.
-make: `/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.sequence_top_wins.truncated.logo.png' is up to date.
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/subTopWins.pl \
-	--input /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot \
-	--locations /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.top_wins \
-	--win_size 12 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot_top_wins
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot_top_wins | awk 'length($0)==12' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot_top_wins.truncated
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot_top_wins.truncated | awk '{print ">"i++"\n"$0}' | \
-	/usr/local/user/weblogo/weblogo-3.2/weblogo -F png_print -o /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tDZfIk.test.struct_annot_top_wins.truncated.logo.png \
-	--alphabet 'BEHIMS' \
-	--errorbars NO \
-	--fineprint '' \
-	--units probability \
-	--color 'red' 'S' 'Stacking' \
-	--color blue E External \
-	--color green M Multiloop \
-	--color black H Hairpin \
-	--color 'dark orange' I InternalLoop \
-	--color purple B Bulge \
-	--show-yaxis NO \
-	--show-xaxis NO
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt sequence motif written to file CL_motif.sequence_motif.png
-GraphProt structure motif written to file CL_motif.structure_motif.png
-
-
-
-classification motif onlyseq
-make: Entering directory `/home/maticzkd/co/GraphProt'
-
-using empty set of unknowns!
-touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.unknowns.fa
-( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.positives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.negatives.fa; \
-	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.fa
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl --vp --seq-graph-t -nostr -stdout -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.fa | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz; exit ${PIPESTATUS[0]}
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz | awk '/^u/{print $NF}' | tr 'tT' 'uU' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.affy
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.class
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.class && \
-	/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST_PART \
-	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.class \
-	-r 1 -d 0 -b 10 -g DIRECTED \
-	-e 10 -l 0.001 &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.vertex_margins.log
-OK: gspan and class in sync
-mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz.prediction_part /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.vertex_margins
-zcat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.gspan.gz | \
-	awk -f /home/maticzkd/co/GraphProt/bin/gspan2vertex_dict.awk > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.vertex_dict
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.vertex_margins | \
-	/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/vertex2ntmargins.pl -dict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.vertex_dict > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.nt_margins
-
-summarizing nucleotide-wise margins:
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.nt_margins.summarized
-/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
-	sort -k3,3nr | \
-	head -n 1000 | \
-	sort -k1,1n > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.top_wins
-Loading required package: plyr
-Loading required package: ggplot2
-Loading required package: stats
-Loading required package: reshape
-
-Attaching package: ‘reshape’
-
-The following object(s) are masked from ‘package:plyr’:
-
-    rename, round_any
-
-Loading required package: data.table
-Loading required package: ddply
-Warning message:
-In library(package, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE,  :
-  there is no package called ‘ddply’
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/subTopWins.pl --input /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence --locations /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.top_wins --win_size 12 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence_top_wins
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence_top_wins | awk 'length($0)==12' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence_top_wins.truncated
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence_top_wins.truncated | awk '{print ">"i++"\n"$0}' | \
-	/usr/local/user/weblogo/weblogo-3.2/weblogo -F png_print -o /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-grgXRz.test.sequence_top_wins.truncated.logo.png \
-	--color-scheme classic \
-	--sequence-type rna \
-	--errorbars NO \
-	--fineprint '' \
-	--units probability \
-	--show-yaxis NO \
-	--show-xaxis NO
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt sequence motif written to file CL_onlyseq.sequence_motif.png
-
-
-
-regression, cv
-make: Entering directory `/home/maticzkd/co/GraphProt'
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz; exit ${PIPESTATUS[0]}
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
+gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
+/home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST \
+-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.class \
+-r 1 -d 4 -b 14 -g DIRECTED \
+-e 10 -l 0.001
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz
 
-Counted 50 times.
-Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz.feature
+Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
+----------------------------------------------------------------
+Model information
+----------------------------------------------------------------
+W Norm: 18.4218
+Bias: 0.0200383
+----------------------------------------------------------------
+
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz
+.
+Counted 101 times.
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz.prediction
 Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.gspan.gz.feature
-time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 -h 0 -v 10 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.feature > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-sg1Agy.train.cv_svr
-
-real	0m0.037s
-user	0m0.008s
-sys	0m0.003s
+mv /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz.prediction /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_sgd
+cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.class
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_sgd | awk '{print $2}' | paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.class - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.predictions_class
 make: Leaving directory `/home/maticzkd/co/GraphProt'
-crossvalidation results written to file REG_cv.cv_results
-
-
-
-regression, train
-make: Entering directory `/home/maticzkd/co/GraphProt'
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz; exit ${PIPESTATUS[0]}
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz
-
-Counted 50 times.
-Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.gspan.gz.feature
-time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 11 -p 0.11 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-4v0dfw.train.model
-*.*
-optimization finished, #iter = 117
-nu = 0.567461
-obj = -108.610010, rho = -0.443524
-nSV = 34, nBSV = 24
-
-real	0m0.060s
-user	0m0.004s
-sys	0m0.002s
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt model written to file REG_train.model
-
-
-
-regression, predict
-make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.predictions_affy
-make: Entering directory `/home/maticzkd/co/GraphProt'
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz; exit ${PIPESTATUS[0]}
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz
-
-Counted 50 times.
-Elapsed time: h: 0 m: 0 s: 1
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 1
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.gspan.gz.feature
-time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.predictions_svr
-Mean squared error = 0.171034 (regression)
-Squared correlation coefficient = 0.20851 (regression)
-
-real	0m0.031s
-user	0m0.003s
-sys	0m0.004s
-paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQNpAQ.test.predictions_affy
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt predictions written to file REG_predict.predictions
-
-
-
-regression, predict no affys
-make -C /home/maticzkd/co/GraphProt -e PWD=/home/maticzkd/co/GraphProt -e GRAPH_TYPE=CONTEXTSHREP -e SVM=SVR /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.predictions_affy
-make: Entering directory `/home/maticzkd/co/GraphProt'
-cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.param
-/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.fa -stdout \
-	--seq-graph-t --seq-graph-alph -abstr \
-	  --vp \
-	-t 1 \
-	-M 3 \
-	-wins '150' \
-	-shift '25' | \
-	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz; exit ${PIPESTATUS[0]}
-/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.affy && \
-	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz -r 0 -d 0 -b 10 -g DIRECTED
-OK: gspan and class in sync
-----------------------------------------------------------------
-EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
-Author: Fabrizio Costa costa@informatik.uni-freiburg.de
-----------------------------------------------------------------
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz
-
-Counted 50 times.
-Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz.feature
-Total run-time:
-Elapsed time: h: 0 m: 0 s: 0
-cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.feature
-rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.gspan.gz.feature
-time /home/maticzkd/src/libsvm-3.12/svm-predict /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.feature /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.train.model /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.predictions_svr
-Mean squared error = 1.21821 (regression)
-Squared correlation coefficient = nan (regression)
-
-real	0m0.038s
-user	0m0.004s
-sys	0m0.001s
-paste /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.predictions_svr > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-yQEJmF.test.predictions_affy
-make: Leaving directory `/home/maticzkd/co/GraphProt'
-GraphProt predictions written to file REG_predict_noaffys.predictions
+GraphProt predictions written to file test_edenacc_manualtestontrain.predictions
