@@ -731,7 +731,7 @@ ifeq ($(DO_SGDOPT),YES)
 	-of $@ \
 	-bindir $(PWD) \
 	-tmp $(PWD) \
-	-sgdopt 2> >(tee $@.log >&2)
+	-sgdopt &> $@.log
 
 # call sgdsvmnspdk optimization and write file containing optimized parameters
 %.ls.param : EPOCHS=$(shell grep '^EPOCHS ' $*.ls_sgdopt.param | cut -f 2 -d' ')
@@ -766,7 +766,7 @@ else
 	-mf Makefile \
 	-of $@ \
 	-tmp $(PWD) \
-	-bindir $(PWD) 2> >(tee $@.log >&2)
+	-bindir $(PWD) &> $@.log
 endif
 #endif
 
