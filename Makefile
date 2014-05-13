@@ -421,7 +421,7 @@ ifeq ($(SVM),SVR)
 %.cv_svr : C=$(shell grep '^c ' $*.param | cut -f 2 -d' ')
 %.cv_svr : EPSILON=$(shell grep '^e ' $*.param | cut -f 2 -d' ')
 %.cv_svr : %.feature | %.param
-	time  $(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
+	$(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) -h 0 -v $(CV_FOLD) $< > $@
 
 # final result of cross validation: squared correlation coefficient
 %.cv : %.cv_svr
@@ -433,11 +433,11 @@ ifeq ($(SVM),SVR)
 %.model : C=$(shell grep '^c' $*.param | cut -f 2 -d' ')
 %.model : EPSILON=$(shell grep '^e' $*.param | cut -f 2 -d' ')
 %.model : %.feature | %.param
-	time  $(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) $< $@
+	$(SVRTRAIN) -s 3 -t 0 -m $(SVR_CACHE) -c $(C) -p $(EPSILON) $< $@
 
 # SVR predictions
 %.test.predictions_svr : %.train.model %.test.feature
-	time $(SVRPREDICT) $*.test.feature $< $@
+	$(SVRPREDICT) $*.test.feature $< $@
 
 # affinities and predictions default format
 %.predictions_affy : %.predictions_svr %.affy

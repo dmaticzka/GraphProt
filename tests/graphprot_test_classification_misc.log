@@ -42,7 +42,7 @@ cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy /home/maticz
 	-e 2 -l 0.1 &> /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv.predictions_class.log
 OK: gspan and class in sync
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz.cv_predictions | awk '{print $2==1?1:-1, $4}' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv.predictions_class
-rm  -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz.cv_predictions/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model_*
+rm  -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz.cv_predictions /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model_*
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.cv.predictions_class | \
 	awk '$1!=0' | \
 	sed 's/^-1/0/g' | \
@@ -128,14 +128,14 @@ Bias: 0.00856223
 ----------------------------------------------------------------
 Performance on train set:
     Size: 20
-    Correct: 14 ( 70 %)
-    Error: 6 ( 30 %)
+    Correct: 16 ( 80 %)
+    Error: 4 ( 20 %)
     Confusion table:
-    TP:7 FP:3
-    FN:3 TN:7
-    +Precision:0.7 +Recall:0.7 +F-measure:0.7
-    -Precision:0.7 -Recall:0.7 -F-measure:0.7
-    bPrecision:0.7 bRecall:0.7 bF-measure:0.7
+    TP:7 FP:1
+    FN:3 TN:9
+    +Precision:0.875 +Recall:0.7 +F-measure:0.777778
+    -Precision:0.75 -Recall:0.9 -F-measure:0.818182
+    bPrecision:0.8125 bRecall:0.8 bF-measure:0.79798
 
 Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
 
@@ -399,10 +399,11 @@ cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.motif.vertex_margins |
 
 summarizing nucleotide-wise margins:
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.motif.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.motif.nt_margins.summarized
-/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.motif.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
+/usr/local/R/2.15.1-lx/bin/R --vanilla --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.motif.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
 	sort -k3,3nr | \
 	head -n 1000 | \
 	sort -k1,1n > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.top_wins
+Loading required package: plyr
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/subTopWins.pl --input /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence --locations /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.top_wins --win_size 12 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins | awk 'length($0)==12' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins.truncated
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins.truncated | awk '{print ">"i++"\n"$0}' | \
@@ -471,10 +472,11 @@ cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.vertex_margins | 
 
 summarizing nucleotide-wise margins:
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/summarize_margins.pl -W 12 < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.nt_margins > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.nt_margins.summarized
-/usr/local/R/2.15.1-lx/bin/R --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
+/usr/local/R/2.15.1-lx/bin/R --vanilla --slave --no-save --args /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.nt_margins.summarized < /home/maticzkd/co/GraphProt/bin/selectTopWinShreps.R | \
 	sort -k3,3nr | \
 	head -n 1000 | \
 	sort -k1,1n > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.top_wins
+Loading required package: plyr
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/subTopWins.pl --input /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence --locations /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.top_wins --win_size 12 > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins | awk 'length($0)==12' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins.truncated
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.sequence_top_wins.truncated | awk '{print ">"i++"\n"$0}' | \

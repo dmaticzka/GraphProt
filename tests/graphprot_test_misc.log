@@ -77,14 +77,14 @@ Bias: 0.0200383
 ----------------------------------------------------------------
 Performance on train set:
     Size: 100
-    Correct: 96 ( 96 %)
-    Error: 4 ( 4 %)
+    Correct: 86 ( 86 %)
+    Error: 14 ( 14 %)
     Confusion table:
-    TP:48 FP:2
-    FN:2 TN:48
-    +Precision:0.96 +Recall:0.96 +F-measure:0.96
-    -Precision:0.96 -Recall:0.96 -F-measure:0.96
-    bPrecision:0.96 bRecall:0.96 bF-measure:0.96
+    TP:37 FP:1
+    FN:13 TN:49
+    +Precision:0.973684 +Recall:0.74 +F-measure:0.840909
+    -Precision:0.790323 -Recall:0.98 -F-measure:0.875
+    bPrecision:0.882003 bRecall:0.86 bF-measure:0.857955
 
 Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
 

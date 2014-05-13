@@ -3,8 +3,8 @@ EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
 
-Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.class .... read: 20 values.
-Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.feature.gz
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.class .... read: 20 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.feature.gz
 
 No row index list specified. Assuming all 20 row indices as valid.
 
@@ -34,16 +34,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 12 ( 66.6667 %)
-    Error: 6 ( 33.3333 %)
+    Correct: 14 ( 77.7778 %)
+    Error: 4 ( 22.2222 %)
     Confusion table:
-    TP:6 FP:3
-    FN:3 TN:6
-    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
-    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
-    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+    TP:6 FP:1
+    FN:3 TN:8
+    +Precision:0.857143 +Recall:0.666667 +F-measure:0.75
+    -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
+    bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_1
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_1
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -68,16 +68,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 15 ( 83.3333 %)
+    Error: 3 ( 16.6667 %)
     Confusion table:
-    TP:7 FP:3
-    FN:2 TN:6
-    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
-    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:7 FP:1
+    FN:2 TN:8
+    +Precision:0.875 +Recall:0.777778 +F-measure:0.823529
+    -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
+    bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_2
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_2
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -105,13 +105,13 @@ Performance on train set:
     Correct: 14 ( 77.7778 %)
     Error: 4 ( 22.2222 %)
     Confusion table:
-    TP:8 FP:3
-    FN:1 TN:6
-    +Precision:0.727273 +Recall:0.888889 +F-measure:0.8
-    -Precision:0.857143 -Recall:0.666667 -F-measure:0.75
+    TP:6 FP:1
+    FN:3 TN:8
+    +Precision:0.857143 +Recall:0.666667 +F-measure:0.75
+    -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
     bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_3
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_3
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -136,16 +136,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 15 ( 83.3333 %)
+    Error: 3 ( 16.6667 %)
     Confusion table:
-    TP:7 FP:3
-    FN:2 TN:6
-    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
-    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:7 FP:1
+    FN:2 TN:8
+    +Precision:0.875 +Recall:0.777778 +F-measure:0.823529
+    -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
+    bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_4
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_4
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -170,16 +170,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 15 ( 83.3333 %)
+    Error: 3 ( 16.6667 %)
     Confusion table:
-    TP:7 FP:3
-    FN:2 TN:6
-    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
-    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:7 FP:1
+    FN:2 TN:8
+    +Precision:0.875 +Recall:0.777778 +F-measure:0.823529
+    -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
+    bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_5
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_5
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -204,16 +204,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 15 ( 83.3333 %)
+    Error: 3 ( 16.6667 %)
     Confusion table:
-    TP:6 FP:2
-    FN:3 TN:7
-    +Precision:0.75 +Recall:0.666667 +F-measure:0.705882
-    -Precision:0.7 -Recall:0.777778 -F-measure:0.736842
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:6 FP:0
+    FN:3 TN:9
+    +Precision:1 +Recall:0.666667 +F-measure:0.8
+    -Precision:0.75 -Recall:1 -F-measure:0.857143
+    bPrecision:0.875 bRecall:0.833333 bF-measure:0.828571
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_6
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_6
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -238,16 +238,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 15 ( 83.3333 %)
+    Error: 3 ( 16.6667 %)
     Confusion table:
-    TP:7 FP:3
-    FN:2 TN:6
-    +Precision:0.7 +Recall:0.777778 +F-measure:0.736842
-    -Precision:0.75 -Recall:0.666667 -F-measure:0.705882
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:7 FP:1
+    FN:2 TN:8
+    +Precision:0.875 +Recall:0.777778 +F-measure:0.823529
+    -Precision:0.8 -Recall:0.888889 -F-measure:0.842105
+    bPrecision:0.8375 bRecall:0.833333 bF-measure:0.832817
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_7
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_7
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -272,16 +272,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 13 ( 72.2222 %)
-    Error: 5 ( 27.7778 %)
+    Correct: 14 ( 77.7778 %)
+    Error: 4 ( 22.2222 %)
     Confusion table:
-    TP:6 FP:2
-    FN:3 TN:7
-    +Precision:0.75 +Recall:0.666667 +F-measure:0.705882
-    -Precision:0.7 -Recall:0.777778 -F-measure:0.736842
-    bPrecision:0.725 bRecall:0.722222 bF-measure:0.721362
+    TP:6 FP:1
+    FN:3 TN:8
+    +Precision:0.857143 +Recall:0.666667 +F-measure:0.75
+    -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
+    bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_8
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_8
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -306,16 +306,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 12 ( 66.6667 %)
-    Error: 6 ( 33.3333 %)
+    Correct: 14 ( 77.7778 %)
+    Error: 4 ( 22.2222 %)
     Confusion table:
-    TP:6 FP:3
-    FN:3 TN:6
-    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
-    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
-    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+    TP:6 FP:1
+    FN:3 TN:8
+    +Precision:0.857143 +Recall:0.666667 +F-measure:0.75
+    -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
+    bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_9
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_9
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -340,16 +340,16 @@ Bias: 0.0084545
 ----------------------------------------------------------------
 Performance on train set:
     Size: 18
-    Correct: 12 ( 66.6667 %)
-    Error: 6 ( 33.3333 %)
+    Correct: 14 ( 77.7778 %)
+    Error: 4 ( 22.2222 %)
     Confusion table:
-    TP:6 FP:3
-    FN:3 TN:6
-    +Precision:0.666667 +Recall:0.666667 +F-measure:0.666667
-    -Precision:0.666667 -Recall:0.666667 -F-measure:0.666667
-    bPrecision:0.666667 bRecall:0.666667 bF-measure:0.666667
+    TP:6 FP:1
+    FN:3 TN:8
+    +Precision:0.857143 +Recall:0.666667 +F-measure:0.75
+    -Precision:0.727273 -Recall:0.888889 -F-measure:0.8
+    bPrecision:0.792208 bRecall:0.777778 bF-measure:0.775
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.model_10
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.model_10
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -364,7 +364,7 @@ Performance on data set in cross validation:
     -Precision:0.75 -Recall:0.9 -F-measure:0.818182
     bPrecision:0.8125 bRecall:0.8 bF-measure:0.79798
 
-Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-cwa8MT.train.feature.gz.cv_predictions
+Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-lowY6m.train.feature.gz.cv_predictions
 Crossvalidation concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 Total run-time:

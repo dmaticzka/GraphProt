@@ -1,211 +1,284 @@
-CACHE DIRECTORY: /home/maticzkd/co/GraphProt/GspanCache_lineSearch-44CnFP
+CACHE DIRECTORY: /home/maticzkd/co/GraphProt/GspanCache_lineSearch-zCPg7W
 
 *** optimizing parameter e, round: 1, current best: 0
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-fbffO0'
+/usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.fa -stdout \
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 3 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz; exit ${PIPESTATUS[0]}
+/bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.affy && \
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
+OK: gspan and class in sync
+----------------------------------------------------------------
+EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
+Author: Fabrizio Costa costa@informatik.uni-freiburg.de
+----------------------------------------------------------------
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz
 
-real	0m0.408s
-user	0m0.342s
+Counted 50 times.
+Elapsed time: h: 0 m: 0 s: 0
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz.feature
+Total run-time:
+Elapsed time: h: 0 m: 0 s: 1
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz.feature | grep -v \"^\" | paste -d' ' /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.affy - > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.feature
+rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.gspan.gz.feature
+time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 1 -p 0.001 -h 0 -v 10 /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.feature > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.cv_svr
+
+real	0m0.412s
+user	0m0.303s
 sys	0m0.006s
-1.38user 1.24system 0:02.95elapsed 88%CPU (0avgtext+0avgdata 47424maxresident)k
-0inputs+0outputs (0major+227199minor)pagefaults 0swaps
+cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.cv_svr | \
+	grep 'Cross Validation Squared correlation coefficient' | \
+	/usr/local/perl/bin/perl -ne 'print /(\d+.\d+)/' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-e31zpG.ls.cv
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-fbffO0'
 correlation: 0.45398
 parameters: e 0.01;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.03elapsed 23%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ys_w8q'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ys_w8q'
 correlation: 0.45398
 parameters: e 0.1;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+586minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-tG6bi9'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-tG6bi9'
 correlation: 0.45398
 parameters: e 1;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 25%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ddniPF'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ddniPF'
 correlation: 0.45398
 
 *** optimizing parameter c, round: 1, current best: 0.45398
 parameters: e 0.001;c 0.001;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+586minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-GGP_hz'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-GGP_hz'
 correlation: 0.45398
 parameters: e 0.001;c 0.01;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 61%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+589minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-6F7hjE'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-6F7hjE'
 correlation: 0.45398
 parameters: e 0.001;c 0.1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-jgGgYO'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-jgGgYO'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 46%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-5__q4w'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-5__q4w'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-n6XMWg'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-n6XMWg'
 correlation: 0.45398
 parameters: e 0.001;c 10;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 41%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-wfI7Vz'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-wfI7Vz'
 correlation: 0.45398
 
 *** optimizing parameter R, round: 1, current best: 0.45398
 parameters: e 0.001;c 1;R 4;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 25%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+586minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-X0fZ8t'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-X0fZ8t'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 3;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 33%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-CqpJcM'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-CqpJcM'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 2;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 33%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-RzJxxI'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-RzJxxI'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 25%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+586minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-5QkKXD'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-5QkKXD'
 correlation: 0.45398
 
 *** optimizing parameter D, round: 1, current best: 0.45398
 parameters: e 0.001;c 1;R 1;D 6;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 83%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-7b93h3'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-7b93h3'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 5;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-8ZFhdK'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-8ZFhdK'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-kynGwC'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-kynGwC'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 3;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 61%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-jgcyhX'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-jgcyhX'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 2;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 46%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-FSzhFD'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-FSzhFD'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 1;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 61%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+589minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Gv35NB'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Gv35NB'
 correlation: 0.45398
 
 *** optimizing parameter ABSTRACTION, round: 1, current best: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 1;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-3nUJu0'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-3nUJu0'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-5N4Ybf'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-5N4Ybf'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 5;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 46%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-UhhhOV'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-UhhhOV'
 correlation: 0.45398
 
 *** optimizing parameter e, round: 2, current best: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 35%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Ufcxbf'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Ufcxbf'
 correlation: 0.45398
 parameters: e 0.01;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-wI8ycQ'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-wI8ycQ'
 correlation: 0.45398
 parameters: e 0.1;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 46%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-B8xp_M'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-B8xp_M'
 correlation: 0.45398
 parameters: e 1;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+586minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-nmPnpt'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-nmPnpt'
 correlation: 0.45398
 
 *** optimizing parameter c, round: 2, current best: 0.45398
 parameters: e 0.001;c 0.001;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-jfPfhX'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-jfPfhX'
 correlation: 0.45398
 parameters: e 0.001;c 0.01;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-39p1rs'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-39p1rs'
 correlation: 0.45398
 parameters: e 0.001;c 0.1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 66%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-5iuMCs'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-5iuMCs'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ej6MmM'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ej6MmM'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 66%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-fYvCfA'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-fYvCfA'
 correlation: 0.45398
 parameters: e 0.001;c 10;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-WM3dqX'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-WM3dqX'
 correlation: 0.45398
 
 *** optimizing parameter R, round: 2, current best: 0.45398
 parameters: e 0.001;c 1;R 4;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 66%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ZLZDHv'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ZLZDHv'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 3;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-dqUA8i'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-dqUA8i'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 2;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 33%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-qSpnMg'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-qSpnMg'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 38%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-vJXvcn'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-vJXvcn'
 correlation: 0.45398
 
 *** optimizing parameter D, round: 2, current best: 0.45398
 parameters: e 0.001;c 1;R 1;D 6;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 41%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-APmc9L'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-APmc9L'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 5;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-i5Ov3i'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-i5Ov3i'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 75%CPU (0avgtext+0avgdata 4288maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-xXtDRP'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-xXtDRP'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 3;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 46%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-CyG3F3'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-CyG3F3'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 2;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+588minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-IX5B3q'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-IX5B3q'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 1;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 75%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+589minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-3mUE5F'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-3mUE5F'
 correlation: 0.45398
 
 *** optimizing parameter ABSTRACTION, round: 2, current best: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 1;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 66%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+589minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-OizhxA'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-OizhxA'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 3;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 41%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-OANN3m'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-OANN3m'
 correlation: 0.45398
 parameters: e 0.001;c 1;R 1;D 4;b 14;ABSTRACTION 5;DIRECTED DIRECTED;CUE nil;STACK nil;VIEWPOINT --vp;
-0.00user 0.00system 0:00.01elapsed 50%CPU (0avgtext+0avgdata 4304maxresident)k
-0inputs+0outputs (0major+587minor)pagefaults 0swaps
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-n822zt'
+make[1]: Nothing to be done for `cv'.
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-n822zt'
 correlation: 0.45398
 
 

@@ -3,7 +3,7 @@ EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
 
-Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tUKX2M.train.model
+Loading model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-njiLOE.train.model
 ----------------------------------------------------------------
 Model information
 ----------------------------------------------------------------
@@ -11,10 +11,10 @@ W Norm: 1.73468
 Bias: 0.00856223
 ----------------------------------------------------------------
 
-Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tUKX2M.test.gspan.gz
+Processing I/O file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-njiLOE.test.gspan.gz
 
 Counted 10 times.
 Elapsed time: h: 0 m: 0 s: 0
-Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-tUKX2M.test.gspan.gz.prediction_part
+Result saved in file /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-njiLOE.test.gspan.gz.prediction_part
 Total run-time:
 Elapsed time: h: 0 m: 0 s: 0
