@@ -173,6 +173,14 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
 my $scriptdir = abs_path( dirname($0) );
 
+# check fastapl
+`perl $scriptdir/bin/fastapl --version`;
+if ( $? != 256 ) {
+	print STDERR "\n\nfastapl call returned: '$?'\n";
+  print STDERR "error running fastapl. perhaps your perl version is very old?\n";
+  exit;
+}
+
 # check RNAshapes
 `RNAshapes -h`;
 if ( $? != 0 ) {
@@ -219,7 +227,7 @@ if ( defined $mode and $mode eq 'regression' ) {
   }
 }
 
-if ( $action eq 'motif' ) {
+if ( defined $action and $action eq 'motif' ) {
   `R --help`;
   if ( $? != 0 ) {
     print STDERR
