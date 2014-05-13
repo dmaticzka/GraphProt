@@ -506,7 +506,7 @@ ifeq ($(SVM),SGD)
 	-r $(RADIUS) -d $(DISTANCE) -b $(BITSIZE) -g $(DIRECTED) \
 	-e $(EPOCHS) -l $(LAMBDA) &> $@.log
 	cat $<.cv_predictions | awk '{print $$2==1?1:-1, $$4}' > $@
-	-rm  -f $<.cv_predictions$* $*.model_*
+	-rm  -f $<.cv_predictions $*.model_*
 
 # compute margins of graph vertices
 # vertex_margins format: seqid verticeid margin
