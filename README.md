@@ -71,8 +71,12 @@ Trains a GraphProt model. The model is written to file "GraphProt.model".
 
 #### predict - Predict binding for a whole site ####
 
-Predict binding of whole sequences, e.g. CLIP sites. Each prediction in "GraphProt.predictions"
-contains three columns: the id from the fasta file, the predicted class and the prediction margin.
+Predict binding of whole sequences, e.g. CLIP sites. Predictions are written to file "GraphProt.predictions",
+this file contains three columns: 
+
+1. sequence id from the fasta file
+2. predicted class
+3. prediction margin
 
 #### predict_profile - Predict binding profiles ####
 
@@ -100,6 +104,10 @@ This file contains three columns:
 
 Create RNA sequence and structure motifs as described in the "GraphProt" paper.
 Motifs are written to files "GraphProt.sequence_motif.png" and "GraphProt.structure_motif.png".
+
+To create motifs as done in the paper, this should be run using a trained model
+and the bound training sequences from the CLIP experiment the model was trained on.
+E.g. "GraphProt.pl --action motif --model CLIP.model --fasta CLIP_bound.fa".
 
 ## Advanced Usage ##
 
