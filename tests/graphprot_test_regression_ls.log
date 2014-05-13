@@ -10,7 +10,7 @@ make: Entering directory `/home/maticzkd/co/GraphProt'
 	-of /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param \
 	-tmp /home/maticzkd/co/GraphProt \
 	-bindir /home/maticzkd/co/GraphProt 2> >(tee /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param.log >&2)
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-liCNBP'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-BfYEU_'
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.ls.fa -stdout \
 	--seq-graph-t --seq-graph-alph -abstr \
 	  --vp \
@@ -37,142 +37,142 @@ time  /home/maticzkd/src/libsvm-3.12/svm-train -s 3 -t 0 -m 10000 -c 1 -p 0.001 
 cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.ls.cv_svr | \
 	grep 'Cross Validation Squared correlation coefficient' | \
 	/usr/local/perl/bin/perl -ne 'print /(\d+.\d+)/' > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.ls.cv
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-liCNBP'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-7c8KmL'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-BfYEU_'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-DVKxn4'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-7c8KmL'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-fkBFeL'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-DVKxn4'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-UNFuuO'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-fkBFeL'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-OtwQuJ'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-UNFuuO'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-v8Bu_h'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-OtwQuJ'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-K21qvE'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-v8Bu_h'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-NNqvpk'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-K21qvE'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-tVDUIk'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-NNqvpk'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-pmE_hk'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-tVDUIk'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-0fZI0K'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-pmE_hk'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-lXwuB1'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-0fZI0K'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-25Z5Da'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-lXwuB1'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-dqByE6'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-25Z5Da'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-gTNPdd'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-dqByE6'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-pJ47cb'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-gTNPdd'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-6QQnJy'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-pJ47cb'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Hd2cOY'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-6QQnJy'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Ej3680'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Hd2cOY'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-afJqdn'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Ej3680'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-VSFz0W'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-afJqdn'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ygArHh'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-VSFz0W'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-tmDBD5'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ygArHh'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-OjIdHe'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-tmDBD5'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Qg6vl4'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-OjIdHe'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-a55USY'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Qg6vl4'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-nxwfZr'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-a55USY'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-gEMxJc'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-nxwfZr'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-do4cs1'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-gEMxJc'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-irrn9U'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-do4cs1'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-bWyCfE'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-irrn9U'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-TulyjK'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-bWyCfE'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-_OJqg_'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-TulyjK'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-P0ljPL'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-_OJqg_'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-VJNVOv'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-P0ljPL'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-jHxWq9'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-VJNVOv'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-6UdQjn'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-jHxWq9'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-6lW_Km'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-6UdQjn'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-qC92WL'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-6lW_Km'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-EkSPYt'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-qC92WL'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-92MuEA'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-EkSPYt'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-HbmCEr'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-92MuEA'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-e03SmM'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-HbmCEr'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-On98RC'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-e03SmM'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-15HodX'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-On98RC'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-JNr8DO'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-15HodX'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-XZgMcR'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-JNr8DO'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-294xtt'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-XZgMcR'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-wtjIDD'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-294xtt'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-cVgmyW'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-wtjIDD'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-S5wO8G'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-cVgmyW'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-fERQyX'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-S5wO8G'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-gDU6mY'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-fERQyX'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-nCT_le'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-gDU6mY'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-BAiB5j'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-nCT_le'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-OEa90S'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-BAiB5j'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-vuKuPW'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-OEa90S'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-vHrFRL'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-vuKuPW'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-9qxpx1'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-vHrFRL'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-rMx53k'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-9qxpx1'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-Eqqut4'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-rMx53k'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-pIdy9l'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-Eqqut4'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ubW_8W'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-pIdy9l'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-5aydGR'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ubW_8W'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-zjaedW'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-5aydGR'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-QC4GXk'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-zjaedW'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-lWwsw_'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-QC4GXk'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-FcqjEF'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-lWwsw_'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-MJyssp'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-FcqjEF'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-sZDlBm'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-MJyssp'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-icQjNy'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-sZDlBm'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-eyx477'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-icQjNy'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-sR9pVM'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-eyx477'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ak2jIG'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-sR9pVM'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-pMYqZS'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ak2jIG'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-law4qy'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-pMYqZS'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-1_szjw'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-law4qy'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-FCkIaP'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-1_szjw'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-ZZQmf9'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-FCkIaP'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-UrBq0S'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-ZZQmf9'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-h2tfiI'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-UrBq0S'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-PcquHc'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-h2tfiI'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-3otzhW'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-PcquHc'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-LzVRUw'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-3otzhW'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-CY91x5'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-LzVRUw'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-SOek4l'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-CY91x5'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-zVZhs3'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-SOek4l'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-h5gxt9'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-zVZhs3'
-make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-d7ALl2'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-h5gxt9'
+make[1]: Entering directory `/home/maticzkd/co/GraphProt/lineSearch-MP5YoH'
 make[1]: Nothing to be done for `cv'.
-make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-d7ALl2'
+make[1]: Leaving directory `/home/maticzkd/co/GraphProt/lineSearch-MP5YoH'
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 optimized parameters:
 epsilon: 0.001

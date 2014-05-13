@@ -1,10 +1,74 @@
-CACHE DIRECTORY: /home/maticzkd/co/GraphProt/GspanCache_lineSearch-lo4S4b
+CACHE DIRECTORY: /home/maticzkd/co/GraphProt/GspanCache_lineSearch-iachk5
 
 *** optimizing sgd-internal parameters
 parameters: EPOCHS 50;LAMBDA 10e-8;R 4;D 6;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
-make[1]: *** [/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQ0T5k.ls.param] Interrupt
-Command terminated by signal 2
-37.75user 1.16system 0:41.13elapsed 94%CPU (0avgtext+0avgdata 640704maxresident)k
-0inputs+0outputs (0major+172443minor)pagefaults 0swaps
-time make -f /home/maticzkd/co/GraphProt/Makefile -e PWD=/home/maticzkd/co/GraphProt /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-pQ0T5k.ls.param failed: 512 at /home/maticzkd/co/GraphProt/bin/lineSearch.pl line 271, <PARAM> line 11.
-cannot remove path when cwd is /home/maticzkd/co/GraphProt/lineSearch-NnCgQI for /home/maticzkd/co/GraphProt/lineSearch-NnCgQI:  at /usr/local/perl/5.12.2/lib/5.12.2/File/Temp.pm line 2445.
+542.86user 2.69system 9:05.76elapsed 99%CPU (0avgtext+0avgdata 977152maxresident)k
+0inputs+0outputs (0major+259228minor)pagefaults 0swaps
+
+*** optimizing parameter b, round: 1, current best: 0
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+rm: cannot remove `/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-5LHzOa.ls.feature.gz.cv_predictions/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-5LHzOa.ls': Not a directory
+make[1]: [/home/maticzkd/co/GraphProt/tests/GraphProt_tmp-5LHzOa.ls.cv.predictions_class] Error 1 (ignored)
+10.25user 0.90system 0:10.79elapsed 103%CPU (0avgtext+0avgdata 490560maxresident)k
+0inputs+0outputs (0major+160809minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 16;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.03elapsed 25%CPU (0avgtext+0avgdata 4288maxresident)k
+0inputs+0outputs (0major+592minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 18;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4288maxresident)k
+0inputs+0outputs (0major+593minor)pagefaults 0swaps
+correlation: 0.88135
+
+*** optimizing parameter ABSTRACTION, round: 1, current best: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 1;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 30%CPU (0avgtext+0avgdata 4288maxresident)k
+0inputs+0outputs (0major+592minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 53%CPU (0avgtext+0avgdata 4288maxresident)k
+0inputs+0outputs (0major+593minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 5;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 76%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+594minor)pagefaults 0swaps
+correlation: 0.88135
+
+*** optimizing sgd-internal parameters
+parameters: EPOCHS 50;LAMBDA 10e-8;R 4;D 6;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+532.15user 2.43system 8:59.09elapsed 99%CPU (0avgtext+0avgdata 977136maxresident)k
+0inputs+0outputs (0major+148960minor)pagefaults 0swaps
+
+*** optimizing parameter b, round: 2, current best: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.04elapsed 20%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+594minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 16;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 69%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+595minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 18;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 61%CPU (0avgtext+0avgdata 4288maxresident)k
+0inputs+0outputs (0major+592minor)pagefaults 0swaps
+correlation: 0.88135
+
+*** optimizing parameter ABSTRACTION, round: 2, current best: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 1;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 61%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+594minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 66%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+594minor)pagefaults 0swaps
+correlation: 0.88135
+parameters: EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 5;CUE nil;STACK nil;VIEWPOINT --vp;
+0.00user 0.00system 0:00.01elapsed 58%CPU (0avgtext+0avgdata 4304maxresident)k
+0inputs+0outputs (0major+594minor)pagefaults 0swaps
+correlation: 0.88135
+
+
+improvement to last round < 0.01, stopping
+top values from rounds: 0; 0.88135; 0.88135
+EPOCHS 30;LAMBDA 0.001;R 0;D 0;b 14;DIRECTED DIRECTED;ABSTRACTION 3;CUE nil;STACK nil;VIEWPOINT --vp;

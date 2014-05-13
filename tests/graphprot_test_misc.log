@@ -7,20 +7,20 @@ make: Entering directory `/home/maticzkd/co/GraphProt'
 using empty set of unknowns!
 touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.unknowns.fa
 ( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.positives.fa; \
-  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.negatives.fa; \
-  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa
+	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.negatives.fa; \
+	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa
 cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.param
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa -stdout \
---seq-graph-t --seq-graph-alph -abstr \
-  --vp \
--t 3 \
--M 3 \
--wins '150' \
--shift '25' | \
-gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz; exit ${PIPESTATUS[0]}
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 3 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz; exit ${PIPESTATUS[0]}
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy
 /bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy && \
-OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
@@ -36,10 +36,10 @@ rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz.featu
 gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature
 cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.affy /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class
 /bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class && \
-/home/maticzkd/co/GraphProt/EDeN/EDeN -a TRAIN \
--i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class -m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model \
--r 1 -d 4 -g DIRECTED -b 14 \
--e 10 -l 0.001
+	/home/maticzkd/co/GraphProt/EDeN/EDeN -a TRAIN \
+	-i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.class -m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model \
+	-r 1 -d 4 -g DIRECTED -b 14 \
+	-e 10 -l 0.001
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
@@ -88,7 +88,7 @@ Performance on train set:
 
 Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model
 
-Train phase completed:Elapsed time: h: 0 m: 0 s: 1
+Train phase completed:Elapsed time: h: 0 m: 0 s: 0
 Total run-time:
 make: Leaving directory `/home/maticzkd/co/GraphProt'
 GraphProt model written to file test_edenacc_train.model
@@ -101,20 +101,20 @@ make: Entering directory `/home/maticzkd/co/GraphProt'
 using empty set of unknowns!
 touch /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.unknowns.fa
 ( /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.positives.fa; \
-  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.negatives.fa; \
-  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa
+	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " -1";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.negatives.fa; \
+	  /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -p -1 -e '$head .= " 0";' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.unknowns.fa ) > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa
 cp /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.param /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.param
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/fasta2shrep_gspan.pl -fasta /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa -stdout \
---seq-graph-t --seq-graph-alph -abstr \
-  --vp \
--t 3 \
--M 3 \
--wins '150' \
--shift '25' | \
-gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz; exit ${PIPESTATUS[0]}
+	--seq-graph-t --seq-graph-alph -abstr \
+	  --vp \
+	-t 3 \
+	-M 3 \
+	-wins '150' \
+	-shift '25' | \
+	gzip > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz; exit ${PIPESTATUS[0]}
 /usr/local/perl/bin/perl /home/maticzkd/co/GraphProt/bin/fastapl -e '@ry = split(/\s/,$head); print $ry[-1], "\n"' < /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.fa > /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy
 /bin/bash /home/maticzkd/co/GraphProt/bin/check_sync_gspan_class.sh /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.affy && \
-OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
+	OMP_NUM_THREADS=1 /home/maticzkd/co/GraphProt/EDeN/EDeN -a FEATURE -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz -r 1 -d 4 -b 14 -g DIRECTED
 OK: gspan and class in sync
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
@@ -129,9 +129,9 @@ cat /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature 
 rm -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.gspan.gz.feature
 gzip -f /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature
 /home/maticzkd/co/GraphProt/EDeN/EDeN -a TEST \
--m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.class \
--r 1 -d 4 -b 14 -g DIRECTED \
--e 10 -l 0.001
+	-m /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.train.model -i /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.feature.gz -f SPARSE_VECTOR -t /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-XXXXX.test.class \
+	-r 1 -d 4 -b 14 -g DIRECTED \
+	-e 10 -l 0.001
 ----------------------------------------------------------------
 EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
