@@ -229,7 +229,13 @@ if ( $action eq 'motif' ) {
   `echo 'require(plyr)' | R --slave &> /dev/null`;
   if ( $? != 0 ) {
     print STDERR
-      "please make sure that the R package 'plyr' is installed.\n";
+      "please make sure that the R package 'plyr' is installed.\nfrom within R, call: install.packages('plyr')";
+    exit;
+  }
+  `echo 'require(stats)' | R --slave &> /dev/null`;
+  if ( $? != 0 ) {
+    print STDERR
+      "please make sure that the R package 'stats' is installed.\nfrom within R, call: install.packages('stats')";
     exit;
   }
   my $weblogo_version = `weblogo --version`;

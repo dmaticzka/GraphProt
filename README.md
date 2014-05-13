@@ -21,6 +21,7 @@ follwing programs are installed and accessible via the PATH environment variable
 * GNU make is used as the pipeline backend ([http://www.gnu.org/software/make/](http://www.gnu.org/software/make/))
 * R is used to process nucleotide-wise margins for motif creation ([www.r-project.org/](www.r-project.org/))
 * The R plyr package is required for calculating motifs ([http://plyr.had.co.nz/](http://plyr.had.co.nz/)) and can be installed from within R by issuing the command "install.packages('plyr')".
+* The R stats package is required for calculating motifs ([http://plyr.had.co.nz/](http://plyr.had.co.nz/)) and can be installed from within R by issuing the command "install.packages('stats')".
 * GraphProt uses WebLogo3 to plot sequence and structure motifs. GraphProt was tested using version WebLogo 3.2 [http://code.google.com/p/weblogo/downloads](http://code.google.com/p/weblogo/downloads).
 
 GraphProt will scan for these programs and notify you if something seems amiss.
