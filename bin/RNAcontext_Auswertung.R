@@ -8,7 +8,7 @@
 #
 # second part: don't do selection of input data on training data, just select a best model from within full and from within weak
 
-require(plyr)
+library(plyr)
 
 # best for my own computations:
 d_apr <- read.table("results_aucpr.csv", col.names=c('pred','protein','type','set','length','apr'));

@@ -1,4 +1,4 @@
-require(plyr)
+library(plyr)
 # parse command line arguments
 args <- commandArgs(trailingOnly=T)
 nt_margins <- args[1]

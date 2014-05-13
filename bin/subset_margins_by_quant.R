@@ -1,4 +1,4 @@
-require(stats)
+library(stats)
 
 args <- commandArgs(trailingOnly=T)
 

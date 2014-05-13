@@ -235,13 +235,13 @@ if ( defined $action and $action eq 'motif' ) {
       "please check if R is installed and in your path (can't call R).\n";
     exit;
   }
-  `echo 'require(plyr)' | R --slave &> /dev/null`;
+  `echo 'library(plyr)' | R --slave &> /dev/null`;
   if ( $? != 0 ) {
     print STDERR
       "please make sure that the R package 'plyr' is installed.\nfrom within R, call: install.packages('plyr')";
     exit;
   }
-  `echo 'require(stats)' | R --slave &> /dev/null`;
+  `echo 'library(stats)' | R --slave &> /dev/null`;
   if ( $? != 0 ) {
     print STDERR
       "please make sure that the R package 'stats' is installed.\nfrom within R, call: install.packages('stats')";
