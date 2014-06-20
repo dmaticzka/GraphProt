@@ -62,8 +62,14 @@ to file "GraphProt.param".
 
 #### cv - Crossvalidation ####
 
-Runs a 10-fold crossvalidation. Crossvalidation results are written to file
-"GraphProt.cv_results".
+Runs a 10-fold crossvalidation. Measures of classification performance are
+listed in "GraphProt.cv_results". In classification setting, crossvalidation
+results are written to file "GraphProt.cv_predictions", this file contains three
+columns:
+
+1. sequence id of training instance
+2. class of training instance
+3. predicted margin
 
 #### train - Model Training ####
 

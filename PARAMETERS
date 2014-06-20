@@ -16,7 +16,7 @@ TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
 WEBLOGO:=/usr/local/user/weblogo/weblogo-3.2/weblogo
 
 ## General parameters ##########################################################
-DIST_DIR:=GraphProt-1.1.0
+DIST_DIR:=GraphProt-1.1.1
 
 # use sge arrayjobs to create gspan and features
 # implemented for CONTEXTSHREP

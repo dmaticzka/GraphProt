@@ -746,9 +746,14 @@ if ( $mode eq 'regression' ) {
     # add targets
     $makecall .= " $tmpdir.train.cv.perf";
     system("$makecall");
+    
+    # prepare output
+    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.train.fa > ${tmpdir}.train.fa.id");
+    system("cat $tmpdir.train.cv.predictions_class | awk '\$1!=0' | sed 's/^-1/0/g' | " .
+    	'paste -d "\t" ' . "${tmpdir}.train.fa.id - > $prefix.cv_predictions");
     move( "$tmpdir.train.cv.perf", "$prefix.cv_results" );
     print
-      "GraphProt crossvalidation results written to file $prefix.cv_results\n";
+      "GraphProt crossvalidation results written to files $prefix.cv_predictions and $prefix.cv_results\n";
   } elsif ( $action eq 'train' ) {
 
     # copy files
