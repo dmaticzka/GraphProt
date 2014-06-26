@@ -38,6 +38,12 @@ Options:
     -help        brief help message
     -man         full documentation
 
+Specify parameters as determined by -action ls:
+
+    -params      parameter config file created by -action ls, alternatively
+                 use the following options to manually enter the desired
+                 parameters
+
 Graph and Feature options:
 
     -abstraction RNAshapes abstraction level [RNA structure graphs]
@@ -127,6 +133,7 @@ my $onlyseq;
 my $prefix;
 my $fasta;
 my $model;
+my $params_fn;
 my $negfasta;
 my $affys;
 my $R;
@@ -151,6 +158,7 @@ my $result = GetOptions(
   "negfasta=s"    => \$negfasta,
   "affinities=s"  => \$affys,
   "model=s"       => \$model,
+  "params=s"      => \$params_fn,
   "R=i"           => \$R,
   "D=i"           => \$D,
   "c=f"           => \$c,
@@ -270,6 +278,10 @@ if ( defined $action and $action eq 'motif' ) {
 ( defined $mode ) or $mode = 'classification';
 ( defined $action ) or pod2usage("please specify -action\n");
 
+if (defined $params_fn) {
+	(-f $params_fn) or pod2usage("error: file '$params_fn' not found");
+}
+
 my $quit_with_help = 0;
 
 sub check_param_fasta {
@@ -340,6 +352,8 @@ sub check_param_R {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "R: $R\n";
 }
 
 sub check_param_D {
@@ -355,6 +369,8 @@ sub check_param_D {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "D: $D\n";
 }
 
 sub check_param_bitsize {
@@ -371,6 +387,8 @@ sub check_param_bitsize {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "bitsize: $bitsize\n";
 }
 
 sub check_param_abstraction {
@@ -388,6 +406,8 @@ sub check_param_abstraction {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "abstraction: $abstraction\n";
 }
 
 sub check_param_c {
@@ -403,6 +423,8 @@ sub check_param_c {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "c: $c\n";
 }
 
 sub check_param_epsilon {
@@ -418,6 +440,8 @@ sub check_param_epsilon {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "epsilon: $epsilon\n";
 }
 
 sub check_param_epochs {
@@ -433,6 +457,8 @@ sub check_param_epochs {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "epochs: $epochs\n";
 }
 
 sub check_param_lambda {
@@ -448,6 +474,8 @@ sub check_param_lambda {
     $quit_with_help = 1;
     return 0;
   }
+  
+  print "lambda: $lambda\n";
 }
 
 sub check_param_percentile {
@@ -460,26 +488,82 @@ sub check_param_percentile {
   }
 }
 
+sub parse_params_regression {
+	if (defined $params_fn) {
+	
+		# read parameters file
+		my %params;
+		open PARAMS, '<', $params_fn;
+		while (my $line = <PARAMS>) {
+			my ($key, $value) = split ' ', $line;
+			$params{$key} = $value;
+		}
+		close PARAMS;
+		
+		# parse parameters
+		$R = $params{'R:'};
+		$D = $params{'D:'};
+		$bitsize = $params{'bitsize:'};
+		$epsilon = $params{'epsilon:'};
+		$c = $params{'c:'};
+		if (not defined $onlyseq) {
+			$abstraction = $params{'abstraction:'};
+		}
+	}
+}
+
 sub check_params_regression {
 
-  # only check when creating a structure model
-  defined $onlyseq or check_param_abstraction;
+	print "Using parameters:\n";
+
   check_param_R;
   check_param_D;
   check_param_bitsize;
   check_param_c;
   check_param_epsilon;
+  # only check when creating a structure model
+  defined $onlyseq or check_param_abstraction;
+  
+  print "\n";
+}
+
+sub parse_params_classification {
+	if (defined $params_fn) {
+	
+		# read parameters file
+		my %params;
+		open PARAMS, '<', $params_fn;
+		while (my $line = <PARAMS>) {
+			my ($key, $value) = split ' ', $line;
+			$params{$key} = $value;
+		}
+		close PARAMS;
+		
+		# parse parameters
+		$R = $params{'R:'};
+		$D = $params{'D:'};
+		$bitsize = $params{'bitsize:'};
+		$epochs = $params{'epochs:'};
+		$lambda = $params{'lambda:'};
+		if (not defined $onlyseq) {
+			$abstraction = $params{'abstraction:'};
+		}
+	}
 }
 
 sub check_params_classification {
 
-  # only check when creating a structure model
-  defined $onlyseq or check_param_abstraction;
+	print "Using parameters:\n";
+
   check_param_R;
   check_param_D;
   check_param_bitsize;
   check_param_epochs;
   check_param_lambda;
+  # only check when creating a structure model
+  defined $onlyseq or check_param_abstraction;
+  
+  print "\n";
 }
 
 defined $action or pod2usage("please specify the GraphProt action\n");
@@ -492,14 +576,17 @@ if ( $mode eq 'regression' ) {
   } elsif ( $action eq 'cv' ) {
     check_param_fasta;
     check_param_affys;
+    parse_params_regression;
     check_params_regression;
   } elsif ( $action eq 'train' ) {
     check_param_fasta;
     check_param_affys;
+    parse_params_regression;
     check_params_regression;
   } elsif ( $action eq 'predict' ) {
     check_param_fasta;
     check_param_model;
+    parse_params_regression;
     check_params_regression;
   } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
@@ -520,27 +607,33 @@ if ( $mode eq 'regression' ) {
   } elsif ( $action eq 'cv' ) {
     check_param_fasta;
     check_param_negfasta;
+    parse_params_classification;
     check_params_classification;
   } elsif ( $action eq 'train' ) {
     check_param_fasta;
     check_param_negfasta;
+    parse_params_classification;
     check_params_classification;
   } elsif ( $action eq 'predict' ) {
     check_param_fasta;
     check_param_model;
+    parse_params_classification;
     check_params_classification;
   } elsif ( $action eq 'predict_profile' ) {
     check_param_fasta;
     check_param_model;
+    parse_params_classification;
     check_params_classification;
   } elsif ( $action eq 'predict_has' ) {
     check_param_fasta;
     check_param_model;
+    parse_params_classification;
     check_params_classification;
     check_param_percentile;
   } elsif ( $action eq 'motif' ) {
     check_param_fasta;
     check_param_model;
+    parse_params_classification;
     check_params_classification;
   } else {
     pod2usage("error: unknown action '$action'\n");
