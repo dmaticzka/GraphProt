@@ -3,8 +3,8 @@ EDeN (Explicit Decomposition with Neighborhoods) Vers. 0.4.2 (15 June 2013)
 Author: Fabrizio Costa costa@informatik.uni-freiburg.de
 ----------------------------------------------------------------
 
-Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.class .... read: 20 values.
-Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.feature.gz
+Reading file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.class .... read: 20 values.
+Processing file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.feature.gz
 
 No row index list specified. Assuming all 20 row indices as valid.
 
@@ -43,7 +43,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_1
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_1
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -77,7 +77,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_2
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_2
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -111,7 +111,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_3
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_3
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -145,7 +145,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_4
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_4
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -179,7 +179,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_5
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_5
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -213,7 +213,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_6
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_6
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -247,7 +247,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_7
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_7
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -281,7 +281,7 @@ Performance on train set:
     -Precision:0.9 -Recall:1 -F-measure:0.947368
     bPrecision:0.95 bRecall:0.944444 bF-measure:0.944272
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_8
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_8
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -315,7 +315,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_9
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_9
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -349,7 +349,7 @@ Performance on train set:
     -Precision:1 -Recall:1 -F-measure:1
     bPrecision:1 bRecall:1 bF-measure:1
 
-Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.model_10
+Saving model file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.model_10
 Fold phase concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 ----------------------------------------------------------------
@@ -364,7 +364,7 @@ Performance on data set in cross validation:
     -Precision:1 -Recall:0.9 -F-measure:0.947368
     bPrecision:0.954545 bRecall:0.95 bF-measure:0.949875
 
-Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-Qlz7zj.ls.feature.gz.cv_predictions
+Instance id, true target, prediction and margin saved in file: /home/maticzkd/co/GraphProt/tests/GraphProt_tmp-2Ms4Wj.ls.feature.gz.cv_predictions
 Crossvalidation concluded in:
 Elapsed time: h: 0 m: 0 s: 0
 Total run-time:

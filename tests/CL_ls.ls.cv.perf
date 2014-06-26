@@ -52,4 +52,4 @@ TOP1   1.00000
 TOP10  1.00000
 RMS    1.66018
 CA1    0.05277 19_0.05_bins
-CA2        nan Bin_Size 100
+CA2       -nan Bin_Size 100
