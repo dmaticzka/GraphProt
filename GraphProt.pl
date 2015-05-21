@@ -78,6 +78,13 @@ Prediction options:
                  as high-affinity sites
                      default: 99
 
+Motif options:
+
+    -motif_len   set length of motifs
+                     (default: 12)
+    -motif_top_n use use n top-scoring subsequences for motif creation
+                     (default: 1000)
+
 =head1 DESCRIPTION
 
 =cut
@@ -122,6 +129,8 @@ my $def_epsilon     = 0.1;
 my $def_c           = 1;
 my $def_prefix      = 'GraphProt';
 my $def_percentile  = 99;
+my $def_motif_len   = 12;
+my $def_motif_top_n = 1000;
 
 ###############################################################################
 # parse command line options
@@ -145,6 +154,8 @@ my $lambda;
 my $abstraction;
 my $bitsize;
 my $percentile;
+my $motif_len;
+my $motif_top_n;
 my $help;
 my $man;
 my $debug;
@@ -168,6 +179,8 @@ my $result = GetOptions(
   "abstraction=i" => \$abstraction,
   "bitsize=i"     => \$bitsize,
   "percentile=f"  => \$percentile,
+  "motif_len=i"   => \$motif_len,
+  "motif_top_n=i" => \$motif_top_n,
   "help"          => \$help,
   "man"           => \$man,
   "debug"         => \$debug,
@@ -488,6 +501,35 @@ sub check_param_percentile {
   }
 }
 
+sub check_param_motif_len {
+    defined $motif_len or $motif_len = $def_motif_len;
+    
+    if ($motif_len < 4) {
+        pod2usage("error: please specify a motif length >= 4");
+        $quit_with_help = 1;
+        return 0;
+    }
+    
+    print "creating motif of length $motif_len\n";
+}
+
+sub check_param_motif_top_n {
+    defined $motif_top_n or $motif_top_n = $def_motif_top_n;
+    
+    if ($motif_top_n < 1) {
+        pod2usage("error: please specify a number > 0 for parameter motif_top_n");
+        $quit_with_help = 1;
+        return 0;
+    }
+    
+    print "using top $motif_top_n scoring subsequences for motif creation\n";
+}
+
+sub check_params_motif {
+    check_param_motif_len;
+    check_param_motif_top_n;
+}
+
 sub parse_params_regression {
 	if (defined $params_fn) {
 	
@@ -513,8 +555,7 @@ sub parse_params_regression {
 }
 
 sub check_params_regression {
-
-	print "Using parameters:\n";
+  print "Using parameters:\n";
 
   check_param_R;
   check_param_D;
@@ -635,6 +676,7 @@ if ( $mode eq 'regression' ) {
     check_param_model;
     parse_params_classification;
     check_params_classification;
+    check_params_motif;
   } else {
     pod2usage("error: unknown action '$action'\n");
   }
@@ -932,6 +974,8 @@ if ( $mode eq 'regression' ) {
 
     # add parameters
     $makecall .= " -e SVM=SGD ";
+    $makecall .= " -e MARGINS_WINDOW=${motif_len} ";
+    $makecall .= " -e TOP_WINDOWS=${motif_top_n} ";
 
     # add targets
     $makecall .= " $tmpdir.test.sequence_top_wins.truncated";
