@@ -71,7 +71,9 @@ while (<OFFSETS>) {
         $currentvertices{$seq_id} = 0;
     }
     for (my $i=0; $i<$nvertices; $i++) {
-        $id2pos{$seq_id}{$currentvertices{$seq_id}} += $offset;
+        if (defined $id2pos{$seq_id}{$currentvertices{$seq_id}}) {
+            $id2pos{$seq_id}{$currentvertices{$seq_id}} += $offset;
+        }
         # print $currentvertices{$seq_id}, " ";
         $currentvertices{$seq_id}++;
     }
