@@ -61,7 +61,7 @@ while (<DICT>) {
 close DICT;
 
 # read and apply offsets
-my %currentvertices = {};
+my %currentvertices;
 open OFFSETS, $vertex_offsets or die $!;
 while (<OFFSETS>) {
     chomp;
