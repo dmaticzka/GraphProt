@@ -57,7 +57,6 @@ FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
 THRESH_MARGINS:=$(PWD)/bin/subset_margins_by_quant.R
-GSPAN_EXTRACT_COORDS:=$(PWD)/bin/gspan_extract_coords.pl
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
@@ -306,7 +305,10 @@ endif
 	-wins '$(SHAPES_WINS)' \
 	-shift '$(SHAPES_SHIFT)' | \
 	awk -f $(GSPAN_SPLIT_GRAPHS) | \
+	awk 'BEGIN{OFS="\t"}/^t/{ntpos=1; print}/^[vV]/&&NF==4{print $$1,$$2,$$3,ntpos++}/^[vV]/&&NF!=4{print}/^e/{print}' | \
 	gzip > $@; exit $${PIPESTATUS[0]}
+
+
 
 # different filenames for motif creation
 # compute margins of graph vertices
@@ -334,14 +336,10 @@ endif
 %.test.sequence : %.motif.gspan.gz
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
-# calculate offsets of windowed vertices
-%.motif.vertex_offsets : %.motif.gspan.gz
-	zcat $< | $(PERL) $(GSPAN_EXTRACT_COORDS) > $@
-
 # compute nucleotide-wise margins from vertice margins
-%.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict %.motif.vertex_offsets
+%.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict
 	cat $< | \
-	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict --vertexoffsets $*.motif.vertex_offsets > $@
+	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict > $@
 
 # removed this because it won't work with sequence only
 # I think I added this for the viewpoint stuff
@@ -553,14 +551,10 @@ ifeq ($(SVM),SGD)
 	zcat $< | \
 	awk -f $(GSPAN2VDICT) > $@
 
-# calculate offsets of windowed vertices
-%.vertex_offsets : %.gspan.gz
-	zcat $< | $(PERL) $(GSPAN_EXTRACT_COORDS) > $@
-
 # compute nucleotide-wise margins from vertice margins
-%.nt_margins : %.vertex_margins %.vertex_dict %.vertex_offsets
+%.nt_margins : %.vertex_margins %.vertex_dict
 	cat $< | \
-	$(VERTEX2NTMARGINS) -dict $*.vertex_dict -vertexoffsets $*.vertex_offsets > $@
+	$(VERTEX2NTMARGINS) -dict $*.vertex_dict > $@
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum

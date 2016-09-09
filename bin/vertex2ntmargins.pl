@@ -39,8 +39,7 @@ my $vertex_offsets;
 my $result = GetOptions( "help" => \$help,
   "man"    => \$man,
   "debug"  => \$debug,
-  "dict=s" => \$dict,
-  "vertexoffsets=s" => \$vertex_offsets );
+  "dict=s" => \$dict );
 pod2usage( -exitstatus => 1, -verbose => 1 ) if $help;
 pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result) or pod2usage(2);
@@ -59,27 +58,6 @@ while (<DICT>) {
   $id2pos{$seq_id}{$vertex_id} = $pos;
 }
 close DICT;
-
-# read and apply offsets
-my %currentvertices;
-open OFFSETS, $vertex_offsets or die $!;
-while (<OFFSETS>) {
-    chomp;
-    # print $_, " : ";
-    my ( $type, $seq_id, $nvertices, $offset ) = split(/\s/);
-    if (not defined $currentvertices{$seq_id}) {
-        $currentvertices{$seq_id} = 0;
-    }
-    for (my $i=0; $i<$nvertices; $i++) {
-        if (defined $id2pos{$seq_id}{$currentvertices{$seq_id}}) {
-            $id2pos{$seq_id}{$currentvertices{$seq_id}} += $offset;
-        }
-        # print $currentvertices{$seq_id}, " ";
-        $currentvertices{$seq_id}++;
-    }
-    # print "\n";
-}
-close OFFSETS;
 
 # second step: map vertice id to nucleotide positions using dictionary
 my %pos2margin;
