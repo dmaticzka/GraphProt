@@ -88,11 +88,11 @@ while (<>) {
 	defined $id2pos{$seq_id}{$vertex_id} or next;
   my $pos = $id2pos{$seq_id}{$vertex_id};
   $pos2margin{$seq_id}{$pos} += $margin;
-  $pos2margin_count{$seq_id}{$pos} += $margin;
+  $pos2margin_count{$seq_id}{$pos} += 1;
 }
 
 # average scores from different shreps
-foreach my $seq_id ( keys $pos2margin ) {
+foreach my $seq_id ( keys %pos2margin ) {
     foreach my $pos ( keys $pos2margin{$seq_id} ) {
         if ($pos2margin_count{$seq_id}{$pos} != 0) {
             $pos2margin{$seq_id}{$pos} /= $pos2margin_count{$seq_id}{$pos}
