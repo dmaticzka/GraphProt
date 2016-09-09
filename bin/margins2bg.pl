@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl
+#! /usr/bin/env perl
 use feature ':5.10';
 use strict 'vars';
 use warnings;
@@ -28,9 +28,6 @@ sequence id, sequence position, margin, (min, max, mean, median, sum)
 Options:
 
     -bed        coordinates of margin entries
-    -aggregate  which aggregate measure to use. choose one of
-                (min, max, mean, median, sum)
-                (default: mean)
     -strand     if set plus or minus; only calculate for this strand
     -debug      enable debug output
     -help       brief help message
@@ -91,7 +88,7 @@ sub cmp_bedgraph {
   }
   my ( $chrom, $chromStart, $chromEnd, undef, undef, $strand, undef, undef,
     undef, $blockCount, $blockSizes, $blockStarts ) = @bed;
-	
+
 	# skip output if not on the desired strand
   if (defined $i_strand) {
 		return if ($i_strand eq 'minus' and $strand ne '-');
@@ -137,32 +134,32 @@ sub cmp_bedgraph {
     # parse margins entry
     my ( $sequence_id, $sequence_position, $margin,
       @aggregates ) = split "\t", $marginline;
-    
+
     # save value of chosen aggregate measure
-    $margins[ $sequence_position ] = $aggregates[$aggregate_choice];
+    $margins[ $sequence_position ] = $margin;
   }
 
   # reverse order of margins if on negative strand
   if ( $strand eq '-' ) {
     @margins = reverse @margins;
   }
-  
+
   # print bedGraph lines
-  if ( scalar @margins != scalar @genome_coords ) {
-    say STDERR "warning: skipping entry because somehow we ended up with a " .
-      "different number of coordinates and margins: " .
-      'genome_coords: ' . scalar @genome_coords . " != " . 'margins: ' . scalar @margins;
-		$debug and say STDERR '@genome_coords: ' . join(',', @genome_coords);
-		$debug and say STDERR '@margins: ' . join(',', @margins);
-    return;
-  }
+  # invalid test for HAS
+  # if ( scalar @margins != scalar @genome_coords ) {
+  #   say STDERR "warning: skipping entry because somehow we ended up with a " .
+  #     "different number of coordinates and margins: " .
+  #     'genome_coords: ' . scalar @genome_coords . " != " . 'margins: ' . scalar @margins;
+  # $debug and say STDERR '@genome_coords: ' . join(',', @genome_coords);
+  # $debug and say STDERR '@margins: ' . join(',', @margins);
+  #   return;
+  # }
   $debug and say STDERR "iterating over " . scalar @genome_coords . " coordinates and " . scalar @margins . " margins";
   $debug and say STDERR '@genome_coords: ', join( "\t", @genome_coords );
   $debug and say STDERR "first coordinate: " . $genome_coords[0];
   $debug and say STDERR "last coordinate: " . $genome_coords[-1];
   foreach my $coord (@genome_coords) {
     $debug and say STDERR "printing coordinate $coord";
-#     say STDERR 'remaining margins: ', join(',', @margins);
     my $margin = shift @margins;
     if (not defined $margin) {
     	die ("Error, no margin left for coordinate $coord of bed record '$bedline'. Check if the number of nucleotides in the bed record matches the number of viewpoint nucleotides of the corresponding sequence.");
