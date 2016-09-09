@@ -7,18 +7,11 @@ BEGIN{
 /^t/{
 	seqid++;
 	vertex_id=0;
-	nt_pos=0;
 }
 # new entry on viewpoint vertice (omitting relational vertices)
-/^v/&&!/\^/&&!/#/{
-	print seqid, vertex_id++, $3, nt_pos++;
+/^v/ && !/\^/ && !/#/ {
+	print seqid, vertex_id++, $3, $4-1;
 }
 # non-viewpoint  vertices only increment nucleotide position
-/^V/&&!/\^/&&!/#/{
-	nt_pos++
-}
-# restart sequence numbering on new subgraph
-# (this does not work with shifted shreps!)
-/^s/||/^u/||/^w/{
-	nt_pos=0
+/^V/ && !/\^/ && !/#/ {
 }
