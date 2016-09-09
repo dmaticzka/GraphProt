@@ -2,7 +2,7 @@
 ################################################################################
 
 usage:
-	@echo 
+	@echo
 	@echo Plese run GraphProt using the command \"GraphProt.pl\".
 	@echo \"GraphProt.pl --help\" will display a short summary of the required parameters.
 
@@ -57,6 +57,7 @@ FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
 THRESH_MARGINS:=$(PWD)/bin/subset_margins_by_quant.R
+GSPAN_EXTRACT_COORDS:=$(PWD)/bin/gspan_extract_coords.pl
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
@@ -333,10 +334,14 @@ endif
 %.test.sequence : %.motif.gspan.gz
 	zcat $< | awk '/^t/{print $$NF}' > $@
 
+# calculate offsets of windowed vertices
+%.motif.vertex_offsets : %.motif.gspan.gz
+	zcat $< | $(PERL) $(GSPAN_EXTRACT_COORDS) > $@
+
 # compute nucleotide-wise margins from vertice margins
-%.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict
+%.motif.nt_margins : %.motif.vertex_margins %.motif.vertex_dict %.motif.vertex_offsets
 	cat $< | \
-	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict > $@
+	$(VERTEX2NTMARGINS) -dict $*.motif.vertex_dict --vertexoffsets $*.motif.vertex_offsets > $@
 
 # removed this because it won't work with sequence only
 # I think I added this for the viewpoint stuff
@@ -370,7 +375,7 @@ endif
 	--input $< \
 	--locations $*.top_wins \
 	--win_size $(MARGINS_WINDOW) > $@
-	
+
 %.pup : %
 	cat $< | tr 'HBIEM' 'U' | tr 'S' 'P' > $@
 
@@ -548,10 +553,14 @@ ifeq ($(SVM),SGD)
 	zcat $< | \
 	awk -f $(GSPAN2VDICT) > $@
 
+# calculate offsets of windowed vertices
+%.vertex_offsets : %.gspan.gz
+	zcat $< | $(PERL) $(GSPAN_EXTRACT_COORDS) > $@
+
 # compute nucleotide-wise margins from vertice margins
-%.nt_margins : %.vertex_margins %.vertex_dict
+%.nt_margins : %.vertex_margins %.vertex_dict %.vertex_offsets
 	cat $< | \
-	$(VERTEX2NTMARGINS) -dict $*.vertex_dict > $@
+	$(VERTEX2NTMARGINS) -dict $*.vertex_dict -vertexoffsets $*.vertex_offsets > $@
 
 # format (tab separated): sequence id, sequence position, margin,
 #                         min, max, mean, median, sum
@@ -591,7 +600,7 @@ ifeq ($(SVM),SGD)
 	exit $${PIPESTATUS[0]}
 
 # compute learningcurve
-# svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format 
+# svmsgdnspdk creates LEARNINGCURVE_SPLITS many files of the format
 # output.lc_predictions_{test,train}_fold{1..LEARNINGCURVE_SPLITS.ID}
 # format: id, class, prediction, margin
 # we evaluate each one and summarize the probabilities in the following format:
@@ -997,4 +1006,3 @@ test_data_full_A.test.fa : $(DATADIR)/test_data_full_A.test.fa
 
 test_data_full_A.train.fa : $(DATADIR)/test_data_full_A.train.fa
 	cp -f $< $@
-

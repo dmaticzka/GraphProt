@@ -3,17 +3,17 @@
 ## Other Binaries ##############################################################
 PERL:=perl
 RBIN:=R --vanilla
-SVRTRAIN:=/home/maticzkd/src/libsvm-3.12/svm-train
-SVRPREDICT:=/home/maticzkd/src/libsvm-3.12/svm-predict
+SVRTRAIN:=svm-train
+SVRPREDICT:=svm-predict
 SHUF:=shuf
-BEDGRAPH2BIGWIG:=/usr/local/ucsctools/2012-02/bin/bedGraphToBigWig
+BEDGRAPH2BIGWIG:=bedGraphToBigWig
 BASH:=/bin/bash
 BEDTOOLS:=bedtools
 GNUPLOT:=gnuplot
 # perf is available at http://www.cs.cornell.edu/~caruana/
 PERF:=perf
-TWOBITTOFA:=/usr/local/ucsctools/2012-02/bin/twoBitToFa
-WEBLOGO:=/usr/local/user/weblogo/weblogo-3.2/weblogo
+TWOBITTOFA:=twoBitToFa
+WEBLOGO:=weblogo
 
 ## General parameters ##########################################################
 DIST_DIR:=GraphProt-1.1.2
