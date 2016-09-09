@@ -21,7 +21,7 @@ echo; echo; echo; echo classification, predict using only positives
 echo; echo; echo; echo classification nt margins
 ../GraphProt.pl -mode classification -action predict_profile --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_ntmargins --keep-tmp
 
-echo; echo; echo; echo classification nt margins
+echo; echo; echo; echo classification nt margins high affinity sites
 ../GraphProt.pl -mode classification -action predict_has --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -percentile 55 -prefix CL_has --keep-tmp
 
 echo; echo; echo; echo classification motif
@@ -30,3 +30,16 @@ echo; echo; echo; echo classification motif
 echo; echo; echo; echo classification motif onlyseq
 ../GraphProt.pl -mode classification -action motif --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -R 1 -D 0 -bitsize 10 -prefix CL_onlyseq --keep-tmp
 
+### test profile calculation for structure models and sequences exactly 300nt
+## all viewpoints
+
+echo; echo; echo; echo classification nt margins allcaps
+../GraphProt.pl -mode classification -action predict_profile -fasta testclip.twoseqs300nt_allcaps.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix testclip.twoseqs300nt_allcaps.margins --keep-tmp
+
+## only center viewpoints
+echo; echo; echo; echo classification nt margins
+../GraphProt.pl -mode classification -action predict_profile -fasta testclip.twoseqs300nt.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix testclip.twoseqs300nt.margins --keep-tmp
+
+## only center viewpoints motif
+echo; echo; echo; echo classification nt margins
+../GraphProt.pl -mode classification -action motif -fasta testclip.twoseqs300nt.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix testclip.twoseqs300nt.motif --keep-tmp
