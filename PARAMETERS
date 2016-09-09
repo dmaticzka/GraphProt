@@ -12,28 +12,16 @@ BEDTOOLS:=bedtools
 GNUPLOT:=gnuplot
 # perf is available at http://www.cs.cornell.edu/~caruana/
 PERF:=perf
+# from ucsc tools
 TWOBITTOFA:=twoBitToFa
 WEBLOGO:=weblogo
 
-## General parameters ##########################################################
-DIST_DIR:=GraphProt-1.1.2
-
-# use sge arrayjobs to create gspan and features
-# implemented for CONTEXTSHREP
-SGEARRAY=NO
-# old cluster:
-# SGE_SUBMIT_HOST=biui.informatik.uni-freiburg.de
-# SGE_EXPORT=export SGE_ROOT=/opt/sge-6.0/
-# SGE_BIN_PATH=/opt/sge-6.0/bin/lx24-amd64
-# new cluster:
-SGE_SUBMIT_HOST=ui.bi.uni-freiburg.de
-SGE_EXPORT=export SGE_ROOT=/opt/sge; export SGE_CELL=BI2
-SGE_BIN_PATH=/opt/sge/bin/lx-amd64
-
 # prefix of train/test data
 # RNAcompete proteins
-#PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
+# PROTEINS:=Fusip HuR PTB RBM4 SF2 SLM2 U1A VTS1 YB1
 PROTEINS:=testclip
+
+SGEARRAY=NO
 
 # select evaluation type: RNACOMPETE / CLIP
 # RNACOMPETE:
@@ -59,6 +47,7 @@ GRAPH_TYPE=CONTEXTSHREP
 # The primary window sizes are used for both shreps and accessibilities.
 # Secondary window size is only used for shreps.
 # W_PRIMARY defaults to 150 according to Lange & Maticzka et al. 2011.
+# W_PRIMARY-50 according to Lange & Maticzka et al. 2011.
 W_PRIMARY=150
 SHAPES_WINS=$(W_PRIMARY)
 SHAPES_SHIFT=25
