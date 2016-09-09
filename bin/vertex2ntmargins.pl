@@ -81,14 +81,26 @@ close OFFSETS;
 
 # second step: map vertice id to nucleotide positions using dictionary
 my %pos2margin;
+my %pos2margin_count;
 while (<>) {
   my ( $seq_id, $vertex_id, $margin ) = split(/\s/);
 #  defined $id2pos{$seq_id} or die "error: nothing known about id '$seq_id' in id2pos";
 	defined $id2pos{$seq_id}{$vertex_id} or next;
   my $pos = $id2pos{$seq_id}{$vertex_id};
   $pos2margin{$seq_id}{$pos} += $margin;
+  $pos2margin_count{$seq_id}{$pos} += $margin;
 }
 
+# average scores from different shreps
+foreach my $seq_id ( keys $pos2margin ) {
+    foreach my $pos ( keys $pos2margin{$seq_id} ) {
+        if ($pos2margin_count{$seq_id}{$pos} != 0) {
+            $pos2margin{$seq_id}{$pos} /= $pos2margin_count{$seq_id}{$pos}
+        }
+    }
+}
+
+# print results
 my @seqids = sort { $a <=> $b } ( keys %pos2margin );
 for my $seq_id (@seqids) {
   my @positions = sort { $a <=> $b } ( keys %{ $pos2margin{$seq_id} } );
