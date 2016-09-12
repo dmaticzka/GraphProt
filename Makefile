@@ -939,7 +939,7 @@ dist:
 	# copy distribution parameters
 	cp PARAMETERS_dist $(DIST_DIR)/PARAMETERS
 	# markdown
-	multimarkdown README.md > $(DIST_DIR)/README.html
+	cp README.md $(DIST_DIR)/README.md
 
 # # delete all files except fastas
 distclean: clean
