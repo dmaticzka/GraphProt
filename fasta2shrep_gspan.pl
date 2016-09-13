@@ -99,20 +99,20 @@ Options:
   -i      <INT> e.g. 10
           Turn on structure sampling and gives number of sampling iterations.
           Default no sampling (i=0)
-  -sample-len 
+  -sample-len
           <INT> e.g. 100
           Only in sampling mode: Sampling is only used for seqs/windows >= given
           length, Default: sample all lengths (0), if -i > 0
   -q      Turn on shape probabilities for RNAshapes, no sampling mode allowed
   -Tp     <FLOAT> e.g 0.001
           Filter cutoff for shape probabilities, applied before -M filter!
-  -seq-graph-win  
+  -seq-graph-win
           add for each window a graph which contains no structure
-  -seq-graph-t    
+  -seq-graph-t
           add for each 't #' a graph which contains no structure
-  -seq-graph-alph 
+  -seq-graph-alph
           change the alphabet of unstructured graphs
-  -annotate    
+  -annotate
           <STRING> annotation.tab
           A file with annotations to be added as abstract graphs on the sequence
           leven (if given) and on the structure (SHREP) level. The format is has
@@ -121,7 +121,7 @@ Options:
           connected components, which is a sequence of label vertices ordered by
           the START position in the sequence.
   -abstr  Add abstract structure graphs to the single shrep graph instances.
-  -abstr-out      
+  -abstr-out
           <STRING> write sequence representation of abstract structure graphs to
           this file
   -nostr  Calculate no structures, only add sequence information,
@@ -1882,7 +1882,7 @@ sub getStructPlusAbstractStructGraph {
 
  #-------------------> stems,stacks
  # build basic graph edges, stacks, and vertices for stems in the abstract graph
-  my @tmp = keys %stems;
+  my @tmp = sort(keys %stems);
   foreach my $sk (@tmp) {
     my @stem = @{ $stems{$sk} }; # stem (i,j,k,l)=> (i,j)= (0,1) and (k,l)=(2,3)
     die "ERROR: There are not enough elements in this stem: ",
@@ -2818,4 +2818,3 @@ sub getSeqHeader {
 
 # If a sequence graph option is given, then these graphs (u #) have to
 # be labelled with this annotation
-
