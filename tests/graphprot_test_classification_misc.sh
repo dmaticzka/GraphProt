@@ -26,6 +26,7 @@ echo; echo; echo; echo classification nt margins high affinity sites
 
 echo; echo; echo; echo classification motif
 ../GraphProt.pl -mode classification -action motif -fasta testclip.train.positives.fa -model CL_train.model  -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_motif --keep-tmp
+gunzip -f CL_motif.motif.gspan.gz
 
 echo; echo; echo; echo classification motif onlyseq
 ../GraphProt.pl -mode classification -action motif --onlyseq -fasta testclip.train.positives.fa -model CL_train.model -R 1 -D 0 -bitsize 10 -prefix CL_onlyseq --keep-tmp
@@ -43,3 +44,5 @@ echo; echo; echo; echo classification nt margins
 ## only center viewpoints motif
 echo; echo; echo; echo classification nt margins
 ../GraphProt.pl -mode classification -action motif -fasta testclip.twoseqs300nt.fa -model CL_train.model -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix testclip.twoseqs300nt.motif --keep-tmp
+
+gunzip -f *.gz
