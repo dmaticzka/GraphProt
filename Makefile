@@ -305,7 +305,7 @@ endif
 	-wins '$(SHAPES_WINS)' \
 	-shift '$(SHAPES_SHIFT)' | \
 	awk -f $(GSPAN_SPLIT_GRAPHS) | \
-	awk 'BEGIN{OFS="\t"}/^t/{ntpos=1; print}/^[vV]/&&NF==4{print $$1,$$2,$$3,ntpos++}/^[vV]/&&NF!=4{print}/^e/{print}' | \
+	awk '/^t/{ntpos=1; print}/^[vV]/&&NF==4{print $$1,$$2,$$3,ntpos++}/^[vV]/&&NF!=4{print}/^e/{print}' | \
 	gzip > $@; exit $${PIPESTATUS[0]}
 
 
