@@ -91,7 +91,7 @@ while (<>) {
 		$label =~ s/#//;
 		$label =~ s/\^//;
 		my $attr = getAttr($label);
-		say DOT "$id [label=$label $attr];";
+		say DOT "$id [label=\"$label $attr\"];";
 	} elsif (/^e/ and ($plotno == $i)) {
 		my (undef, $first, $second, $label) = split();
 		say DOT "$first -> $second;";
@@ -107,4 +107,3 @@ if (not $i > $plotno) {
 		close DOT;
 		exit;
 }
-
