@@ -272,13 +272,8 @@ if ( defined $action and $action eq 'motif' ) {
   chomp $weblogo_version;
   if ( $? != 0 ) {
     print STDERR
-      "please make sure that WebLogo 3.2 is installed and in your PATH (can't call weblogo).\n";
+      "please make sure that WebLogo is installed and in your PATH (can't call weblogo).\n";
     exit;
-  }
-  if ($weblogo_version !~ /WebLogo 3\.2/) {
-    print STDERR
-      "\n WARNING: WebLogo reports version '$weblogo_version'." .
-      "\n GraphProt was tested for version 3.2, motif plotting may fail!\n";
   }
 }
 
@@ -365,7 +360,7 @@ sub check_param_R {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "R: $R\n";
 }
 
@@ -382,7 +377,7 @@ sub check_param_D {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "D: $D\n";
 }
 
@@ -400,7 +395,7 @@ sub check_param_bitsize {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "bitsize: $bitsize\n";
 }
 
@@ -419,7 +414,7 @@ sub check_param_abstraction {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "abstraction: $abstraction\n";
 }
 
@@ -436,7 +431,7 @@ sub check_param_c {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "c: $c\n";
 }
 
@@ -453,7 +448,7 @@ sub check_param_epsilon {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "epsilon: $epsilon\n";
 }
 
@@ -470,7 +465,7 @@ sub check_param_epochs {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "epochs: $epochs\n";
 }
 
@@ -487,7 +482,7 @@ sub check_param_lambda {
     $quit_with_help = 1;
     return 0;
   }
-  
+
   print "lambda: $lambda\n";
 }
 
@@ -503,25 +498,25 @@ sub check_param_percentile {
 
 sub check_param_motif_len {
     defined $motif_len or $motif_len = $def_motif_len;
-    
+
     if ($motif_len < 4) {
         pod2usage("error: please specify a motif length >= 4");
         $quit_with_help = 1;
         return 0;
     }
-    
+
     print "creating motif of length $motif_len\n";
 }
 
 sub check_param_motif_top_n {
     defined $motif_top_n or $motif_top_n = $def_motif_top_n;
-    
+
     if ($motif_top_n < 1) {
         pod2usage("error: please specify a number > 0 for parameter motif_top_n");
         $quit_with_help = 1;
         return 0;
     }
-    
+
     print "using top $motif_top_n scoring subsequences for motif creation\n";
 }
 
@@ -532,7 +527,7 @@ sub check_params_motif {
 
 sub parse_params_regression {
 	if (defined $params_fn) {
-	
+
 		# read parameters file
 		my %params;
 		open PARAMS, '<', $params_fn;
@@ -541,7 +536,7 @@ sub parse_params_regression {
 			$params{$key} = $value;
 		}
 		close PARAMS;
-		
+
 		# parse parameters
 		$R = $params{'R:'};
 		$D = $params{'D:'};
@@ -564,13 +559,13 @@ sub check_params_regression {
   check_param_epsilon;
   # only check when creating a structure model
   defined $onlyseq or check_param_abstraction;
-  
+
   print "\n";
 }
 
 sub parse_params_classification {
 	if (defined $params_fn) {
-	
+
 		# read parameters file
 		my %params;
 		open PARAMS, '<', $params_fn;
@@ -579,7 +574,7 @@ sub parse_params_classification {
 			$params{$key} = $value;
 		}
 		close PARAMS;
-		
+
 		# parse parameters
 		$R = $params{'R:'};
 		$D = $params{'D:'};
@@ -603,7 +598,7 @@ sub check_params_classification {
   check_param_lambda;
   # only check when creating a structure model
   defined $onlyseq or check_param_abstraction;
-  
+
   print "\n";
 }
 
@@ -831,13 +826,13 @@ if ( $mode eq 'regression' ) {
     $makecall .= " $tmpdir.test.predictions_affy";
     print "$makecall\n";
     system("$makecall");
-    
+
     # prepare results
     system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
     system('awk "{if (\$1 > 0) {\$1=1}; if(\$1 < 0) {\$1=-1}; print \$1}"' . " < ${tmpdir}.test.predictions_svr > $tmpdir.test.predicted_class");
     system('paste -d "\t" ' . "${tmpdir}.test.fa.id $tmpdir.test.predicted_class ${tmpdir}.test.predictions_svr > $prefix.predictions");
     print "GraphProt predictions written to file $prefix.predictions\n";
-    
+
   } elsif ( $action eq 'predict_profile' ) {
     print STDERR "sorry, invalid action in regression setting\n";
     exit 2;
@@ -881,7 +876,7 @@ if ( $mode eq 'regression' ) {
     # add targets
     $makecall .= " $tmpdir.train.cv.perf";
     system("$makecall");
-    
+
     # prepare output
     system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.train.fa > ${tmpdir}.train.fa.id");
     system("cat $tmpdir.train.cv.predictions_class | awk '\$1!=0' | sed 's/^-1/0/g' | " .
