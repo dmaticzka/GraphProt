@@ -78,7 +78,7 @@ Trains a GraphProt model. The model is written to file "GraphProt.model".
 #### predict - Predict binding for a whole site ####
 
 Predict binding of whole sequences, e.g. CLIP sites. Predictions are written to file "GraphProt.predictions",
-this file contains three columns: 
+this file contains three columns:
 
 1. sequence id from the fasta file
 2. predicted class
@@ -92,8 +92,6 @@ to file "GraphProt.profile", this file contains three columns:
 1. number of sequence
 2. number of nucleotide
 3. prediction for this nucleotide
-
-Please note that with GraphProt structure models this action currently only supports sequences of up to 150 nt.
 
 #### predict_has - Predict high-affinity binding sites ####
 
@@ -133,7 +131,7 @@ are created using the following parameters. The user has to chose an appropriate
 RNAshapes __ABSTRACTION_LEVEL__.
 
   fasta2shrep_gspan.pl --seq-graph-t --seq-graph-alph -abstr -stdout -M 3 -wins '150,' -shift '25' -fasta PTBv1.train.fa -t __ABSTRACTION_LEVEL__ | gzip > PTBv1.train.gspan.gz
-  
+
 RNA sequence graphs are created using the following parameters:
 
   fasta2shrep_gspan.pl --seq-graph-t -nostr -stdout -fasta PTBv1.train.fa | gzip > PTBv1.train.gspan.gz
