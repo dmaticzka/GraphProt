@@ -979,6 +979,7 @@ if ( $mode eq 'regression' ) {
     if ( not defined $onlyseq ) {
       $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated";
       $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated.logo.png";
+      $makecall .= " $tmpdir.test.struct_annot_top_wins.truncated.pup.logo.png";
       system("$makecall");
     }
 
@@ -993,8 +994,10 @@ if ( $mode eq 'regression' ) {
         "$prefix.structure_motif" );
       copy( "$tmpdir.test.struct_annot_top_wins.truncated.logo.png",
         "$prefix.structure_motif.png" );
+      copy( "$tmpdir.test.struct_annot_top_wins.truncated.pup.logo.png",
+        "$prefix.structure_motif_pairedunpaired.png" );
       print
-        "GraphProt structure motif written to file $prefix.structure_motif.png\n";
+        "GraphProt structure motif written to files $prefix.structure_motif.png and $prefix.structure_motif_pairedunpaired.png\n";
     }
   } else {
     pod2usage("error: unknown action '$action'\n");
