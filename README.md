@@ -15,7 +15,7 @@ GraphProt uses various opensource software packages. Please make sure that the
 follwing programs are installed and accessible via the PATH environment variable
 (i.e. you should be able to call the programs by just issuing the command).
 
-* RNAshapes is used for GraphProt secondary structure predictions (recommended version: 2.1.6, [http://bibiserv.techfak.uni-bielefeld.de/rnashapes/](http://bibiserv.techfak.uni-bielefeld.de/rnashapes/))
+* RNAshapes is used for GraphProt secondary structure predictions (required version: 2.1.6 available for download at [https://github.com/bgruening/download_store/raw/master/RNAshapes/RNAshapes-2.1.6.tar.gz](https://github.com/bgruening/download_store/raw/master/RNAshapes/RNAshapes-2.1.6.tar.gz) or via bioconda [https://bioconda.github.io](https://bioconda.github.io))
 * perf is used to calculate prediction performance ([http://osmot.cs.cornell.edu/kddcup/software.html](http://osmot.cs.cornell.edu/kddcup/software.html))
 * libsvm is used for support vector regressions ([http://www.csie.ntu.edu.tw/~cjlin/libsvm/](http://www.csie.ntu.edu.tw/~cjlin/libsvm/))
 * GNU make is used as the pipeline backend ([http://www.gnu.org/software/make/](http://www.gnu.org/software/make/))
