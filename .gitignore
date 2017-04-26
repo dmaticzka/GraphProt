@@ -6,3 +6,5 @@ EDeN/*.o
 EDeN/EDeN
 *.feature.gz
 *.log
+
+tests/*.png
