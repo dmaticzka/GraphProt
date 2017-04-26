@@ -15,7 +15,7 @@ vertex2ntmargins.pl -dict train.dict < NTMARGINS
 
 =head1 SYNOPSIS
 
-vertex2ntmargins.pl -dict train.dict -vertexoffsets train.vertex_offsets < NTMARGINS
+vertex2ntmargins.pl -dict train.dict < NTMARGINS
 
 Options:
 
@@ -35,7 +35,6 @@ my $help;
 my $man;
 my $debug;
 my $dict;
-my $vertex_offsets;
 my $result = GetOptions( "help" => \$help,
   "man"    => \$man,
   "debug"  => \$debug,
