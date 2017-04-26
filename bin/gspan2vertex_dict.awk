@@ -12,6 +12,11 @@ BEGIN{
 /^v/ && !/\^/ && !/#/ {
 	print seqid, vertex_id++, $3, $4-1;
 }
-# non-viewpoint  vertices only increment nucleotide position
+# relational and abstract vertices increment vertex id and have no position
+/^v/ && (/\^/ || /#/) {
+	#print seqid, vertex_id++, $3, -1
+	vertex_id++
+}
+# non-viewpoint vertices are silent
 /^V/ && !/\^/ && !/#/ {
 }
