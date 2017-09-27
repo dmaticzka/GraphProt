@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # fit learningcurve ROC results (cols 9,17) to function a-b/(c+x)
 # plot data points and fitted functions
@@ -21,4 +21,3 @@ plot '$LC_PERF' u 1:9 t "" w p lt 1, '' u 1:17 t "" w p lt 2, ftr(x) t "Train" w
 EOF
 
 exit 0;
-

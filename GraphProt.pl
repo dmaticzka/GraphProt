@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use strict 'vars';
 use warnings;
 use Getopt::Long;

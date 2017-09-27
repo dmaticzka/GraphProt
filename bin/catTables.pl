@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl
+#!/usr/bin/env perl
 use feature ':5.10';
 use strict 'vars';
 use warnings;
@@ -54,10 +54,10 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $man;
 my $print_head = 1;
 while (my $fname = shift @ARGV) {
 	open IN, $fname;
-	
+
 	# skip nskip lines
 	for (my $i=0; $i<$nskip; $i++) { <IN>; }
-	
+
 	if ($head) {
 		my $header = <IN>;
 		chomp $header;
@@ -66,12 +66,12 @@ while (my $fname = shift @ARGV) {
 		}
 		$print_head = 0; # only do this once
 	}
-	
+
 	while (my $line = <IN>) {
 		chomp $line;
 		say join("\t", $fname, $line);
 	}
-	
+
 	close IN;
 }
 

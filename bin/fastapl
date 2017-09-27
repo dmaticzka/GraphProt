@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl -w
+#!/usr/bin/env perl
 #  Author: Paul Horton
 #  Organization: Computational Biology Research Center, AIST, Japan
 #  Copyright (C) 2010 Paul Horton, All rights reserved.
@@ -37,7 +37,7 @@
 #
 #
 # *------------------      Unusual Code Constructs       -------------------*
-# 
+#
 # HERE DOCUMENTS:
 #   This program is unusual in that it prints part of itself when
 #   the -n|--generate-standalone option is given.
@@ -257,7 +257,7 @@ if(  $mainScript_arg_  ){
     $begScript_  =  _extractBlock( \$entireScript, 'BEGIN' );
 
     if(  $begScript_arg_  ){
-        if (  $begScript_  ){ 
+        if (  $begScript_  ){
             _printUsageError(  "--begin used but BEGIN block also found in the inline script"  );
         }
         else{
@@ -280,7 +280,7 @@ if(  $mainScript_arg_  ){
 
 }
 else{  # -----  Script not given directly on the command line  -----
-    
+
     if(  $begScript_arg_  ){
         _printUsageError(  "'-b|--begin' flag given without '-e'"  );
     }
@@ -307,11 +307,11 @@ else{  # -----  Script not given directly on the command line  -----
                 unshift @ARGV, $scriptFilename;  # filename argument is input file not script file.
                 goto SCRIPT_ASSIGNED;
             }
-            _printUsageError( 
+            _printUsageError(
                 "filename '$scriptFilename' was given as a script file, but it looks like a fasta input file\nPerhaps you forgot to give the script or script file?"
                 );
         }
-        
+
         open( $scriptFile, '<', $scriptFilename )
             or  die( "could not open script file: '$scriptFilename',$!\n" );
 
@@ -462,7 +462,7 @@ exit 0; #  Return success to shell.
 #  Return hash holding any KEY=VALUE pairs present in @_
 #  @_ defaults to @head.
 sub asHash{
-    
+
     @_   or   @_  =  @head;
 
     my @keyValuePairs;
@@ -561,10 +561,10 @@ sub _extractBlock{
 
     my $blockScript;  # to hold block contents and return.
 
-    if(  ( my $upToBlockLabel, my $rest ) = 
+    if(  ( my $upToBlockLabel, my $rest ) =
          (  $$scriptRef  =~  / ^(.*?) $blockLabel \s* ({ .* ) /xs   )
         ){
-        
+
         if(   $blockScript  =  extract_codeblock( $rest, '{}' )   ){
             $$scriptRef  =  $upToBlockLabel . $rest;
         }
@@ -692,7 +692,7 @@ _____END_STANDALONE_PART_____
     print $os_
         "# ----------   Private global variables  ----------\n\n";
 
-    #  Print following code lines, sans the leading '|'.         
+    #  Print following code lines, sans the leading '|'.
     $_  =  <<'_____END_STANDALONE_PART_____';   s/^.//mg;   print $os_ $_;
 
 |my $noHeadSeenYet_  =  'true';  #  no record has yet been seen?
@@ -779,7 +779,7 @@ sub _printCommonCode{
         }
 
         #  Real code in main program. Also conditionally included in standalone program.
-        #                       TEXT    #      STANDALONE:IF    CONDITION 
+        #                       TEXT    #      STANDALONE:IF    CONDITION
         if(   $line  =~  m{  ^ ([^#]+) \#= \s* STANDALONE:IF \t+ ([^\t]+) $  }x   ){
             say $os_ $1   if(  eval $2  );
             next;
@@ -1085,7 +1085,7 @@ sub _processInputStream{
 
             _printInputError( "record has no body. Head line is:\n$line_" )
                 if(  _atEndOfRecord( $fastaInputStream_ )  );
-                
+
             $noHeadSeenYet_  =  0;
             $head  =  substr $line_, 1;  #  remove '>'.
             ($id)  =  ( $head =~ /^ \s* (\S+) \s* (.*) $/x );
@@ -1098,7 +1098,7 @@ sub _processInputStream{
         #  ----------  $line is from the body of a record...
 
         ++$numSeqLines_;
-        
+
         $maxSeqLineLenSeen_  =   length( $line_ )                #= STANDALONE:IF	!$printSeqOn1Line_flag_;
             if(   length( $line_ )  >  $maxSeqLineLenSeen_   );  #= STANDALONE:IF	!$printSeqOn1Line_flag_;
 
@@ -1122,7 +1122,7 @@ sub _processInputStream{
             #=  STANDALONE:BEG_SKIP
             if(  $sortMode_flag_  ){
                 push @rec_,
-                [   
+                [
                     $head,  [map {$_} @head],  $id,  $comment,
                     $seq,
                 ];
@@ -1162,14 +1162,14 @@ sub _processInputStream{
 sub _atEndOfRecord{
     my $inputStream   =  shift;
     my $nextChar  =  getc $inputStream;
-    
+
     if(  $nextChar  ){
         $inputStream->ungetc( ord $nextChar );
     }
 
     return(  !$nextChar  ||  $nextChar eq '>'  );
 }
-    
+
 
 
 #  Print current fasta record to $os_

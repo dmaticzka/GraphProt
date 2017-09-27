@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #$ -cwd
 #$ -l h_vmem=2G
 #$ -sync yes
@@ -6,7 +6,7 @@
 ######################################################################
 ## job script "generic_submit_to_cluster.sh"
 ## so this is a generic shell script that can call a certain perl script
-## with the given parameters. 
+## with the given parameters.
 ## This is useful if you need to commit several similar jobs to the cluster
 ######################################################################
 
@@ -31,4 +31,3 @@ echo call: "/usr/local/perl/bin/perl $perlscript $params --jobid $SGE_TASK_ID"
 
 cd $working_dir
 /usr/local/perl/bin/perl $perlscript $params --jobid $SGE_TASK_ID
-

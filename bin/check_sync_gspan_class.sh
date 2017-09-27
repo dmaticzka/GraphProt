@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 [ $# -ne 2 ] &&  echo "Usage:  $(basename $0) GSPAN.gz class" && echo "Instead of: $(basename $0) $*"  && exit 1
 
 # this skript will check if the class file and the (gzipped) gspan are in sync

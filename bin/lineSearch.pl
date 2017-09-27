@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use feature ':5.10';
 use strict 'vars';
 use warnings;
