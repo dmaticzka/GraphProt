@@ -25,8 +25,6 @@ BEDGRAPH2BIGWIG:=bedGraphToBigWig
 BASH:=/bin/bash
 BEDTOOLS:=bedtools
 GNUPLOT:=gnuplot
-# perf is available at http://www.cs.cornell.edu/~caruana/
-PERF:=perf
 # from ucsc tools
 TWOBITTOFA:=twoBitToFa
 WEBLOGO:=weblogo
@@ -163,6 +161,7 @@ FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
 CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
 SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
 THRESH_MARGINS:=$(PWD)/bin/subset_margins_by_quant.R
+PERF:=$(PWD)/bin/perf.Rscript
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
