@@ -31,4 +31,4 @@ install:
   - conda install rnashapes==2.1.6 libsvm make r-plyr perl perl-getopt-long gawk
 
 script:
-  - ./GraphProt.pl --help
+  - cd tests; bash run_tests.sh
