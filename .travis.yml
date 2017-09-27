@@ -34,6 +34,9 @@ install:
   - cd EDeN
   - make clean
   - make
+  - cd ..
 
 script:
+  - pwd
+  - ls -l
   - cd tests; bash run_tests.sh
