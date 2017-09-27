@@ -18,7 +18,7 @@ install:
   # Useful for debugging any issues with conda
   - conda info -a
 
-  # Replace dep1 dep2 ... with your dependencies
+  # create conda environment
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION
   - source activate test-environment
   # bioconda setup
@@ -28,7 +28,12 @@ install:
   # setup general python testing
   - conda install pytest scripttest
   # setup for GraphProt
-  - conda install rnashapes==2.1.6 libsvm make r-plyr perl perl-getopt-long gawk
+  - conda install gcc libgcc rnashapes==2.1.6 libsvm make r-plyr perl perl-getopt-long gawk
+
+  # build eden
+  - cd EDeN
+  - make clean
+  - make
 
 script:
   - cd tests; bash run_tests.sh
