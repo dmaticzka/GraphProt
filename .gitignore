@@ -8,3 +8,4 @@ EDeN/EDeN
 *.log
 
 tests/*.png
+tests/*tmp*
