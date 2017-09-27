@@ -28,7 +28,7 @@ install:
   # setup general python testing
   - conda install pytest scripttest
   # setup for GraphProt
-  - conda install rnashapes==2.1.6 libsvm make r-plyr perl gawk
+  - conda install rnashapes==2.1.6 libsvm make r-plyr perl perl-getopt-long gawk
 
 script:
-  - GraphProt.pl --help
+  - ./GraphProt.pl --help
