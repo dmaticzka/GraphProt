@@ -37,4 +37,5 @@ install:
   - cd ..
 
 script:
+  - export PATH=`cwd`:$PATH
   - pytest
