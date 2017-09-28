@@ -1,6 +1,5 @@
-epochs: 30
-lambda: 0.001
-R: 0
-D: 0
+epochs: 10
+lambda: 0.0001
+R: 1
+D: 1
 bitsize: 14
-abstraction: 3
