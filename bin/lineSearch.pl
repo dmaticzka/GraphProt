@@ -95,7 +95,7 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 ($result)       or pod2usage(2);
 ( defined $fa ) or pod2usage("error: -fa parameter mandatory");
 ( -f $fa )      or die "error: could not find file '$fa'";
-( -f $mf )      or die "error: could not find file '$mf'";
+( -f "$bindir/$mf" ) or die "error: could not find file '$mf'";
 ( -f $param )   or die "error: could not find file '$param'";
 
 ###############################################################################
