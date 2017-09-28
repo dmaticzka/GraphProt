@@ -189,7 +189,7 @@ my $gspan_cache_dir_obj = File::Temp->newdir(
   CLEANUP => 1
 );
 my $gspan_cache_dir = $gspan_cache_dir_obj->dirname;
-say STDERR "CACHE DIRECTORY: $gspan_cache_dir";
+$debug and say STDERR "CACHE DIRECTORY: $gspan_cache_dir";
 
 # main loop: do until finished
 my $optimization_finished = 0;
@@ -211,7 +211,7 @@ do {
     my $tmpdir     = $tmpdir_obj->dirname;
     my $param_file = $of;
 
-    say STDERR "\n*** optimizing sgd-internal parameters";
+    $debug and say STDERR "\n*** optimizing sgd-internal parameters";
 
     # rewrite to fit to line search input fasta filename
     $param_file =~ s/.param/.ls_sgdopt.param/;
@@ -240,7 +240,7 @@ do {
     # create parameter file
     chdir($tmpdir);
     open PARS, '>', $param_file or die "error: can't open $param_file for writing";
-    print STDERR 'parameters: ';
+    print 'parameters: ';
 
     # distinguish parameter source by parameter
     for my $par (@parameters) {
@@ -255,10 +255,10 @@ do {
         # all other parameters should use the values that are currently best
         $parameter_value = $parameters{$par}{current};
       }
-      print STDERR $par, ' ', $parameter_value, ";";
+      print $par, ' ', $parameter_value, ";";
       say PARS $par, ' ', $parameter_value;
     }
-    print STDERR "\n";
+    $debug and print STDERR "\n";
     close PARS;
 
     # in a first step prepare parameter file
@@ -318,7 +318,7 @@ do {
     }
     $started_at_least_one_evaluation = 1;
 
-    say STDERR "\n*** optimizing parameter $par, "
+    $debug and say STDERR "\n*** optimizing parameter $par, "
       . "round: $n_rounds, "
       . "current best: $top_correlation";
     for my $try_this ( @{ $parameters{$par}{values} } ) {
@@ -335,7 +335,7 @@ do {
 
       # look for cached result
       if ($cached_value_found) {
-        say STDERR 'cached value found: ', $param_key;
+        $debug and say STDERR 'cached value found: ', $param_key;
 
         # retrieve cached result and be done
         $correlation = $result_cache{$param_key};
@@ -371,13 +371,13 @@ do {
         # create parameter file
         chdir($tmpdir);
         open PARS, '>', $param_file;
-        print STDERR 'parameters: ';
+        print 'parameters: ';
         for my $par (@parameters) {
           my $parameter_value = $parameters{$par}{current};
-          print STDERR $par, ' ', $parameter_value, ";";
+          print $par, ' ', $parameter_value, ";";
           say PARS $par, ' ', $parameter_value;
         }
-        print STDERR "\n";
+        $debug and print STDERR "\n";
         close PARS;
 
         # call Makefile for cv
@@ -394,7 +394,7 @@ do {
 
         # save result for later reference
         $result_cache{ get_current_param_key() } = $correlation;
-        say STDERR "correlation: $correlation";
+        $debug and say STDERR "correlation: $correlation";
 
         # if cached gspan filename not exists, copy to cache
         if ( not -f $cached_gspan_fname_full ) {
@@ -425,29 +425,29 @@ do {
 
   # do a maximum of 3 rounds
   if ( $n_rounds++ > 3 ) {
-    say STDERR "\n";
-    say STDERR "maximum of 3 rounds reached, stopping";
+    say "\n";
+    say "maximum of 3 rounds reached, stopping";
     $optimization_finished = 1;
   }
 
   # stop if the last round improved correlation by less than 0.01
   push @top_rounds, $top_correlation;
   if ( $top_rounds[-1] - $top_rounds[-2] < 0.01 ) {
-    say STDERR "\n";
-    say STDERR "improvement to last round < 0.01, stopping";
+    say "\n";
+    say "improvement to last round < 0.01, stopping";
     $optimization_finished = 1;
   }
 } while ( not $optimization_finished );
 
-say STDERR "top values from rounds: ", join( '; ', @top_rounds );
+say "top values from rounds: ", join( '; ', @top_rounds );
 
 # write final parameters
 open OUT, '>', $of;
 for my $par (@parameters) {
-  print STDERR $par, ' ', $parameters{$par}{current}, ";";
+  print $par, ' ', $parameters{$par}{current}, ";";
   say OUT $par, ' ', $parameters{$par}{current};
 }
-print STDERR "\n";
+print "\n";
 close OUT;
 
 chdir();
