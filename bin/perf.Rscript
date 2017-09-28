@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
 
-library(ROCR)
-
+library(PRROC)
 f <- file("stdin")
 d <- read.table(f, col.names=c("labels", "scores"))
-auc <- performance(prediction(d$scores, d$labels), "auc")@y.values[[1]]
-cat(paste("ROC",auc,sep="\t"), "\n")
+d$labels[d$labels==-1] <- 0
+roc <- roc.curve(scores.class0=d$scores, weights.class0=d$labels)$auc
+apr <- pr.curve(scores.class0=d$scores, weights.class0=d$labels)$auc.integral
+cat(paste("ROC",roc,sep="\t"), "\n")
+cat(paste("APR",apr,sep="\t"), "\n")
