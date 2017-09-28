@@ -37,7 +37,7 @@ def test_eden_accuracy2():
 
 
 def test_classification_cv():
-    "Test crossvalidation with classifiation."
+    "Test crossvalidation with classification."
     call = """../../GraphProt.pl -mode classification -action cv \
               -fasta ../testclip.train.positives.fa \
               -negfasta ../testclip.train.negatives.fa \
