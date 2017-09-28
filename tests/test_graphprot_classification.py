@@ -81,7 +81,7 @@ def test_classification_predict_ntmargins():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_ntmargins --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_ntmargins.profile", testdir + "CL_ntmargins.test.profile")
+    cmp("tests/CL_ntmargins.profile", testdir + "CL_ntmargins.profile")
 
 
 def test_classification_predict_has():
