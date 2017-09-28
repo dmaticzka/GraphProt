@@ -23,7 +23,7 @@ def test_regression_train():
               -affinities ../test_data_full_A.train.affys -prefix REG_train \
               -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp"""
     env.run(call)
-    assert cmp("tests/REG_train.model", testdir + "REG_cv.cv_results")
+    assert cmp("tests/REG_train.model", testdir + "REG_train.model")
 
 
 def test_regression_predict():
