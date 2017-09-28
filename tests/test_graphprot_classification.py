@@ -17,13 +17,20 @@ def test_invocation_no_params():
 
 def test_eden_accuracy1():
     "Train a model."
-    call = "../../GraphProt.pl --action train --fasta ../testedenacc.train.positives.fa --negfasta ../testedenacc.train.negatives.fa -prefix test_edenacc_train --keep-tmp"
+    call = """../../GraphProt.pl --action train \
+              --fasta ../testedenacc.train.positives.fa \
+              --negfasta ../testedenacc.train.negatives.fa \
+              -prefix test_edenacc_train --keep-tmp"""
     env.run(call)
 
 
 def test_eden_accuracy2():
     "Now test on train."
-    call = "../../GraphProt.pl --action predict --fasta ../testedenacc.train.positives.fa --negfasta ../testedenacc.train.negatives.fa -model test_edenacc_train.model -prefix test_edenacc_manualtestontrain --keep-tmp"
+    call = """../../GraphProt.pl --action predict \
+              --fasta ../testedenacc.train.positives.fa \
+              --negfasta ../testedenacc.train.negatives.fa \
+              -model ../test_edenacc_train.model \
+              -prefix test_edenacc_manualtestontrain --keep-tmp"""
     run = env.run(call)
     assert "test_edenacc_manualtestontrain.predictions" in run.files_created
     cmp("tests/test_edenacc_manualtestontrain.predictions", testdir + "test_edenacc_manualtestontrain.predictions")
@@ -55,7 +62,7 @@ def test_classification_predict():
     call = """../../GraphProt.pl -mode classification -action predict \
               -fasta ../testclip.train.positives.fa \
               -negfasta ../testclip.train.negatives.fa \
-              -model CL_train.model -abstraction 1 -R 0 -D 0 \
+              -model ../CL_train.model -abstraction 1 -R 0 -D 0 \
               -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_predict --keep-tmp"""
     env.run(call)
     cmp("tests/CL_predict.predictions", testdir + "CL_predict.predictions")
@@ -65,7 +72,7 @@ def test_classification_predict_only_positives():
     "Test prediction using only positives."
     call = """../../GraphProt.pl -mode classification -action predict \
               -fasta ../testclip.train.positives.fa \
-              -model CL_train.model \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_predict_onlypos --keep-tmp"""
     env.run(call)
@@ -77,7 +84,7 @@ def test_classification_predict_ntmargins():
     call = """../../GraphProt.pl -mode classification -action predict_profile \
               --onlyseq \
               -fasta ../testclip.train.positives.fa \
-              -model CL_train.model \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_ntmargins --keep-tmp"""
     env.run(call)
@@ -88,7 +95,7 @@ def test_classification_predict_has():
     "Test prediction of high affinity sites."
     call = """../../GraphProt.pl -mode classification -action predict_has --onlyseq \
               -fasta ../testclip.train.positives.fa \
-              -model CL_train.model \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -percentile 55 \
               -prefix CL_has --keep-tmp"""
     env.run(call)
@@ -98,7 +105,8 @@ def test_classification_predict_has():
 def test_classification_motif():
     "Test motif calculation."
     call = """../../GraphProt.pl -mode classification -action motif \
-              -fasta ../testclip.train.positives.fa -model CL_train.model \
+              -fasta ../testclip.train.positives.fa \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_motif --keep-tmp"""
     run = env.run(call)
@@ -113,7 +121,8 @@ def test_classification_motif_onlyseq():
     "Test motif calculation."
     call = """../../GraphProt.pl -mode classification -action motif \
               --onlyseq \
-              -fasta ../testclip.train.positives.fa -model CL_train.model \
+              -fasta ../testclip.train.positives.fa \
+              -model ../CL_train.model \
               -R 1 -D 0 -bitsize 10 -prefix CL_onlyseq --keep-tmp"""
     run = env.run(call)
     assert "CL_onlyseq.sequence_motif.png" in run.files_created
@@ -124,7 +133,7 @@ def test_classification_profile_all_vp():
     "Calculate profiles for pure viewpoint sequences."
     call = """../../GraphProt.pl -mode classification -action predict_profile \
               -fasta ../testclip.twoseqs300nt_allcaps.fa \
-              -model CL_train.model \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix testclip.twoseqs300nt_allcaps.margins --keep-tmp"""
     env.run(call)
@@ -135,7 +144,8 @@ def test_classification_profile_all_vp():
 def test_classification_profile_center_vp():
     "Calculate profiles for center viewpoint seqeunces."
     call = """../../GraphProt.pl -mode classification -action predict_profile \
-              -fasta ../testclip.twoseqs300nt.fa -model CL_train.model \
+              -fasta ../testclip.twoseqs300nt.fa \
+              -model ../CL_train.model \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix testclip.twoseqs300nt.margins --keep-tmp"""
     env.run(call)
@@ -146,7 +156,8 @@ def test_classification_profile_center_vp():
 def test_classification_motif_center_vp():
     "Calculate motif for center viewpoint jsequences."
     call = "../../GraphProt.pl -mode classification -action motif \
-            -fasta ../testclip.twoseqs300nt.fa -model CL_train.model \
+            -fasta ../testclip.twoseqs300nt.fa \
+            -model ../CL_train.model \
             -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
             -prefix testclip.twoseqs300nt.motif --keep-tmp"""
     run = env.run(call)
