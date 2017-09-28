@@ -841,7 +841,7 @@ ifeq ($(DO_SGDOPT),YES)
 	-of $@ \
 	-bindir $(BINDIR) \
 	-tmp $(TMPDIR) \
-	-sgdopt #&> $@.log
+	-sgdopt > $@.log
 
 # call sgdsvmnspdk optimization and write file containing optimized parameters
 %.ls.param : EPOCHS=$(shell grep '^EPOCHS ' $*.ls_sgdopt.param | cut -f 2 -d' ')
@@ -862,7 +862,7 @@ ifeq ($(DO_SGDOPT),YES)
 	-g $(DIRECTED) \
 	-e $(EPOCHS) \
 	-l $(LAMBDA) \
-	&> $@.log
+	> $@.log
 	( cat $< | grep -v -e '^D ' -e '^R ' -e '^EPOCHS ' -e '^LAMBDA '; \
 	cat $*.ls_sgdopt.gspan.gz.opt_param | awk '{print "R",$$2,"\nD",$$4,"\nEPOCHS",$$6,"\nLAMBDA",$$8}' \
 	) > $@
@@ -876,7 +876,7 @@ else
 	-mf Makefile \
 	-of $@ \
 	-tmp $(TMPDIR) \
-	-bindir $(BINDIR) #&> $@.log
+	-bindir $(BINDIR) > $@.log
 endif
 #endif
 
