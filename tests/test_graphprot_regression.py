@@ -13,7 +13,7 @@ def test_regression_cv():
               -affinities ../test_data_full_A.train.affys -prefix REG_cv \
               -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp"""
     env.run(call)
-    cmp("tests/REG_cv.cv_results", testdir + "REG_cv.cv_results")
+    assert cmp("tests/REG_cv.cv_results", testdir + "REG_cv.cv_results")
 
 
 def test_regression_train():
@@ -23,7 +23,7 @@ def test_regression_train():
               -affinities ../test_data_full_A.train.affys -prefix REG_train \
               -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp"""
     env.run(call)
-    cmp("tests/REG_train.model", testdir + "REG_cv.cv_results")
+    assert cmp("tests/REG_train.model", testdir + "REG_cv.cv_results")
 
 
 def test_regression_predict():
@@ -34,7 +34,7 @@ def test_regression_predict():
               -model ../REG_train.model -prefix REG_predict \
               -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp"""
     env.run(call)
-    cmp("tests/REG_predict.predictions", testdir + "REG_predict.predictions")
+    assert cmp("tests/REG_predict.predictions", testdir + "REG_predict.predictions")
 
 
 def test_regression_predict_noaffy():
@@ -45,4 +45,4 @@ def test_regression_predict_noaffy():
             -prefix REG_predict_noaffys \
             -abstraction 1 -R 0 -D 0 -epsilon 0.11 -c 11 -bitsize 10 --keep-tmp"""
     env.run(call)
-    cmp("tests/REG_predict_noaffys.predictions", testdir + "REG_predict_noaffys.predictions")
+    assert cmp("tests/REG_predict_noaffys.predictions", testdir + "REG_predict_noaffys.predictions")

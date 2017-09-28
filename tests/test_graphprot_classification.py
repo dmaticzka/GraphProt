@@ -33,7 +33,7 @@ def test_eden_accuracy2():
               -prefix test_edenacc_manualtestontrain --keep-tmp"""
     run = env.run(call)
     assert "test_edenacc_manualtestontrain.predictions" in run.files_created
-    cmp("tests/test_edenacc_manualtestontrain.predictions", testdir + "test_edenacc_manualtestontrain.predictions")
+    assert cmp("tests/test_edenacc_manualtestontrain.predictions", testdir + "test_edenacc_manualtestontrain.predictions")
 
 
 def test_classification_cv():
@@ -43,7 +43,7 @@ def test_classification_cv():
               -negfasta ../testclip.train.negatives.fa \
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_cv --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_cv.cv_results", testdir + "CL_cv.cv_results")
+    assert cmp("tests/CL_cv.cv_results", testdir + "CL_cv.cv_results")
 
 
 def test_classification_train():
@@ -54,7 +54,7 @@ def test_classification_train():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_train --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_train.model", testdir + "CL_train.model")
+    assert cmp("tests/CL_train.model", testdir + "CL_train.model")
 
 
 def test_classification_predict():
@@ -65,7 +65,7 @@ def test_classification_predict():
               -model ../CL_train.model -abstraction 1 -R 0 -D 0 \
               -epochs 2 -lambda 0.1 -bitsize 10 -prefix CL_predict --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_predict.predictions", testdir + "CL_predict.predictions")
+    assert cmp("tests/CL_predict.predictions", testdir + "CL_predict.predictions")
 
 
 def test_classification_predict_only_positives():
@@ -76,7 +76,7 @@ def test_classification_predict_only_positives():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_predict_onlypos --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_predict_onlypos.predictions", testdir + "CL_predict_onlypos.predictions")
+    assert cmp("tests/CL_predict_onlypos.predictions", testdir + "CL_predict_onlypos.predictions")
 
 
 def test_classification_predict_ntmargins():
@@ -88,7 +88,7 @@ def test_classification_predict_ntmargins():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix CL_ntmargins --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_ntmargins.profile", testdir + "CL_ntmargins.profile")
+    assert cmp("tests/CL_ntmargins.profile", testdir + "CL_ntmargins.profile")
 
 
 def test_classification_predict_has():
@@ -99,7 +99,7 @@ def test_classification_predict_has():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 -percentile 55 \
               -prefix CL_has --keep-tmp"""
     env.run(call)
-    cmp("tests/CL_has.has", testdir + "CL_has.has")
+    assert cmp("tests/CL_has.has", testdir + "CL_has.has")
 
 
 def test_classification_motif():
@@ -113,8 +113,8 @@ def test_classification_motif():
     assert "CL_motif.structure_motif.png" in run.files_created
     assert "CL_motif.structure_motif_pairedunpaired.png" in run.files_created
     assert "CL_motif.sequence_motif.png" in run.files_created
-    cmp("tests/CL_motif.sequence_motif", testdir + "CL_motif.sequence_motif")
-    cmp("tests/CL_motif.structure_motif", testdir + "CL_motif.structure_motif")
+    assert cmp("tests/CL_motif.sequence_motif", testdir + "CL_motif.sequence_motif")
+    assert cmp("tests/CL_motif.structure_motif", testdir + "CL_motif.structure_motif")
 
 
 def test_classification_motif_onlyseq():
@@ -126,7 +126,7 @@ def test_classification_motif_onlyseq():
               -R 1 -D 0 -bitsize 10 -prefix CL_onlyseq --keep-tmp"""
     run = env.run(call)
     assert "CL_onlyseq.sequence_motif.png" in run.files_created
-    cmp("tests/CL_onlyseq.sequence_motif", testdir + "CL_onlyseq.sequence_motif")
+    assert cmp("tests/CL_onlyseq.sequence_motif", testdir + "CL_onlyseq.sequence_motif")
 
 
 def test_classification_profile_all_vp():
@@ -137,7 +137,7 @@ def test_classification_profile_all_vp():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix testclip.twoseqs300nt_allcaps.margins --keep-tmp"""
     env.run(call)
-    cmp("tests/testclip.twoseqs300nt_allcaps.margins.profile",
+    assert cmp("tests/testclip.twoseqs300nt_allcaps.margins.profile",
         testdir + "testclip.twoseqs300nt_allcaps.margins.profile")
 
 
@@ -149,7 +149,7 @@ def test_classification_profile_center_vp():
               -abstraction 1 -R 0 -D 0 -epochs 2 -lambda 0.1 -bitsize 10 \
               -prefix testclip.twoseqs300nt.margins --keep-tmp"""
     env.run(call)
-    cmp("tests/testclip.twoseqs300nt.margins.profile",
+    assert cmp("tests/testclip.twoseqs300nt.margins.profile",
         testdir + "testclip.twoseqs300nt.margins.profile")
 
 
@@ -164,5 +164,5 @@ def test_classification_motif_center_vp():
     assert "testclip.twoseqs300nt.motif.structure_motif.png" in run.files_created
     assert "testclip.twoseqs300nt.motif.structure_motif_pairedunpaired.png" in run.files_created
     assert "testclip.twoseqs300nt.motif.sequence_motif.png" in run.files_created
-    cmp("tests/testclip.twoseqs300nt.motif.sequence_motif", testdir + "testclip.twoseqs300nt.motif.sequence_motif")
-    cmp("tests/testclip.twoseqs300nt.motif.structure_motif", testdir + "testclip.twoseqs300nt.motif.structure_motif")
+    assert cmp("tests/testclip.twoseqs300nt.motif.sequence_motif", testdir + "testclip.twoseqs300nt.motif.sequence_motif")
+    assert cmp("tests/testclip.twoseqs300nt.motif.structure_motif", testdir + "testclip.twoseqs300nt.motif.structure_motif")
