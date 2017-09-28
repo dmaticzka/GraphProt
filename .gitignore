@@ -11,3 +11,9 @@ tests/*.png
 tests/*tmp*
 
 GraphProt-*
+
+0*
+
+.cache
+__pycache__
+testenv_*
