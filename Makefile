@@ -22,7 +22,7 @@ SVRTRAIN:=svm-train
 SVRPREDICT:=svm-predict
 SHUF:=shuf
 BEDGRAPH2BIGWIG:=bedGraphToBigWig
-BASH:=/bin/bash
+BASH:=bash
 BEDTOOLS:=bedtools
 GNUPLOT:=gnuplot
 # from ucsc tools
