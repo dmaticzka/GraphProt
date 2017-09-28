@@ -37,6 +37,4 @@ install:
   - cd ..
 
 script:
-  - pwd
-  - ls -l
-  - cd tests; bash run_tests.sh
+  - pytest
