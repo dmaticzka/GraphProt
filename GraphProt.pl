@@ -193,10 +193,18 @@ pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 # check program paths
 ###############################################################################
 
-my $scriptdir = abs_path( dirname($0) );
+my $basepath = abs_path( dirname($0) );
+my $scriptdir = "$basepath/bin/";
+my $edendir = "$basepath/EDeN/";
+my $datadir = "$basepath/data/";
+# if this script is not found this may be a conda install
+if (!-e "$scriptdir/check_sync_gspan_class.sh") {
+    $scriptdir = $edendir = "$ENV{CONDA_PREFIX}/libexec/graphprot/";
+    $datadir = "$ENV{CONDA_PREFIX}/share/graphprot/";
+}
 
 # check fastapl
-`perl $scriptdir/bin/fastapl --version`;
+`perl $scriptdir/fastapl --version`;
 if ( $? != 256 ) {
 	print STDERR "\n\nfastapl call returned: '$?'\n";
   print STDERR "error running fastapl. perhaps your perl version is very old?\n";
@@ -211,7 +219,7 @@ if ( $? != 0 ) {
 }
 
 # check EDeN
-`$scriptdir/EDeN/EDeN -h`;
+`$edendir/EDeN -h`;
 if ( $? != 0 ) {
   print STDERR
     "please check if the EDeN binary is executable on your system.\n";
@@ -732,7 +740,7 @@ if ( $action ne "ls" ) {
 }
 
 # collect make call
-my $makecall = "make -C $scriptdir -e PWD=$scriptdir -e TMPDIR=${tmp_prefix}";
+my $makecall = "make -f $scriptdir/Makefile -e BINDIR=$scriptdir -e DATADIR=$datadir -e TMPDIR=${tmp_prefix} -e EDENDIR=${edendir}";
 
 # use sequence graphs
 if ( defined $onlyseq ) {
@@ -821,7 +829,7 @@ if ( $mode eq 'regression' ) {
     system("$makecall");
 
     # prepare results
-    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
+    system("$scriptdir/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
     system('awk "{if (\$1 > 0) {\$1=1}; if(\$1 < 0) {\$1=-1}; print \$1}"' . " < ${tmpdir}.test.predictions_svr > $tmpdir.test.predicted_class");
     system('paste -d "\t" ' . "${tmpdir}.test.fa.id $tmpdir.test.predicted_class ${tmpdir}.test.predictions_svr > $prefix.predictions");
     print "GraphProt predictions written to file $prefix.predictions\n";
@@ -871,7 +879,7 @@ if ( $mode eq 'regression' ) {
     system("$makecall");
 
     # prepare output
-    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.train.fa > ${tmpdir}.train.fa.id");
+    system("$scriptdir/fastapl_printid.pl < ${tmpdir}.train.fa > ${tmpdir}.train.fa.id");
     system("cat $tmpdir.train.cv.predictions_class | awk '\$1!=0' | sed 's/^-1/0/g' | " .
     	'paste -d "\t" ' . "${tmpdir}.train.fa.id - > $prefix.cv_predictions");
     move( "$tmpdir.train.cv.perf", "$prefix.cv_results" );
@@ -914,7 +922,7 @@ if ( $mode eq 'regression' ) {
     system("$makecall");
 
     # prepare results
-    system("$scriptdir/bin/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
+    system("$scriptdir/fastapl_printid.pl < ${tmpdir}.test.fa > ${tmpdir}.test.fa.id");
     system('paste -d "\t" ' . "${tmpdir}.test.fa.id " . "${tmpdir}.test.predictions_sgd" . ' | tr " " "\t" > ' . "$prefix.predictions");
     print "GraphProt predictions written to file $prefix.predictions\n";
   } elsif ( $action eq 'predict_profile' ) {

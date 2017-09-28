@@ -1,4 +1,4 @@
-#!/usr/local/perl/bin/perl
+#!/usr/bin/env perl
 
 ############################################################################
 # Software developed at the Bioinformatics Group, Department of Computer

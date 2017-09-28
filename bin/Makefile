@@ -132,6 +132,7 @@ PWD:=$(shell pwd)
 # overwritten by GraphProt.pl to put it into same directory
 TMPDIR=$(PWD)
 BINDIR:=$(PWD)/bin
+EDENDIR:=$(PWD)/EDeN
 DATADIR:=$(PWD)/data
 
 
@@ -157,11 +158,10 @@ GENERICSUBMITTOCLUSTER:=$(BINDIR)/generic_submit_to_cluster.sh
 MOREGENERICSGESUBMITSCRIPT:=$(BINDIR)/more_generic_submit_to_cluster.sh
 GSPAN2VDICT:=$(BINDIR)/gspan2vertex_dict.awk
 FASTAPL:=$(PERL) $(BINDIR)/fastapl
-FASTA2GSPAN:=$(PERL) $(PWD)/fasta2shrep_gspan.pl
-CAT_TABLES:=$(PERL) /home/maticzkd/co/MiscScripts/catTables.pl
-SVMSGDNSPDK:=$(PWD)/EDeN/EDeN
-THRESH_MARGINS:=$(PWD)/bin/subset_margins_by_quant.R
-PERF:=$(PWD)/bin/perf.Rscript
+FASTA2GSPAN:=$(PERL) $(BINDIR)/fasta2shrep_gspan.pl
+PERF:=$(BINDIR)/perf.Rscript
+THRESH_MARGINS:=$(BINDIR)/subset_margins_by_quant.R
+SVMSGDNSPDK:=$(EDENDIR)/EDeN
 
 ## set appropriate id (used to determine which parameter sets to use)
 ################################################################################
