@@ -225,13 +225,6 @@ if ( $? != 0 ) {
   exit;
 }
 
-# check perf
-`perf -h`;
-if ( $? != 256 ) {
-  print STDERR "please check if perf is installed and in your PATH.\n";
-  exit;
-}
-
 if ( defined $mode and $mode eq 'regression' ) {
 
   # check svm-train
