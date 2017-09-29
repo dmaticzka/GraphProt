@@ -200,7 +200,7 @@ my $datadir = "$basepath/data/";
 # if this script is not found this may be a conda install
 if (!-e "$scriptdir/check_sync_gspan_class.sh") {
     $scriptdir = $edendir = "$ENV{CONDA_PREFIX}/libexec/graphprot/";
-    $datadir = "$ENV{CONDA_PREFIX}/share/graphprot/";
+    $datadir = "$ENV{CONDA_PREFIX}/share/graphprot/data/";
 }
 
 # check fastapl
