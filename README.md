@@ -1,10 +1,25 @@
-# GraphProt Manual #
+# GraphProt #
 
-This software package contains the GraphProt framework as published in
-"GraphProt: modeling binding preferences of
-RNA-binding proteins".
+[![Build Status](https://travis-ci.org/dmaticzka/GraphProt.svg?branch=master)](https://travis-ci.org/dmaticzka/GraphProt)
+
+GraphProt is a tool for modelling binding preferences of RNA-binding proteins from high-throughput experiments such as CLIP-seq and RNAcompete.
+
+When using GraphProt please cite
+
+* Maticzka, D., Lange, S. J., Costa, F. & Backofen, R. GraphProt: modeling binding preferences of RNA-binding proteins. Genome Biol. 15, R17 (2014).
 
 ## Installation ##
+
+### Bioconda
+
+GraphProt is available via [bioconda](https://bioconda.github.io/).
+GraphProt including all dependencies can be installed via:
+
+```bash
+conda install graphprot
+```
+
+### Manual Installation
 
 GraphProt contains a precompiled version of "EDeN", the SVM package used for
 feature creation and classification. This binary should run on most Linux-based
