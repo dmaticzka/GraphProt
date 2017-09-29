@@ -24,7 +24,7 @@
 
 CXX=g++
 C=gcc
-OPTS=-g -O3 -Wno-deprecated -DLOSS=1  -fopenmp -static  #-DDEBUGON -DCHECKLIMITS
+OPTS=-g -O3 -Wno-deprecated -DLOSS=1 -fopenmp #-static  #-DDEBUGON -DCHECKLIMITS
 #OPTS=-g -Wno-deprecated -DLOSS=1 -DDEBUGON
 #OPTS=-g -Wno-deprecated -static -pg
 CXXFLAGS=${OPTS} -Wall -mtune=native -march=native
