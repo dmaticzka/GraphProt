@@ -9,6 +9,7 @@ use File::Temp qw(tempdir);
 use File::Basename;
 use Cwd qw/abs_path getcwd/;
 use File::Copy;
+use autodie qw(system);
 
 =head1 NAME
 
