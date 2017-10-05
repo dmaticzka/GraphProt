@@ -26,9 +26,9 @@ install:
   - conda config --add channels conda-forge
   - conda config --add channels bioconda
   # setup general python testing
-  - conda install pytest scripttest
+  - conda install -q pytest scripttest
   # setup for GraphProt
-  - conda install gcc libgcc rnashapes==2.1.6 weblogo libsvm make r-plyr perl perl-getopt-long gawk libcxx zlib coreutils r-prroc
+  - conda install -q gcc libgcc rnashapes==2.1.6 weblogo libsvm make r-plyr perl perl-getopt-long gawk libcxx zlib coreutils r-prroc perl-ipc-system-simple
 
   # build eden
   - cd EDeN
