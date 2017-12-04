@@ -39,7 +39,7 @@ follwing programs are installed and accessible via the PATH environment variable
 * GraphProt uses WebLogo3 to plot sequence and structure motifs. GraphProt was tested using version WebLogo 3.2 [http://code.google.com/p/weblogo/downloads](http://code.google.com/p/weblogo/downloads).
 
 GraphProt will scan for these programs and notify you if something seems amiss.
-GraphProt contains a copy of fastapl ([http://seq.cbrc.jp/fastapl/index.html.en](http://seq.cbrc.jp/fastapl/index.html.en)).
+GraphProt contains a copy of [fastapl](https://github.com/paulhorton/fastapl).
 
 ## Usage ##
 
