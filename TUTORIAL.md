@@ -36,7 +36,7 @@ GraphProt classification models are trained using sets of bound and unbound sequ
 For the purpose of this tutorial, download a sample of 1000 positive and negative sequences from a TAF15 PAR-CLIP experiment (Tollervey, J. R. et al. Characterizing the RNA targets and position-dependent splicing regulation by TDP-43. Nat. Neurosci. 14, 452–458 (2011).). Please note that length of the sequences around the binding sites was reduced to allow quick calculation. This will reduce the quality of secondary struture predictions!
 
 ```
-wget bioinf.uni-freiburg.de/~maticzkd/Downloads/GraphProtTutorialData.tar.bz2 && \
+wget bioinf.uni-freiburg.de/~maticzkd/GraphProtTutorialData.tar.bz2 && \
 tar xf GraphProtTutorialData.tar.bz2
 cd GraphProtTutorialData
 ```
