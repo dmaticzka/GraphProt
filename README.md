@@ -49,7 +49,9 @@ The default mode is to run analyses in classification setting,
 switch to regression setting using the parameter -mode regression.
 In general, GraphProt analyses are run by issuing different actions, e.g.
 
-  GraphProt.pl --action train -fasta train_positives.fa -negfasta train_negatives.fa
+```bash
+GraphProt.pl --action train -fasta train_positives.fa -negfasta train_negatives.fa
+```
 
 GraphProt supports input sequences in fasta format. The **viewpoint** mechanism
 sets viewpoints to all nucleotides in **uppercase** letters, nucleotides in
@@ -125,7 +127,7 @@ Motifs are written to files "GraphProt.sequence_motif.png" and "GraphProt.struct
 
 To create motifs as done in the paper, this should be run using a trained model
 and the bound training sequences from the CLIP experiment the model was trained on.
-E.g. "GraphProt.pl --action motif --model CLIP.model --fasta CLIP_bound.fa".
+E.g. `GraphProt.pl --action motif --model CLIP.model --fasta CLIP_bound.fa`.
 
 ## Advanced Usage ##
 
@@ -144,17 +146,23 @@ RNA sequence and structure graphs are created using fasta2shrep_gspan.pl. Struct
 are created using the following parameters. The user has to chose an appropriate
 RNAshapes __ABSTRACTION_LEVEL__.
 
-  fasta2shrep_gspan.pl --seq-graph-t --seq-graph-alph -abstr -stdout -M 3 -wins '150,' -shift '25' -fasta PTBv1.train.fa -t __ABSTRACTION_LEVEL__ | gzip > PTBv1.train.gspan.gz
+```bash
+fasta2shrep_gspan.pl --seq-graph-t --seq-graph-alph -abstr -stdout -M 3 -wins '150,' -shift '25' -fasta PTBv1.train.fa -t __ABSTRACTION_LEVEL__ | gzip > PTBv1.train.gspan.gz
+```
 
 RNA sequence graphs are created using the following parameters:
 
-  fasta2shrep_gspan.pl --seq-graph-t -nostr -stdout -fasta PTBv1.train.fa | gzip > PTBv1.train.gspan.gz
+```bash
+fasta2shrep_gspan.pl --seq-graph-t -nostr -stdout -fasta PTBv1.train.fa | gzip > PTBv1.train.gspan.gz
+```
 
 ### NSPD kernel and SGD support vector machine ###
 
 For example, 10-fold crossvalidation using EDeN is done via:
 
-  EDeN/EDeN -a CROSS_VALIDATION -c 10 -i PTBv1.train.gspan.gz -t PTBv1.train.class -g DIRECTED -b __BIT_SIZE__ -r __RADIUS__ -d __DISTANCE__ -e __EPOCHS__ -l __LAMBDA__
+```bash
+EDeN/EDeN -a CROSS_VALIDATION -c 10 -i PTBv1.train.gspan.gz -t PTBv1.train.class -g DIRECTED -b __BIT_SIZE__ -r __RADIUS__ -d __DISTANCE__ -e __EPOCHS__ -l __LAMBDA__
+```
 
-and setting the appropriate parameters for BIT_SIZE, RADIUS, DISTANCE, EPOCHS
-and LAMBDA.
+and setting the appropriate parameters for `BIT_SIZE, RADIUS, DISTANCE, EPOCHS`
+and `LAMBDA`.
