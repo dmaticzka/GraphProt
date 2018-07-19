@@ -2,7 +2,7 @@
 
 ## Installation
 
-We recommend the installation of GraphProt via Bioconda. Once Bioconda is set up (see !(https://bioconda.github.io/)[https://bioconda.github.io/]), GraphProt including all it's dependencies can be installed easily.
+We recommend the installation of GraphProt via Bioconda. Once Bioconda is set up (see [https://bioconda.github.io/](https://bioconda.github.io/)), GraphProt including all it's dependencies can be installed easily.
 
 ```bash
 conda install graphprot
